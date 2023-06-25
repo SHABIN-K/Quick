@@ -1,9 +1,13 @@
+import { Nunito } from "next/font/google";
+
 import "./globals.css";
 
 export const metadata = {
   title: "Airbnb",
   description: "airbnb clone next app",
 };
+
+const font = Nunito({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -12,7 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={font.className}>
+        {children}</body>
     </html>
   );
 }
