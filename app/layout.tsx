@@ -1,28 +1,18 @@
-import { Nunito} from 'next/font/google'
-
-import Navbar from '@/app/components/navbar/Navbar';
-
-import './globals.css'
+import "./globals.css";
 
 export const metadata = {
-  title: 'Airbnb',
-  description: 'airbnb clone next app',
-}
+  title: "Airbnb",
+  description: "airbnb clone next app",
+};
 
-const font = Nunito({
-  subsets: ['latin']
-});
-
-export default function RootLayout ({
+export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={font.className}>
-        <Navbar/>
-        {children}</body>
+      <body>{children}</body>
     </html>
-  )
+  );
 }
