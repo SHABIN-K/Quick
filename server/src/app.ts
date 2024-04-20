@@ -9,6 +9,7 @@ import 'dotenv/config';
 import { errorHandler, notFoundHandler } from './error/errorHandler';
 
 // routes
+import authRoute from './routes/authRoutes';
 import userRoute from './routes/userRoutes';
 
 // Create an Express application
@@ -37,6 +38,7 @@ app.use(
 );
 
 // api
+app.use('/auth', authRoute);
 app.use('/api', userRoute);
 
 // Error handling middleware
