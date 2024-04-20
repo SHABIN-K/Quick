@@ -6,7 +6,10 @@ import cookieParser from 'cookie-parser';
 // config env;
 import 'dotenv/config';
 
-import errorHandler from './error/errorHandler';
+import { errorHandler, notFoundHandler } from './error/errorHandler';
+
+// routes
+import userRoute from './routes/userRoutes';
 
 // Create an Express application
 const app = express();
@@ -33,17 +36,13 @@ app.use(
   }),
 );
 
-app.get('/', (req, res) => {
-  console.log('hello world');
-  res.send('helo world');
-});
+// api
+app.use('/api', userRoute);
 
-// 404 routes
-app.use((req, res) => {
-  res.status(404).json({ success: false, status: 404, message: 'Not found' });
-});
-
-// error handler
+// Error handling middleware
 app.use(errorHandler);
+
+// 404 route handler
+app.use(notFoundHandler);
 
 export default app;

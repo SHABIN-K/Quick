@@ -12,7 +12,12 @@ const errorHandler = (err: ErrorResponse, req: Request, res: Response, next: Nex
       message: err.message,
     });
   }
+
   return res.status(500).json({ success: false, status: 500, message: 'Something went wrong' });
 };
+// 404 route handler
+const notFoundHandler = (req: Request, res: Response) => {
+  res.status(404).json({ success: false, status: 404, message: 'Not found' });
+};
 
-export default errorHandler;
+export { errorHandler, notFoundHandler };
