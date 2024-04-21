@@ -12,6 +12,7 @@ type Variant = "LOGIN" | "REGISTER";
 const AuthForm = () => {
   const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState([]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -33,25 +34,33 @@ const AuthForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
     if (variant === "REGISTER") {
       //Axios Register
-      signupApi({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      })
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => {
-          console.log(err.response);
-        })
-        .finally(() => {
-          setIsLoading(false);
+      try {
+        const res = await signupApi({
+          name: data.name,
+          email: data.email,
+          password: data.password,
         });
+
+        // Assuming the error message is directly available as res.data.message
+        console.log(res.data.message);
+        const err = res.data.message;
+
+        // Set errMsg state with the error message
+        setErrMsg(err);
+      } catch (err) {
+        console.log(err.response.data.message);
+        const errMsg = err.response.data.message;
+
+        // Set errMsg state with the error message
+        setErrMsg(errMsg);
+      } finally {
+        setIsloading(false);
+      }
     }
 
     if (variant === "LOGIN") {
@@ -63,7 +72,6 @@ const AuthForm = () => {
     setIsLoading(true);
     console.log(action);
   };
-
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

@@ -11,6 +11,7 @@ interface InputProps {
   register: UseFormRegister<FieldValues>;
   errors: FieldErrors;
   disabled?: boolean;
+  errorMsg?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -21,6 +22,7 @@ const Input: React.FC<InputProps> = ({
   register,
   errors,
   disabled,
+  errorMsg,
 }) => {
   return (
     <div>
@@ -60,6 +62,7 @@ const Input: React.FC<InputProps> = ({
             disabled && "opacity-50 cursor-default"
           )}
         />
+        {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
       </div>
     </div>
   );
