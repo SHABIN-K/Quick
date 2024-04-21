@@ -38,7 +38,7 @@ app.use(
 );
 
 // api
-app.use('/auth', authRoute);
+app.use('/api/auth', authRoute);
 app.use('/api', userRoute);
 
 // Error handling middleware

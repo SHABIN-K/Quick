@@ -1,10 +1,11 @@
 "use client";
 
-import { Button, Input } from "@/app/components";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { BsGithub, BsGoogle } from "react-icons/bs";
 import AuthSocialButton from "./AuthSocialButton";
+import { Button, Input } from "@/components";
+import { signupApi } from "@/helpers/apis/auth";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -37,6 +38,20 @@ const AuthForm = () => {
 
     if (variant === "REGISTER") {
       //Axios Register
+      signupApi({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err.response);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
 
     if (variant === "LOGIN") {
@@ -48,6 +63,7 @@ const AuthForm = () => {
     setIsLoading(true);
     console.log(action);
   };
+
 
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

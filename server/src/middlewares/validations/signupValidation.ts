@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as yup from 'yup';
 
-import ErrorResponse from '../../error/ErrorResponse';
-
 declare module 'express' {
   interface Request {
     validData?: {
@@ -26,7 +24,7 @@ const signupSchema = yup.object().shape({
     .trim()
     .required('Password can not be empty')
     .min(8, 'Too short password')
-    .max(16, 'Too long password')
+    .max(16, 'Too long password'),
 });
 
 const signupValidation = (req: Request, res: Response, next: NextFunction) => {
@@ -38,9 +36,23 @@ const signupValidation = (req: Request, res: Response, next: NextFunction) => {
       next();
     })
     .catch((err) => {
-      const [validationErr] = err.errors;
-      next(ErrorResponse.badRequest(validationErr));
+      //console.log(err.inner);
+      const validationErrors: { [key: string]: string[] } = {};
+      err.inner.forEach((error: yup.ValidationError) => {
+        const fieldName = error.path || '';
+        if (!validationErrors[fieldName]) {
+          validationErrors[fieldName] = [];
+        }
+        validationErrors[fieldName].push(error.message);
+      });
+    
+      return res.status(400).json({
+        success: false,
+        status: err.status,
+        message: validationErrors,
+      });
     });
 };
+//intersted
 
 export default signupValidation;
