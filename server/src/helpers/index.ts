@@ -2,6 +2,8 @@ import * as crypto from 'crypto';
 import { create } from 'express-handlebars';
 import jwt from 'jsonwebtoken';
 import transporter from '../config/nodemailer';
+import ErrorResponse from '../error/ErrorResponse';
+import db from '../config/prismadb';
 
 // random profile pic genarator to use as default
 export const profilePicGenerator = (email: string) => {
@@ -34,7 +36,7 @@ export const sendMail = (toEmail: string, subject: string, htmlContent: unknown)
 
 // sending email verification otp to mail
 export const sendVerificationOtp = async (email: string) => {
-  const token = jwt.sign({ email }, process.env.OTP_TOKEN_SECRET as string, { expiresIn: 60 * 12 });
+  const token = jwt.sign({ email }, process.env.JWT_TOKEN_SECRET as string, { expiresIn: 60 * 12 });
 
   // creating otp and save to db
   const otp = Math.floor(100000 + Math.random() * 900000);
@@ -59,4 +61,27 @@ export const sendVerificationOtp = async (email: string) => {
     token,
     message: 'Verification mail send successfully',
   };
+};
+
+export const authTokens = async ({
+  email,
+  id,
+}: {
+  email: string;
+  id: string;
+}): Promise<{ accessToken: string; refreshToken: string }> => {
+  const accessToken = jwt.sign({ data: { email, id } }, process.env.ACCESS_TOKEN_SECRET as string, {
+    expiresIn: 60 * 10,
+  });
+  const refreshToken = jwt.sign({ data: { email, id } }, process.env.REFRESH_TOKEN_SECRET as string, {
+    expiresIn: '7d',
+  });
+
+  const res = await db.account.update({
+    where: { id: id },
+    data: { refresh_token: refreshToken },
+  });
+
+  if (!res) throw ErrorResponse.badRequest('Something went wrong, try again');
+  else return { accessToken, refreshToken };
 };
