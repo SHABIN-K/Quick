@@ -42,8 +42,8 @@ export const signupController = async (req: Request, res: Response, next: NextFu
       message: 'Account created successfully',
       data: {
         name: newUser.name,
-        email: newUser.email,
         username: newUser.username,
+        email: newUser.email,
         profile: newUser.profile,
         confirmToken: token,
       },
@@ -81,6 +81,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       message: 'Logged in successfully',
       data: {
         name: user.name,
+        username: user.username,
         email: user.email,
         profile: user.profile,
         accessToken,

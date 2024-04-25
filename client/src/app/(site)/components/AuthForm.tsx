@@ -1,16 +1,16 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { useCookies } from "react-cookie";
+import { useRouter } from "next/navigation";
+import { BsGithub, BsGoogle } from "react-icons/bs";
 import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { BsGithub, BsGoogle } from "react-icons/bs";
 
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components";
-import { signInApi, signUpApi } from "@/helpers/apis/auth";
 import AuthSocialButton from "./AuthSocialButton";
 import { useSession } from "@/context/AuthContext";
+import { signInApi, signUpApi } from "@/helpers/apis/auth";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -23,9 +23,9 @@ const AuthForm = () => {
   const session = useSession();
   const [, setCookie] = useCookies(["token"]);
 
-  const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<ErrorObject>({});
+  const [variant, setVariant] = useState<Variant>("LOGIN");
 
   useEffect(() => {
     if (session?.status === "authenticated") {
@@ -72,10 +72,13 @@ const AuthForm = () => {
           setCookie("token", res.data.data.confirmToken, {
             path: "/",
           });
+
+          //remove token fomr response data
+          const { confirmToken, ...userData } = res.data.data;
+          const userDataJSON = JSON.stringify(userData);
+          localStorage.setItem("user.profile", userDataJSON);
           //router.push("/chats");
         }
-
-        console.log(res.data);
       } catch (err: any) {
         const errMsg = err.response.data.message;
         setErrMsg(errMsg);
@@ -91,6 +94,20 @@ const AuthForm = () => {
           email: data.email,
           password: data.password,
         });
+
+        if (res.data.success) {
+          toast.success(`Great to see you again, ${res.data.data.name}!`);
+          setCookie("token", res.data.data.accessToken, {
+            path: "/",
+          });
+
+          //remove token fomr response data
+          const { accessToken, ...userData } = res.data.data;
+          const userDataJSON = JSON.stringify(userData);
+          localStorage.setItem("user.profile", userDataJSON);
+          //router.push("/chats");
+        }
+        console.log(res.data);
       } catch (err: any) {
         const errMsg = err.response.data.message;
         setErrMsg(errMsg);

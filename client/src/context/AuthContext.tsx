@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       try {
         
         const isAuthenticated = cookies.token ? true : false;
-        console.log(isAuthenticated);
         setStatus(isAuthenticated ? "authenticated" : "unauthenticated");
       } catch (error) {
         console.error("Error checking authentication:", error);
