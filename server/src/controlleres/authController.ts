@@ -7,27 +7,21 @@ import { profilePicGenerator } from '../helpers';
 import ErrorResponse from '../error/ErrorResponse';
 
 export const signupController = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, email, password } = req.validData || { name: '', email: '', password: '' };
+  const { name, username, email, password } = req.validData || { name: '', username: '', email: '', password: '' };
 
   try {
-    // checking for duplicate user
-    const user = await db.user.findFirst({
-      where: { email: email },
-    });
-
-    if (user) return next(ErrorResponse.badRequest('Email already registed'));
-
     // generating password hash
     const saltRounds = Number(process.env.SALT_ROUNDS) || 10;
     const hashedpass = await bcrypt.hash(password, saltRounds);
 
     //generating profile picture
-    const profilePic = profilePicGenerator(email);
+    const profilePic = profilePicGenerator(username);
 
     // saving to db
     const newUser = await db.user.create({
       data: {
         name: name,
+        username: username,
         email: email,
         hashedPassword: hashedpass,
         profile: profilePic,
@@ -49,6 +43,7 @@ export const signupController = async (req: Request, res: Response, next: NextFu
       data: {
         name: newUser.name,
         email: newUser.email,
+        username: newUser.username,
         profile: newUser.profile,
         confirmToken: token,
       },

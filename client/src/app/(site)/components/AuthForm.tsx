@@ -9,10 +9,14 @@ import { signupApi } from "@/helpers/apis/auth";
 
 type Variant = "LOGIN" | "REGISTER";
 
+interface ErrorObject {
+  [key: string]: string | string[];
+}
+
 const AuthForm = () => {
-  const [variant, setVariant] = useState<Variant>("LOGIN");
+  const [variant, setVariant] = useState<Variant>("REGISTER");
   const [isLoading, setIsLoading] = useState(false);
-  const [errMsg, setErrMsg] = useState([]);
+  const [errMsg, setErrMsg] = useState<ErrorObject>({});
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -29,6 +33,7 @@ const AuthForm = () => {
   } = useForm<FieldValues>({
     defaultValues: {
       name: "",
+      username: "",
       email: "",
       password: "",
     },
@@ -42,24 +47,25 @@ const AuthForm = () => {
       try {
         const res = await signupApi({
           name: data.name,
+          username: data.username,
           email: data.email,
           password: data.password,
         });
 
         // Assuming the error message is directly available as res.data.message
-        console.log(res.data.message);
+        console.log(res.data);
         const err = res.data.message;
 
         // Set errMsg state with the error message
         setErrMsg(err);
-      } catch (err) {
+      } catch (err: any) {
         console.log(err.response.data.message);
         const errMsg = err.response.data.message;
 
         // Set errMsg state with the error message
         setErrMsg(errMsg);
       } finally {
-        setIsloading(false);
+        setIsLoading(false);
       }
     }
 
@@ -72,19 +78,29 @@ const AuthForm = () => {
     setIsLoading(true);
     console.log(action);
   };
-
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
       <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {variant === "REGISTER" && (
-            <Input
-              id="name"
-              label="Name"
-              register={register}
-              errors={errors}
-              disabled={isLoading}
-            />
+            <>
+              <Input
+                id="name"
+                label="Name"
+                register={register}
+                errors={errors}
+                disabled={isLoading}
+                errorMsg={errMsg.name ? errMsg.name : ""}
+              />
+              <Input
+                id="username"
+                label="Username"
+                register={register}
+                errors={errors}
+                disabled={isLoading}
+                errorMsg={errMsg.username ? errMsg.username : ""}
+              />
+            </>
           )}
           <Input
             id="email"
@@ -93,6 +109,7 @@ const AuthForm = () => {
             register={register}
             errors={errors}
             disabled={isLoading}
+            errorMsg={errMsg.email ? errMsg.email : ""}
           />
           <Input
             id="password"
@@ -101,6 +118,7 @@ const AuthForm = () => {
             register={register}
             errors={errors}
             disabled={isLoading}
+            errorMsg={errMsg.password ? errMsg.password : ""}
           />
           <div>
             <Button disabled={isLoading} fullWidth type="submit">

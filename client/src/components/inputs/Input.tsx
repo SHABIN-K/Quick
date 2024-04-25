@@ -11,7 +11,7 @@ interface InputProps {
   register: UseFormRegister<FieldValues>;
   errors: FieldErrors;
   disabled?: boolean;
-  errorMsg?: string;
+  errorMsg?: string | string[];
 }
 
 const Input: React.FC<InputProps> = ({
@@ -59,10 +59,11 @@ const Input: React.FC<InputProps> = ({
             sm:text-sm
             sm:leading-6`,
             errors[id] && "focus:ring-rose-500",
+            errorMsg && "ring-rose-500",
             disabled && "opacity-50 cursor-default"
           )}
         />
-        {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
+        {errorMsg && <p className="text-xs text-red-600 mt-1">{errorMsg[0]}</p>}
       </div>
     </div>
   );

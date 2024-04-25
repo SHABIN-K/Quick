@@ -1,4 +1,3 @@
-import * as crypto from 'crypto';
 import { create } from 'express-handlebars';
 import jwt from 'jsonwebtoken';
 import transporter from '../config/nodemailer';
@@ -6,9 +5,8 @@ import ErrorResponse from '../error/ErrorResponse';
 import db from '../config/prismadb';
 
 // random profile pic genarator to use as default
-export const profilePicGenerator = (email: string) => {
-  const hash = crypto.createHash('md5').update(email).digest('hex');
-  return `https://www.gravatar.com/avatar/${hash}?d=retro`;
+export const profilePicGenerator = (username: string) => {
+  return `https://avatar.iran.liara.run/public/?username=${username}`;
 };
 
 // rendering data with html to send over email
