@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 import db from '../config/prismadb';
@@ -54,18 +53,6 @@ export const signupController = async (req: Request, res: Response, next: NextFu
     return next(ErrorResponse.badRequest('Something went wrong'));
   }
 };
-//confirmatoin mail
-// {
-//   id: '6623f49a90b3894970a35b19',
-//   name: 'Shabink',
-//   email: 'dogemdan@twittwer.md',
-//   profile: 'https://www.gravatar.com/avatar/7a9652bf7591b69cd9f97fe56dc0dd72?d=retro',
-//   hashedPassword: '$2b$10$IzfTy1FDmdk/U//sMsZ6me7KE00VWQivE4NJSBmFicLd6lBwKWtci',
-//   createdAt: 2024-04-20T17:00:10.779Z,
-//   updatedAt: 2024-04-20T17:00:10.779Z,
-//   conversationIds: [],
-//   seenMessageIds: []
-// }
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.validDaata || { email: '', password: '' };
@@ -81,13 +68,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
     // invalid password
     if (!match) return next(ErrorResponse.badRequest('Invalid email or passwrod'));
 
-    const accessToken = jwt.sign(
-      { data: { email: user.email, id: user.id } },
-      process.env.ACCESS_TOKEN_SECRET as string,
-      {
-        expiresIn: 60 * 10,
-      },
-    );
+    const accessToken = generateToken(email);
 
     res.cookie('authToken', accessToken, {
       httpOnly: true,

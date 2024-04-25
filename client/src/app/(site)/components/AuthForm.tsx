@@ -150,6 +150,11 @@ const AuthForm = () => {
             disabled={isLoading}
             errorMsg={errMsg.password ? errMsg.password : ""}
           />
+
+          <span className="cursor-pointer text-xs text-gray-500 py-2 hover:underline">
+            forget password ?
+          </span>
+
           <div>
             <Button disabled={isLoading} fullWidth type="submit">
               {variant === "LOGIN" ? "Sign in" : "Register"}

@@ -1,6 +1,4 @@
 import * as yup from 'yup';
-import ErrorResponse from '../../error/ErrorResponse';
-
 import { Request, Response, NextFunction } from 'express';
 
 declare module 'express' {
@@ -21,18 +19,30 @@ const loginSchema = yup.object().shape({
     .max(16, 'Too long password'),
 });
 
-const loginValidation = (req: Request, res: Response, next: NextFunction) => {
+const loginValidation = async (req: Request, res: Response, next: NextFunction) => {
+  const validationErrors: { [key: string]: string[] } = {};
   const { email, password } = req.body;
-  loginSchema
-    .validate({ email, password }, { stripUnknown: true, abortEarly: false })
-    .then((data) => {
-      req.validDaata = data;
-      next();
-    })
-    .catch((err) => {
-      const [validationErr] = err.errors;
-      next(ErrorResponse.badRequest(validationErr));
+  try {
+    const validatedData = await loginSchema.validate({ email, password }, { stripUnknown: true, abortEarly: false });
+    // Set validated data to the request object
+    req.validDaata = validatedData;
+    next();
+  } catch (err) {
+    if (err instanceof yup.ValidationError) {
+      err.inner.forEach((error: yup.ValidationError) => {
+        const fieldName = error.path || '';
+        if (!validationErrors[fieldName]) {
+          validationErrors[fieldName] = [];
+        }
+        validationErrors[fieldName].push(error.message);
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: validationErrors,
     });
+  }
 };
 
 export default loginValidation;
