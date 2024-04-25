@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import {  Inter } from "next/font/google";
 
 import ToasterContext from "@/context/ToasterContext";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
+import CookieContext from "@/context/cookieContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,8 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToasterContext />
-        {children}
+        <AuthProvider>
+          <CookieContext>
+            <ToasterContext />
+            {children}
+          </CookieContext>
+        </AuthProvider>
       </body>
     </html>
   );

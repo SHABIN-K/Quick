@@ -1,8 +1,9 @@
+import  jwt  from 'jsonwebtoken';
 import { create } from 'express-handlebars';
-import jwt from 'jsonwebtoken';
 import transporter from '../config/nodemailer';
 import ErrorResponse from '../error/ErrorResponse';
 import db from '../config/prismadb';
+import { generateToken } from './jwtHelper';
 
 // random profile pic genarator to use as default
 export const profilePicGenerator = (username: string) => {
@@ -34,7 +35,7 @@ export const sendMail = (toEmail: string, subject: string, htmlContent: unknown)
 
 // sending email verification otp to mail
 export const sendVerificationOtp = async (email: string) => {
-  const token = jwt.sign({ email }, process.env.JWT_TOKEN_SECRET as string, { expiresIn: 60 * 12 });
+  const token = generateToken(email);
 
   // creating otp and save to db
   const otp = Math.floor(100000 + Math.random() * 900000);

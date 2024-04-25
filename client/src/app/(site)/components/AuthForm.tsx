@@ -1,11 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCookies } from "react-cookie";
+import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { BsGithub, BsGoogle } from "react-icons/bs";
-import AuthSocialButton from "./AuthSocialButton";
+
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components";
-import { signupApi } from "@/helpers/apis/auth";
+import { signInApi, signUpApi } from "@/helpers/apis/auth";
+import AuthSocialButton from "./AuthSocialButton";
+import { useSession } from "@/context/AuthContext";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -14,9 +19,19 @@ interface ErrorObject {
 }
 
 const AuthForm = () => {
-  const [variant, setVariant] = useState<Variant>("REGISTER");
+  const router = useRouter();
+  const session = useSession();
+  const [, setCookie] = useCookies(["token"]);
+
+  const [variant, setVariant] = useState<Variant>("LOGIN");
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<ErrorObject>({});
+
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/");
+    }
+  }, [router, session?.status]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -45,24 +60,24 @@ const AuthForm = () => {
     if (variant === "REGISTER") {
       //Axios Register
       try {
-        const res = await signupApi({
+        const res = await signUpApi({
           name: data.name,
           username: data.username,
           email: data.email,
           password: data.password,
         });
 
-        // Assuming the error message is directly available as res.data.message
+        if (res.data.success) {
+          toast.success("Welcome to Quick! Your account is ready to use");
+          setCookie("token", res.data.data.confirmToken, {
+            path: "/",
+          });
+          //router.push("/chats");
+        }
+
         console.log(res.data);
-        const err = res.data.message;
-
-        // Set errMsg state with the error message
-        setErrMsg(err);
       } catch (err: any) {
-        console.log(err.response.data.message);
         const errMsg = err.response.data.message;
-
-        // Set errMsg state with the error message
         setErrMsg(errMsg);
       } finally {
         setIsLoading(false);
@@ -71,12 +86,27 @@ const AuthForm = () => {
 
     if (variant === "LOGIN") {
       //Axios login
+      try {
+        const res = await signInApi({
+          email: data.email,
+          password: data.password,
+        });
+      } catch (err: any) {
+        const errMsg = err.response.data.message;
+        setErrMsg(errMsg);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   const socialAction = (action: string) => {
-    setIsLoading(true);
-    console.log(action);
+    toast("Shhh... Something Quick is brewing.", {
+      icon: "🤫",
+      style: {
+        borderRadius: "10px",
+      },
+    });
   };
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

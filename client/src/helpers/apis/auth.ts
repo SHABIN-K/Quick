@@ -1,6 +1,6 @@
 import axios from "../../config/api";
 
-export const signupApi = ({
+export const signUpApi = ({
   name,
   username,
   email,
@@ -11,3 +11,12 @@ export const signupApi = ({
   email: string;
   password: string;
 }) => axios.post("/auth/signup", { name, username, email, password });
+
+export const signInApi = ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => axios.post("/auth/login", { email, password });
+

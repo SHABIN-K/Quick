@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import db from '../config/prismadb';
 import { profilePicGenerator } from '../helpers';
 import ErrorResponse from '../error/ErrorResponse';
+import { generateToken } from '../helpers/jwtHelper';
 
 export const signupController = async (req: Request, res: Response, next: NextFunction) => {
   const { name, username, email, password } = req.validData || { name: '', username: '', email: '', password: '' };
@@ -28,7 +29,7 @@ export const signupController = async (req: Request, res: Response, next: NextFu
       },
     });
 
-    const token = jwt.sign({ userID: newUser.id }, process.env.JWT_TOKEN_SECRET as string, { expiresIn: 60 * 12 });
+    const token = generateToken(email);
 
     // Set cookie with refresh token
     res.cookie('refreshToken', token, {
