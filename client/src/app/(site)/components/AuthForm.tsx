@@ -29,7 +29,7 @@ const AuthForm = () => {
 
   useEffect(() => {
     if (session?.status === "authenticated") {
-      router.push("/");
+      router.push("/chats");
     }
   }, [router, session?.status]);
 
@@ -77,7 +77,7 @@ const AuthForm = () => {
           const { confirmToken, ...userData } = res.data.data;
           const userDataJSON = JSON.stringify(userData);
           localStorage.setItem("user.profile", userDataJSON);
-          //router.push("/chats");
+          router.push("/chats");
         }
       } catch (err: any) {
         const errMsg = err.response.data.message;
@@ -105,7 +105,7 @@ const AuthForm = () => {
           const { accessToken, ...userData } = res.data.data;
           const userDataJSON = JSON.stringify(userData);
           localStorage.setItem("user.profile", userDataJSON);
-          //router.push("/chats");
+          router.push("/chats");
         }
         console.log(res.data);
       } catch (err: any) {
