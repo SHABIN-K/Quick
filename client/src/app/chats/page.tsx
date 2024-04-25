@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyState from "@/components/EmptyState";
 import { logoutApi } from "@/helpers/apis/auth";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
@@ -29,10 +30,8 @@ const Chats = () => {
   };
 
   return (
-    <div className="justify-center align-middle pl-10 w-1/2">
-      <button className="border" onClick={handleLogout}>
-        Logout
-      </button>
+    <div className="hidden lg:block lg:pl-80 h-full">
+      <EmptyState />
     </div>
   );
 };
