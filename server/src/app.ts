@@ -15,8 +15,14 @@ import userRoute from './routes/userRoutes';
 // Create an Express application
 const app = express();
 
+// Allow requests from the specified origin with credentials
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+};
+
 // Use CORS middleware
-app.use(cors());
+app.use(cors(corsOptions));
 // body parsers
 app.use(express.json());
 app.use(cookieParser());

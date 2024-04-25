@@ -67,20 +67,20 @@ const AuthForm = () => {
           password: data.password,
         });
 
-        if (res.data.success) {
+        if (res?.data?.success) {
           toast.success("Welcome to Quick! Your account is ready to use");
-          setCookie("token", res.data.data.confirmToken, {
+          setCookie("token", res?.data?.data?.confirmToken, {
             path: "/",
           });
 
           //remove token fomr response data
-          const { confirmToken, ...userData } = res.data.data;
+          const { confirmToken, ...userData } = res?.data?.data;
           const userDataJSON = JSON.stringify(userData);
           localStorage.setItem("user.profile", userDataJSON);
           router.push("/chats");
         }
       } catch (err: any) {
-        const errMsg = err.response.data.message;
+        const errMsg = err?.response?.data?.message;
         setErrMsg(errMsg);
       } finally {
         setIsLoading(false);
@@ -95,9 +95,9 @@ const AuthForm = () => {
           password: data.password,
         });
 
-        if (res.data.success) {
-          toast.success(`Great to see you again, ${res.data.data.name}!`);
-          setCookie("token", res.data.data.accessToken, {
+        if (res?.data?.success) {
+          toast.success(`Great to see you again, ${res?.data?.data?.name}!`);
+          setCookie("token", res?.data?.data?.accessToken, {
             path: "/",
           });
 
@@ -109,7 +109,7 @@ const AuthForm = () => {
         }
         console.log(res.data);
       } catch (err: any) {
-        const errMsg = err.response.data.message;
+        const errMsg = err?.response?.data?.message;
         setErrMsg(errMsg);
       } finally {
         setIsLoading(false);
@@ -137,7 +137,7 @@ const AuthForm = () => {
                 register={register}
                 errors={errors}
                 disabled={isLoading}
-                errorMsg={errMsg.name ? errMsg.name : ""}
+                errorMsg={errMsg?.name ? errMsg.name : ""}
               />
               <Input
                 id="username"
@@ -145,7 +145,7 @@ const AuthForm = () => {
                 register={register}
                 errors={errors}
                 disabled={isLoading}
-                errorMsg={errMsg.username ? errMsg.username : ""}
+                errorMsg={errMsg?.username ? errMsg.username : ""}
               />
             </>
           )}
@@ -156,7 +156,7 @@ const AuthForm = () => {
             register={register}
             errors={errors}
             disabled={isLoading}
-            errorMsg={errMsg.email ? errMsg.email : ""}
+            errorMsg={errMsg?.email ? errMsg.email : ""}
           />
           <Input
             id="password"
@@ -165,7 +165,7 @@ const AuthForm = () => {
             register={register}
             errors={errors}
             disabled={isLoading}
-            errorMsg={errMsg.password ? errMsg.password : ""}
+            errorMsg={errMsg?.password ? errMsg.password : ""}
           />
 
           <span className="cursor-pointer text-xs text-gray-500 py-2 hover:underline">

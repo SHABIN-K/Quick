@@ -28,10 +28,10 @@ export const signupController = async (req: Request, res: Response, next: NextFu
       },
     });
 
-    const token = generateToken(email);
+    const accessToken = generateToken(email);
 
     // Set cookie with refresh token
-    res.cookie('refreshToken', token, {
+    res.cookie('authToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Set to true in production
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
@@ -45,7 +45,7 @@ export const signupController = async (req: Request, res: Response, next: NextFu
         username: newUser.username,
         email: newUser.email,
         profile: newUser.profile,
-        confirmToken: token,
+        confirmToken: accessToken,
       },
     });
   } catch (err) {
@@ -90,4 +90,17 @@ export const loginController = async (req: Request, res: Response, next: NextFun
   } catch (err) {
     return next(err);
   }
+};
+
+export const logoutController = async (req: Request, res: Response) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: 'Logged out successfully',
+  });
 };
