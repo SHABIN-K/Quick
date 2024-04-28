@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,13 +8,14 @@ import { toast } from "react-hot-toast";
 import Modal from "../Modal";
 import Input from "../inputs/Input";
 import Image from "next/image";
-import { CldUploadButton } from "next-cloudinary";
+
 import Button from "../Button";
+import { UserType } from "@/shared/types";
 
 interface SettingsModalProps {
   isOpen?: boolean;
   onClose: () => void;
-  currentUser: User;
+  currentUser: UserType;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -35,7 +35,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   } = useForm<FieldValues>({
     defaultValues: {
       name: currentUser?.name,
-      image: currentUser?.image,
+      image: currentUser?.profile,
     },
   });
 
@@ -120,11 +120,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     height="48"
                     className="rounded-full"
                     src={
-                      image || currentUser?.image || "/images/placeholder.jpg"
+                      image || currentUser?.profile || "/images/placeholder.jpg"
                     }
                     alt="Avatar"
                   />
-                  <CldUploadButton
+                  {/* <CldUploadButton
                     options={{ maxFiles: 1 }}
                     onUpload={handleUpload}
                     uploadPreset="g1usl1sb"
@@ -132,7 +132,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <Button disabled={isLoading} secondary type="button">
                       Change
                     </Button>
-                  </CldUploadButton>
+                  </CldUploadButton>*/}
                 </div>
               </div>
             </div>
