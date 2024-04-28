@@ -6,11 +6,13 @@ import cookieParser from 'cookie-parser';
 // config env;
 import 'dotenv/config';
 
+import { userAuthorization } from './middlewares/authorization';
 import { errorHandler, notFoundHandler } from './error/errorHandler';
 
 // routes
 import authRoute from './routes/authRoutes';
 import userRoute from './routes/userRoutes';
+import chatsRoute from './routes/chatsRoutes';
 
 // Create an Express application
 const app = express();
@@ -45,6 +47,7 @@ app.use(
 
 // api
 app.use('/api/auth', authRoute);
+app.use('/api/chats', userAuthorization, chatsRoute);
 app.use('/api', userRoute);
 
 // Error handling middleware

@@ -1,13 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as yup from 'yup';
 import db from '../../config/prismadb';
-
-interface userType {
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-}
+import { userType } from '../../shared/type';
 
 declare module 'express' {
   interface Request {
@@ -42,7 +36,7 @@ const signupValidation = async (req: Request, res: Response, next: NextFunction)
   const validationErrors: { [key: string]: string[] } = {};
   const { name, username, email, password } = req.body;
 
-  try {    
+  try {
     // Check if email and username is already registered
     const [existingUser, existingUsername] = await Promise.all([
       db.user.findFirst({ where: { email } }),
