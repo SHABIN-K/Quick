@@ -10,17 +10,15 @@ import SettingsModal from "./SettingsModal";
 import { useSession } from "@/context/AuthContext";
 
 const DesktopSidebar = () => {
-  const { getSession } = useSession();
-  const currentUser = getSession;
-  console.log(currentUser);
+  const currentUser = useSession();
   const routes = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      {currentUser && (
+      {currentUser?.getSession && (
         <SettingsModal
-          currentUser={currentUser}
+          currentUser={currentUser?.getSession}
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
         />
@@ -45,7 +43,9 @@ const DesktopSidebar = () => {
             onClick={() => setIsOpen(true)}
             className="cursor-pointer hover:opacity-75 transition"
           >
-            {currentUser && <Avatar user={currentUser} />}
+            {currentUser?.getSession && (
+              <Avatar user={currentUser?.getSession} />
+            )}
           </div>
         </nav>
       </div>
