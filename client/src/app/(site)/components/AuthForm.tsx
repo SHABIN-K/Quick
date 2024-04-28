@@ -20,7 +20,7 @@ interface ErrorObject {
 
 const AuthForm = () => {
   const router = useRouter();
-  const session = useSession();
+  const { status, setSession } = useSession();
   const [, setCookie] = useCookies(["token"]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,10 +28,10 @@ const AuthForm = () => {
   const [variant, setVariant] = useState<Variant>("LOGIN");
 
   useEffect(() => {
-    if (session?.status === "authenticated") {
+    if (status === "authenticated") {
       router.push("/chats");
     }
-  }, [router, session?.status]);
+  }, [router, status]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -75,8 +75,7 @@ const AuthForm = () => {
 
           //remove token fomr response data
           const { confirmToken, ...userData } = res?.data?.data;
-          const userDataJSON = JSON.stringify(userData);
-          localStorage.setItem("user.profile", userDataJSON);
+          setSession?.(userData);
           router.push("/chats");
         }
       } catch (err: any) {
@@ -103,8 +102,7 @@ const AuthForm = () => {
 
           //remove token fomr response data
           const { accessToken, ...userData } = res.data.data;
-          const userDataJSON = JSON.stringify(userData);
-          localStorage.setItem("user.profile", userDataJSON);
+          setSession?.(userData);
           router.push("/chats");
         }
         console.log(res.data);
