@@ -1,4 +1,4 @@
-import axios from "../../config/api";
+import axios from "../config/api";
 
 export const signUpApi = ({
   name,

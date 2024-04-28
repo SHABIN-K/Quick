@@ -1,7 +1,7 @@
 "use client";
 
 import EmptyState from "@/components/EmptyState";
-import { logoutApi } from "@/helpers/apis/auth";
+import { logoutApi } from "@/actions/getAuth";
 import { useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 import toast from "react-hot-toast";

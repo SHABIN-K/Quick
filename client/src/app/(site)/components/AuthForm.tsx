@@ -10,7 +10,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Button, Input } from "@/components";
 import AuthSocialButton from "./AuthSocialButton";
 import { useSession } from "@/context/AuthContext";
-import { signInApi, signUpApi } from "@/helpers/apis/auth";
+import { signInApi, signUpApi } from "@/actions/getAuth";
 
 type Variant = "LOGIN" | "REGISTER";
 

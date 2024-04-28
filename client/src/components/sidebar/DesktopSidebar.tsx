@@ -2,18 +2,24 @@
 
 import { useState } from "react";
 
+import { UserType } from "@/shared/types";
+import useNavigation from "@/hooks/useNavigation";
+
 import Avatar from "../Avatar";
 import DesktopItem from "./DesktopItem";
 import SettingsModal from "./SettingsModal";
-import useNavigation from "@/hooks/useNavigation";
 
-const DesktopSidebar = () => {
+interface DesktopSidebarProps {
+  currentUser: UserType;
+}
+
+const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ currentUser }) => {
   const routes = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const userData = localStorage.getItem("user.profile");
-  const currentUser = JSON.parse(userData as string);
-  console.log(currentUser);
+  //const userData = localStorage.getItem("user.profile");
+  //const currentUser = JSON.parse(userData as string);
+  //console.log(currentUser);
 
   return (
     <>
@@ -42,7 +48,7 @@ const DesktopSidebar = () => {
             onClick={() => setIsOpen(true)}
             className="cursor-pointer hover:opacity-75 transition"
           >
-            {/* <Avatar user={currentUser} />*/}
+            <Avatar user={currentUser} />
           </div>
         </nav>
       </div>
