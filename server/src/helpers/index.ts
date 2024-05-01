@@ -1,4 +1,4 @@
-import  jwt  from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { create } from 'express-handlebars';
 import transporter from '../config/nodemailer';
 import ErrorResponse from '../error/ErrorResponse';
