@@ -8,7 +8,5 @@ export const getUsers = async ({ email }: { email: string }) => {
       withCredentials: true,
     }
   );
-  console.log(result);
-
   return result;
 };

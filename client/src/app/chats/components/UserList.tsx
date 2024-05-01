@@ -13,10 +13,13 @@ const UserList = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await getUsers({
-          email: getSession?.email as string,
-        });
-        setUsers(response.data);
+        const email = getSession?.email as string;
+        if (email) {
+          const response = await getUsers({ email });
+          setUsers(response.data);
+        } else {
+          console.error("Error: user is undefined");
+        }
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -24,17 +27,14 @@ const UserList = () => {
 
     fetchUsers();
   }, [getSession]);
-  console.log(users);
-
   return (
     <aside className="fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-auto border-r border-gray-200 block w-full left-0">
       <div className="px-5">
         <div className="flex-col">
           <div className="text-2xl font-bold text-neutral-800 py-4">People</div>
         </div>
-        {/* {users.map((user) => (
-          <UserBox key={user.id} data={user} />
-        ))} */}
+        {Array.isArray(users) &&
+          users.map((user) => <UserBox key={user.id} data={user} />)}
       </div>
     </aside>
   );
