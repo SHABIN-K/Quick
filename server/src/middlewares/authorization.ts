@@ -23,7 +23,7 @@ export const userAuthorization = async (req: ExtendedRequest, res: Response, nex
     req.userData = decode.data;
     return next();
   } catch (err) {
+    console.error('Error in userAuthorization middleware:', err);
     return next(ErrorResponse.forbidden('Forbidden'));
   }
-  return next();
 };

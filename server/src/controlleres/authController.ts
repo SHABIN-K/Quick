@@ -54,19 +54,23 @@ export const signupController = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const loginController = async (req: Request, res: Response, next: NextFunction) => {
+export const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.validDaata || { email: '', password: '' };
-
+  const validationErrors: { [key: string]: string[] } = {};
   try {
     const user = await db.user.findFirst({
       where: { email: email },
     });
     // invalid email
-    if (!user) return next(ErrorResponse.badRequest('Invalid email or passwrod'));
+    if (!user) {
+      validationErrors['email'] = ['Did you mistype your email address?'];
+    }
 
-    const match = await bcrypt.compare(password, user.hashedPassword as string);
+    const match = await bcrypt.compare(password, user?.hashedPassword as string);
     // invalid password
-    if (!match) return next(ErrorResponse.badRequest('Invalid email or passwrod'));
+    if (!match) {
+      validationErrors['password'] = ['Oops! The password you entered does not match.'];
+    }
 
     const accessToken = generateToken(email);
 
@@ -80,15 +84,18 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       success: true,
       message: 'Logged in successfully',
       data: {
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        profile: user.profile,
+        name: user?.name,
+        username: user?.username,
+        email: user?.email,
+        profile: user?.profile,
         accessToken,
       },
     });
   } catch (err) {
-    return next(err);
+    return res.status(400).json({
+      success: false,
+      message: validationErrors,
+    });
   }
 };
 
