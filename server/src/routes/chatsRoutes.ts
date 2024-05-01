@@ -1,10 +1,10 @@
 import express from 'express';
-import { getUsersController, getConversationsController } from '../controlleres/chatsController';
+import { getChatController, getConversationController } from '../controlleres/chatsController';
 
 const router = express.Router();
 
-router.post('/users', getUsersController);
+router.post('/get-chat', getChatController);
 
-router.post('/conversations', getConversationsController);
+router.post('/conversations', getConversationController);
 
 export default router;

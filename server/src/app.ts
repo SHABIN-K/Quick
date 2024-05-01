@@ -10,7 +10,7 @@ import { errorHandler, notFoundHandler } from './error/errorHandler';
 
 // routes
 import authRoute from './routes/authRoutes';
-import userRoute from './routes/userRoutes';
+import usersRoute from './routes/usersRoutes';
 import chatsRoute from './routes/chatsRoutes';
 
 // Create an Express application
@@ -47,7 +47,7 @@ app.use(
 // api
 app.use('/api/auth', authRoute);
 app.use('/api/chats', chatsRoute);
-app.use('/api', userRoute);
+app.use('/api/users', usersRoute);
 
 // Error handling middleware
 app.use(errorHandler);

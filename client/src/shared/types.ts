@@ -5,3 +5,56 @@ export type UserType = {
   profile: string;
   username: string;
 };
+
+export type User = {
+  id: string;
+  name?: string;
+  username?: string;
+  email?: string;
+  emailVerified?: string;
+  profile?: string;
+  hashedPassword?: string;
+  createdAt: string;
+  updatedAt: string;
+
+  conversationIds: string[];
+  conversations: Conversation[];
+  seenMessageIds: string[];
+  seenMessages: Message[];
+  messages: Message[];
+};
+
+type Conversation = {
+  id: string;
+  createdAt: string;
+  lastMessageAt: string;
+  name?: string;
+  isGroup?: boolean;
+  messagesIds: string[];
+  messages: Message[];
+  userIds: string[];
+  users: User[];
+};
+
+type Message = {
+  id: string;
+  body?: string;
+  image?: string;
+  createdAt: string;
+  seenIds: string[];
+  seen: User[];
+  conversationId: string;
+  conversation: Conversation;
+  senderId: string;
+  sender: User;
+};
+
+export type FullMessageType = Message & {
+  sender: User;
+  seen: User[];
+};
+
+export type FullConversationType = Conversation & {
+  users: User[];
+  messages: FullMessageType[];
+};

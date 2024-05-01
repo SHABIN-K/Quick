@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 
 import UserBox from "./UserBox";
 import { UserType } from "@/shared/types";
-import { getUsers } from "@/actions/getChats";
+
 import { useSession } from "@/context/AuthContext";
+import { getUsers } from "@/actions/getUsers";
 
 const UserList = () => {
   const { getSession } = useSession();

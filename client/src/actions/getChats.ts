@@ -1,16 +1,5 @@
 import axios from "../config/api";
 
-export const getUsers = async ({ email }: { email: string }) => {
-  const result = await axios.post(
-    "/chats/users",
-    { email },
-    {
-      withCredentials: true,
-    }
-  );
-  return result;
-};
-
 export const getChats = async ({
   userId,
   chatId,
@@ -19,8 +8,19 @@ export const getChats = async ({
   chatId: string;
 }) => {
   const result = await axios.post(
-    "/chats/conversations",
+    "/chats/get-chat",
     { userId, chatId },
+    {
+      withCredentials: true,
+    }
+  );
+  return result;
+};
+
+export const getConversations = async ({ email }: { email: string }) => {
+  const result = await axios.post(
+    "/chats/conversations",
+    { email },
     {
       withCredentials: true,
     }
