@@ -1,11 +1,19 @@
-import EmptyState from "@/components/EmptyState";
+"use client";
 
-const Chats = () => {
+import EmptyState from "@/components/EmptyState";
+import useConversation from "@/hooks/useConversation";
+
+import clsx from "clsx";
+
+const Home = () => {
+  const { isOpen } = useConversation();
   return (
-    <div className="hidden lg:block lg:pl-80 h-full">
+    <div
+      className={clsx("lg:pl-80 h-full lg:block", isOpen ? "block" : "hidden")}
+    >
       <EmptyState />
     </div>
   );
 };
 
-export default Chats;
+export default Home;

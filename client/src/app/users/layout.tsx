@@ -1,7 +1,7 @@
 import Sidebar from "@/components/sidebar/Sidebar";
-import ConversationList from "./components/ConversationList";
+import UserList from "./components/UserList";
 
-export default async function ChatLayout({
+export default async function UsersLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -9,7 +9,7 @@ export default async function ChatLayout({
   return (
     <Sidebar>
       <div className="h-full">
-        <ConversationList />
+        <UserList />
         {children}
       </div>
     </Sidebar>

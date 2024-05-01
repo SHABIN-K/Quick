@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 import { HiChat } from "react-icons/hi";
@@ -15,15 +15,15 @@ const useRoutes = () => {
     () => [
       {
         label: "Chat",
-        href: "/conversations",
+        href: "/chats",
         icon: HiChat,
-        active: pathname === "/conversations" || !!conversationId,
+        active: pathname === "/chats" || !!conversationId,
       },
       {
         label: "Users",
-        href: "/chats",
+        href: "/users",
         icon: HiUsers,
-        active: pathname === "/chats",
+        active: pathname === "/users",
       },
       {
         label: "Logout",
