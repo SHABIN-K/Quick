@@ -10,3 +10,20 @@ export const getUsers = async ({ email }: { email: string }) => {
   );
   return result;
 };
+
+export const getChats = async ({
+  userId,
+  chatId,
+}: {
+  userId: string;
+  chatId: string;
+}) => {
+  const result = await axios.post(
+    "/chats/conversations",
+    { userId, chatId },
+    {
+      withCredentials: true,
+    }
+  );
+  return result;
+};

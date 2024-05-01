@@ -13,7 +13,7 @@ const errorHandler = (err: ErrorResponse, req: Request, res: Response, next: Nex
     });
   }
 
-  return res.status(500).json({ success: false, status: 500, message: 'Something went wrong' });
+  return res.status(500).json({ success: false, status: 500, message: 'Internal Error' });
 };
 // 404 route handler
 const notFoundHandler = (req: Request, res: Response) => {

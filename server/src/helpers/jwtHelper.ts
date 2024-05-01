@@ -5,6 +5,15 @@ export const generateToken = (email: string) => {
     expiresIn: 60 * 12,
   });
 };
+
 export const verifyToken = (token: string) => {
-  return jwt.verify(token, process.env.JWT_TOKEN_SECRET as string);
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_TOKEN_SECRET as string, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
 };
