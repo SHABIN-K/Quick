@@ -1,3 +1,5 @@
+"use client";
+
 import { FullMessageType } from "@/shared/types";
 
 interface BodyProps {
@@ -5,6 +7,8 @@ interface BodyProps {
 }
 
 const Body: React.FC<BodyProps> = ({ initialMessages }) => {
+  console.log(initialMessages);
+
   return <div>Body</div>;
 };
 

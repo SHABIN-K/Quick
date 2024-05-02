@@ -15,7 +15,7 @@ const useOtherUser = (
     );
 
     return otherUser[0];
-  }, [getSession?.email, conversation.users]);
+  }, [getSession?.email, conversation?.users]);
 
   return otherUser;
 };
