@@ -27,3 +27,15 @@ export const getConversations = async ({ email }: { email: string }) => {
   );
   return result;
 };
+
+
+export const getConversationById = async ({ chatId }: { chatId: string }) => {
+  const result = await axios.post(
+    "/chats/get-conversations",
+    { chatId },
+    {
+      withCredentials: true,
+    }
+  );
+  return result;
+};

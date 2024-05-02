@@ -110,3 +110,27 @@ export const getConversationController = async (req: Request, res: Response, nex
     return next(error);
   }
 };
+
+export const getSingleChatController = async (req: Request, res: Response, next: NextFunction) => {
+  const { chatId } = req.body;
+  try {
+    // Fetch conversations for the current user
+    const conversations = await db.conversation.findMany({
+      where: {
+        id: chatId,
+      },
+      include: {
+        users: true,
+      },
+    });
+    console.log(conversations);
+    return res.status(200).json({
+      success: true,
+      message: 'converstaion founded',
+      data: conversations,
+    });
+  } catch (error) {
+    console.error('Error is getSingleChatController:', error);
+    return next(error);
+  }
+};
