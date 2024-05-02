@@ -105,7 +105,6 @@ const AuthForm = () => {
           setSession?.(userData);
           router.push("/chats");
         }
-        console.log(res.data);
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
         setErrMsg(errMsg);
