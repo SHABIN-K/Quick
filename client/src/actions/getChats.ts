@@ -17,6 +17,17 @@ export const getChats = async ({
   return result;
 };
 
+export const getMessages = async ({ chatId }: { chatId: string }) => {
+  const result = await axios.post(
+    "/chats/get-messages",
+    { chatId },
+    {
+      withCredentials: true,
+    }
+  );
+  return result;
+};
+
 export const getConversations = async ({ email }: { email: string }) => {
   const result = await axios.post(
     "/chats/conversations",
@@ -27,7 +38,6 @@ export const getConversations = async ({ email }: { email: string }) => {
   );
   return result;
 };
-
 
 export const getConversationById = async ({ chatId }: { chatId: string }) => {
   const result = await axios.post(

@@ -123,7 +123,7 @@ export const getSingleChatController = async (req: Request, res: Response, next:
         users: true,
       },
     });
-    console.log(conversations);
+
     return res.status(200).json({
       success: true,
       message: 'converstaion founded',
@@ -131,6 +131,33 @@ export const getSingleChatController = async (req: Request, res: Response, next:
     });
   } catch (error) {
     console.error('Error is getSingleChatController:', error);
+    return next(error);
+  }
+};
+export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
+  const { chatId } = req.body;
+  try {
+    // Fetch message for the current user
+    const message = await db.message.findMany({
+      where: {
+        conversationId: chatId,
+      },
+      include: {
+        sender: true,
+        seen: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'message founded',
+      data: message,
+    });
+  } catch (error) {
+    console.error('Error is getMessageController:', error);
     return next(error);
   }
 };
