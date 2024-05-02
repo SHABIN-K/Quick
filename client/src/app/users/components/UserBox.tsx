@@ -25,7 +25,7 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
 
       const chatId = response.data.data.id;
       if (chatId) {
-        router.push(`/chat/${chatId}`);
+        router.push(`/chats/${chatId}`);
       }
     } catch (error) {
       console.error("Error fetching chats:", error);
