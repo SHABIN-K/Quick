@@ -3,10 +3,10 @@
 import Image from "next/image";
 
 //import useActiveList from "../hooks/useActiveList";
-import { UserType } from "@/shared/types";
+import { User, UserType } from "@/shared/types";
 
 interface AvatarProps {
-  user?: UserType;
+  user?: User;
 }
 
 const Avatar: React.FC<AvatarProps> = ({ user }) => {

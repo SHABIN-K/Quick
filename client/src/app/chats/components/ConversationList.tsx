@@ -1,21 +1,22 @@
 "use client";
 
-import { getConversations } from "@/actions/getChats";
-import { useSession } from "@/context/AuthContext";
-import { FullConversationType, UserType } from "@/shared/types";
+import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MdOutlineGroupAdd } from "react-icons/md";
 
-interface ConversationListProps {
-  initialItems: FullConversationType[];
-  users: UserType[];
-}
-const ConversationList: React.FC<ConversationListProps> = ({
-  initialItems,
-  users,
-}) => {
+import ConversationBox from "./ConversationBox";
+import { useSession } from "@/context/AuthContext";
+import { getConversations } from "@/actions/getChats";
+import useConversation from "@/hooks/useConversation";
+import { FullConversationType } from "@/shared/types";
+
+const ConversationList = () => {
+  const router = useRouter();
   const { getSession } = useSession();
+  const { conversationId, isOpen } = useConversation();
 
-  const [conversations, setConversations] = useState<[]>([]);
+  const [items, setItems] = useState<FullConversationType[]>();
 
   useEffect(() => {
     const fetchConverstations = async () => {
@@ -23,7 +24,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         const email = getSession?.email as string;
         if (email) {
           const response = await getConversations({ email });
-          setConversations(response.data.data);
+          setItems(response.data.data);
         } else {
           console.error("Error: user is undefined");
         }
@@ -35,7 +36,32 @@ const ConversationList: React.FC<ConversationListProps> = ({
     fetchConverstations();
   }, [getSession]);
 
-  return <div>ConversationList</div>;
+  return (
+    <>
+      <aside
+        className={clsx(
+          `fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-auto border-r border-gray-200`,
+          isOpen ? "hidden" : "block w-full left-0"
+        )}
+      >
+        <div className="px-5">
+          <div className="flex justify-between mb-4 pt-4">
+            <div className="text-2xl font-bold text-neutral-800">Messages</div>
+            <div className="rounded-full p-2 bg-gray-100 text-gray-600 cursor-pointer hover:opacity-75 transition">
+              <MdOutlineGroupAdd size={20} />
+            </div>
+          </div>
+          {items?.map((item) => (
+            <ConversationBox
+              key={item.id}
+              data={item}
+              selected={conversationId === item.id}
+            />
+          ))}
+        </div>
+      </aside>
+    </>
+  );
 };
 
 export default ConversationList;
