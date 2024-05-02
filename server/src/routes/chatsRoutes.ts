@@ -4,6 +4,7 @@ import {
   getConversationController,
   getSingleChatController,
   getMessagesController,
+  geSingletMessagesController,
 } from '../controlleres/chatsController';
 
 const router = express.Router();
@@ -14,6 +15,8 @@ router.post('/conversations', getConversationController);
 
 router.post('/get-conversations', getSingleChatController);
 
-router.post('/get-messages', getMessagesController);
+router.post('/get-messages', geSingletMessagesController);
+
+router.post('/messages', getMessagesController);
 
 export default router;

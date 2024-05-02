@@ -5,8 +5,6 @@ import db from '../config/prismadb';
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId, isGroup, members, name } = req.body;
 
-  console.log(isGroup, members, name);
-
   try {
     const currentUser = await db.user.findUnique({
       where: { email: email },
@@ -135,7 +133,7 @@ export const getSingleChatController = async (req: Request, res: Response, next:
   }
 };
 
-export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
+export const geSingletMessagesController = async (req: Request, res: Response, next: NextFunction) => {
   const { chatId } = req.body;
   try {
     // Fetch message for the current user
@@ -156,6 +154,73 @@ export const getMessagesController = async (req: Request, res: Response, next: N
       success: true,
       message: 'message founded',
       data: message,
+    });
+  } catch (error) {
+    console.error('Error is getMessageController:', error);
+    return next(error);
+  }
+};
+
+export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
+  const { message, image, conversationId, userId: email } = req.body;
+  try {
+    const currentUser = await db.user.findUnique({
+      where: { email: email },
+    });
+    // Fetch message for the current user
+    const newMessage = await db.message.create({
+      data: {
+        body: message,
+        image: image,
+        conversation: {
+          connect: {
+            id: conversationId,
+          },
+        },
+        sender: {
+          connect: {
+            id: currentUser?.id,
+          },
+        },
+        seen: {
+          connect: {
+            id: currentUser?.id,
+          },
+        },
+      },
+      include: {
+        seen: true,
+        sender: true,
+      },
+    });
+
+    const updatedConversation = await db.conversation.update({
+      where: {
+        id: conversationId,
+      },
+      data: {
+        lastMessageAt: new Date(),
+        messages: {
+          connect: {
+            id: newMessage.id,
+          },
+        },
+      },
+      include: {
+        users: true,
+        messages: {
+          include: {
+            seen: true,
+          },
+        },
+      },
+    });
+    console.log(updatedConversation);
+
+    return res.status(200).json({
+      success: true,
+      message: 'message founded',
+      data: newMessage,
     });
   } catch (error) {
     console.error('Error is getMessageController:', error);
