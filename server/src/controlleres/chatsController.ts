@@ -164,9 +164,14 @@ export const geSingletMessagesController = async (req: Request, res: Response, n
 export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
   const { message, image, conversationId, userId: email } = req.body;
   try {
+    console.log(image, conversationId);
+
     const currentUser = await db.user.findUnique({
       where: { email: email },
     });
+
+    console.log(currentUser);
+
     // Fetch message for the current user
     const newMessage = await db.message.create({
       data: {
