@@ -1,27 +1,38 @@
-import React, { useCallback, useState } from "react";
+import Avatar from "@/components/Avatar";
 import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { UserType } from "@/shared/types";
-import Avatar from "@/components/Avatar";
-import LoadingModal from "@/components/LoadingModal";
 import { getChats } from "@/actions/getChats";
+import LoadingModal from "@/components/LoadingModal";
 
 interface UserBoxProps {
   data: UserType;
   currentUser: string;
 }
+
 const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const handleClick = useCallback(async () => {
-    //setIsLoading(true);
-    const response = await getChats({
-      userId: currentUser,
-      chatId: data.id as string,
-    });
 
-    console.log(response.data);
-  }, [currentUser, data.id]);
+  const handleClick = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await getChats({
+        userId: currentUser,
+        chatId: data.id as string,
+      });
+
+      const chatId = response.data.data.id;
+      if (chatId) {
+        router.push(`/chat/${chatId}`);
+      }
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentUser, data.id, router]);
 
   return (
     <>
