@@ -24,7 +24,7 @@ export type User = {
   messages: Message[];
 };
 
-type Conversation = {
+export type Conversation = {
   id: string;
   createdAt: string;
   lastMessageAt: string;
@@ -36,7 +36,7 @@ type Conversation = {
   users: User[];
 };
 
-type Message = {
+export type Message = {
   id: string;
   body?: string;
   image?: string;

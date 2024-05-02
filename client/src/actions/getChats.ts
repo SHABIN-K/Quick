@@ -47,5 +47,6 @@ export const getConversationById = async ({ chatId }: { chatId: string }) => {
       withCredentials: true,
     }
   );
+  
   return result;
 };

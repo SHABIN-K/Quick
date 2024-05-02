@@ -134,6 +134,7 @@ export const getSingleChatController = async (req: Request, res: Response, next:
     return next(error);
   }
 };
+
 export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
   const { chatId } = req.body;
   try {
