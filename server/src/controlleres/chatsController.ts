@@ -4,6 +4,7 @@ import db from '../config/prismadb';
 
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId, isGroup, members, name } = req.body;
+  console.log(email, chatId);
 
   try {
     const currentUser = await db.user.findUnique({
@@ -72,11 +73,6 @@ export const getConversationController = async (req: Request, res: Response, nex
       where: { email: email },
     });
 
-    // Check if currentUser exists and has valid data
-    if (!currentUser?.id || !currentUser?.email) {
-      return next(ErrorResponse.badRequest('Unauthorized'));
-    }
-
     // Fetch conversations for the current user
     const conversations = await db.conversation.findMany({
       orderBy: {
@@ -84,7 +80,7 @@ export const getConversationController = async (req: Request, res: Response, nex
       },
       where: {
         userIds: {
-          has: currentUser.id,
+          has: currentUser?.id,
         },
       },
       include: {
