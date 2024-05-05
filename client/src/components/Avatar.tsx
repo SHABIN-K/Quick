@@ -6,7 +6,7 @@ import Image from "next/image";
 import { User, UserType } from "@/shared/types";
 
 interface AvatarProps {
-  user?: User;
+  user?: User | UserType;
 }
 
 const Avatar: React.FC<AvatarProps> = ({ user }) => {
