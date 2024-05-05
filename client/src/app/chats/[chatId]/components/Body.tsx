@@ -5,6 +5,7 @@ import useConversation from "@/hooks/useConversation";
 import { FullMessageType } from "@/shared/types";
 import MessageBox from "./MessageBox";
 import axios from "@/config/api";
+import { useSession } from "@/context/AuthContext";
 
 interface BodyProps {
   initialMessages: FullMessageType[];
@@ -13,12 +14,14 @@ interface BodyProps {
 const Body: React.FC<BodyProps> = ({ initialMessages }) => {
   const [messages, setMessages] = useState(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
-
+  const { getSession } = useSession();
   const { conversationId } = useConversation();
 
   useEffect(() => {
-    axios.post(`/api/conversations/${conversationId}/seen`);
-  }, [conversationId]);
+    axios.post(`/chats/conversations/${conversationId}`, {
+      email: getSession?.email,
+    });
+  }, [conversationId, getSession?.email]);
 
   return (
     <div className="flex-1 overflow-y-auto">

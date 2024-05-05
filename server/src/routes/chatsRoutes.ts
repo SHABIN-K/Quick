@@ -5,11 +5,14 @@ import {
   getSingleChatController,
   getMessagesController,
   geSingletMessagesController,
+  getConversationByParamsController,
 } from '../controlleres/chatsController';
 
 const router = express.Router();
 
 router.post('/get-chat', getChatController);
+
+router.post('/conversations/:conversationId', getConversationByParamsController);
 
 router.post('/conversations', getConversationController);
 

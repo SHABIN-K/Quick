@@ -232,3 +232,72 @@ export const getMessagesController = async (req: Request, res: Response, next: N
     return next(error);
   }
 };
+
+export const getConversationByParamsController = async (req: Request, res: Response, next: NextFunction) => {
+  const { conversationId } = req.params;
+  const { email } = req.body;
+  console.log('parsma conveserstation : ', conversationId);
+
+  try {
+    const currentUser = await db.user.findUnique({
+      where: { email: email },
+    });
+
+    // Fetch conversation for the current user
+    const conversation = await db.conversation.findUnique({
+      where: {
+        id: conversationId,
+      },
+      include: {
+        messages: {
+          include: {
+            seen: true,
+          },
+        },
+        users: true,
+      },
+    });
+
+    if (!conversation) {
+      return next(ErrorResponse.badRequest('Invalid ID'));
+    }
+
+    // Find the last message
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+
+    if (!lastMessage) {
+      return res.status(200).json({
+        success: true,
+        message: 'conversation founded',
+        data: conversation,
+      });
+    }
+
+    // Update seen of last message
+    const updatedMessage = await db.message.update({
+      where: {
+        id: lastMessage.id,
+      },
+      include: {
+        sender: true,
+        seen: true,
+      },
+      data: {
+        seen: {
+          connect: {
+            id: currentUser?.id,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'updatedMessage ',
+      data: updatedMessage,
+    });
+  } catch (error) {
+    console.error('Error is getMessageController:', error);
+    return next(error);
+  }
+};
