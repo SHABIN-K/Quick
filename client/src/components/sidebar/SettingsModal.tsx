@@ -1,16 +1,16 @@
 "use client";
 
-import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import Modal from "../Modal";
-import Input from "../inputs/Input";
-import Image from "next/image";
 
-import Button from "../Button";
+import Modal from "../Modal";
+import axios from "@/config/api";
+import Input from "../inputs/Input";
 import { UserType } from "@/shared/types";
+import image from "next/image";
+import Button from "../Button";
 
 interface SettingsModalProps {
   isOpen?: boolean;
@@ -29,29 +29,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
       name: currentUser?.name,
-      image: currentUser?.profile,
     },
   });
 
-  const image = watch("image");
-
-  const handleUpload = (result: any) => {
-    setValue("image", result?.info?.secure_url, {
-      shouldValidate: true,
-    });
-  };
-
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
+    console.log(data);
 
     axios
-      .post("/api/settings", data)
+      .post("/user/settings", data)
       .then(() => {
         router.refresh();
         onClose();
@@ -65,28 +55,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
-            <h2
-              className="
-              text-base
-              font-semibold
-              leading-7
-              text-gray-900
-            "
-            >
+            <h2 className="text-base font-semibold leading-7 text-gray-900">
               Profile
             </h2>
             <p className="mt-1 text-sm leading-6 text-gray-600">
               Edit your public information.
             </p>
 
-            <div
-              className="
-              mt-10
-              flex
-              flex-col
-              gap-y-8
-            "
-            >
+            <div className="mt-10 flex flex-col gap-y-8">
               <Input
                 disabled={isLoading}
                 label="Name"
@@ -95,36 +71,24 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 required
                 register={register}
               />
+
+              {/* 
               <div>
-                <label
-                  className="
-                    block
-                    text-sm
-                    font-medium
-                    leading-6
-                    text-gray-900
-                  "
-                >
+                <label className="block text-sm font-medium leading-6 text-gray-900">
                   Photo
                 </label>
-                <div
-                  className="
-                  mt-2
-                  flex
-                  items-center
-                  gap-x-3
-                "
-                >
+                <div className="mt-2 flex items-center gap-x-3">
                   <Image
                     width="48"
                     height="48"
                     className="rounded-full"
                     src={
-                      image || currentUser?.profile || "/images/placeholder.jpg"
+                      currentUser?.profile || "/images/placeholder.jpg"
                     }
                     alt="Avatar"
                   />
-                  {/* <CldUploadButton
+              
+                  <CldUploadButton
                     options={{ maxFiles: 1 }}
                     onUpload={handleUpload}
                     uploadPreset="g1usl1sb"
@@ -132,21 +96,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     <Button disabled={isLoading} secondary type="button">
                       Change
                     </Button>
-                  </CldUploadButton>*/}
+                  </CldUploadButton>
                 </div>
               </div>
+
+                */}
             </div>
           </div>
 
-          <div
-            className="
-              mt-6
-              flex
-              items-center
-              justify-end
-              gap-x-6
-            "
-          >
+          <div className="mt-6 flex items-center justify-end gap-x-6">
             <Button disabled={isLoading} secondary onClick={onClose}>
               Cancel
             </Button>
