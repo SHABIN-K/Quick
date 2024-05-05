@@ -9,7 +9,6 @@ import Modal from "../Modal";
 import axios from "@/config/api";
 import Input from "../inputs/Input";
 import { UserType } from "@/shared/types";
-import image from "next/image";
 import Button from "../Button";
 
 interface SettingsModalProps {
@@ -38,11 +37,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    console.log(data);
 
     axios
-      .post("/user/settings", data)
+      .post("/users/update-user", {
+        name: data?.name,
+        email: currentUser?.email,
+      })
       .then(() => {
+        toast.success("user updated succesfully");
         router.refresh();
         onClose();
       })

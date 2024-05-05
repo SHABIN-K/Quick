@@ -38,3 +38,34 @@ export const getUsersController = async (req: Request, res: Response, next: Next
     return next(error);
   }
 };
+
+export const updateUserController = async (req: Request, res: Response, next: NextFunction) => {
+  const { name, email } = req.body;
+  try {
+    const currentUser = await db.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!currentUser) {
+      return next(ErrorResponse.badRequest('something wernt wrong'));
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: currentUser?.id,
+      },
+      data: {
+        name: name,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error('Error in updateUserController:', error);
+    return next(error);
+  }
+};
