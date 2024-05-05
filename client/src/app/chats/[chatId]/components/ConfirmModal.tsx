@@ -10,6 +10,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components";
 import { Dialog } from "@headlessui/react";
 import { FiAlertTriangle } from "react-icons/fi";
+import { useSession } from "@/context/AuthContext";
 
 interface ConfirmModalProps {
   isOpen?: boolean;
@@ -18,6 +19,7 @@ interface ConfirmModalProps {
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
+  const { getSession } = useSession();
   const { conversationId } = useConversation();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +27,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     axios
-      .delete(`/api/conversations/${conversationId}`)
+      .delete(`/chats/conversations/${conversationId}`, {
+        data: { email: getSession?.email },
+      })
       .then(() => {
         onClose();
         router.push("/chats");
@@ -33,7 +37,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose }) => {
       })
       .catch(() => toast.error("Something went wrong!"))
       .finally(() => setIsLoading(false));
-  }, [conversationId, router, onClose]);
+  }, [conversationId, router, onClose, getSession?.email]);
 
   return (
     <>

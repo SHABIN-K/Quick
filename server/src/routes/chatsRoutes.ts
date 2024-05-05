@@ -6,6 +6,7 @@ import {
   getMessagesController,
   geSingletMessagesController,
   getConversationByParamsController,
+  deleteConversationByParamsController,
 } from '../controlleres/chatsController';
 
 const router = express.Router();
@@ -13,6 +14,8 @@ const router = express.Router();
 router.post('/get-chat', getChatController);
 
 router.post('/conversations/:conversationId', getConversationByParamsController);
+
+router.delete('/conversations/:conversationId', deleteConversationByParamsController);
 
 router.post('/conversations', getConversationController);
 
