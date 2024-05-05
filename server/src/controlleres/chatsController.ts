@@ -4,7 +4,6 @@ import db from '../config/prismadb';
 
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId, isGroup, members, name } = req.body;
-  console.log(email, chatId);
 
   try {
     const currentUser = await db.user.findUnique({

@@ -41,7 +41,6 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    console.log(data);
 
     axios
       .post("/chats/get-chat", {
