@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ErrorResponse from '../error/ErrorResponse';
 import db from '../config/prismadb';
+import { pusherServer } from '../config/pusher';
 
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId, isGroup, members, name } = req.body;
@@ -211,7 +212,19 @@ export const getMessagesController = async (req: Request, res: Response, next: N
         },
       },
     });
-    console.log(updatedConversation);
+
+    await pusherServer.trigger(conversationId, 'messages:new', newMessage);
+
+    const lastMsg = updatedConversation.messages[updatedConversation.messages.length - 1];
+
+    updatedConversation.users.map((user) => {
+      if (user?.email) {
+        pusherServer.trigger(user.email, 'conversation:update', {
+          id: conversationId,
+          message: [lastMsg],
+        });
+      }
+    });
 
     return res.status(200).json({
       success: true,
@@ -233,6 +246,9 @@ export const getConversationByParamsController = async (req: Request, res: Respo
       where: { email: email },
     });
 
+    if (!currentUser?.id || !currentUser?.email) {
+      return next(ErrorResponse.badRequest('unauthorized'));
+    }
     // Fetch conversation for the current user
     const conversation = await db.conversation.findUnique({
       where: {
@@ -281,9 +297,24 @@ export const getConversationByParamsController = async (req: Request, res: Respo
       },
     });
 
+    await pusherServer.trigger(currentUser?.email, 'conversation:update', {
+      id: conversationId,
+      messages: [updatedMessage],
+    });
+
+    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+      return res.status(200).json({
+        success: true,
+        message: 'conversation founded',
+        data: conversation,
+      });
+    }
+
+    await pusherServer.trigger(conversationId!, 'message:update', updatedMessage);
+
     return res.status(200).json({
       success: true,
-      message: 'updatedMessage ',
+      message: 'updatedMessage',
       data: updatedMessage,
     });
   } catch (error) {
