@@ -17,6 +17,9 @@ export default function Home() {
         </h2>
       </div>
       <AuthForm />
+      <h6 className="mt-6 text-center text-sm text-gray-500">
+        ©2024 Quick.inc ,All rights reserved.
+      </h6>
     </div>
   );
 }
