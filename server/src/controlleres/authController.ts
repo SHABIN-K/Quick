@@ -5,6 +5,7 @@ import db from '../config/prismadb';
 import { profilePicGenerator } from '../helpers';
 import ErrorResponse from '../error/ErrorResponse';
 import { generateToken } from '../helpers/jwtHelper';
+import { pusherServer } from '../config/pusher';
 
 export const signupController = async (req: Request, res: Response, next: NextFunction) => {
   const { name, username, email, password } = req.validData || { name: '', username: '', email: '', password: '' };
@@ -112,4 +113,32 @@ export const logoutController = async (req: Request, res: Response) => {
     success: true,
     message: 'Logged out successfully',
   });
+};
+
+export const pusherController = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('hey pusher');
+  const { email } = req.body;
+
+  try {
+    if (email) {
+      return next(ErrorResponse.badRequest('unauthorized'));
+    }
+    console.log(req.body);
+    const socketId = req.body.socketId;
+    const channel = req.body.channel_name;
+    const data = {
+      user_id: email,
+    };
+
+    const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
+
+    return res.status(200).json({
+      success: true,
+      message: 'pusher loged successfully',
+      data: authResponse,
+    });
+  } catch (error) {
+    console.error('Error is getMessageController:', error);
+    return next(error);
+  }
 };

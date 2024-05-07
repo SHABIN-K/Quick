@@ -1,3 +1,4 @@
+import { pusherClient } from "./../config/pusher";
 import axios from "../config/api";
 
 export const signUpApi = ({
