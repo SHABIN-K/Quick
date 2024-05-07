@@ -1,5 +1,4 @@
 import winston from 'winston';
-import 'winston-daily-rotate-file';
 
 const { combine, timestamp, printf, colorize, align, json } = winston.format;
 
@@ -11,13 +10,6 @@ const logLevels = {
   debug: 4,
   trace: 5,
 };
-
-
-const fileRotateTransport = new winston.transports.DailyRotateFile({
-  filename: './logs/%DATE%/combined-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  maxFiles: '1d',
-});
 
 const logger = winston.createLogger({
   levels: logLevels,
@@ -32,18 +24,13 @@ const logger = winston.createLogger({
     json(),
   ),
   defaultMeta: { service: 'user-service' },
-  transports: [
-    fileRotateTransport,
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: './logs/app-error.log', level: 'error' }),
-    new winston.transports.File({ filename: './logs/combined.log' }),
-  ],
+  transports: [new winston.transports.Console()],
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.APP_NODE_ENV === 'production') {
   logger.add(
     new winston.transports.Console({
-      format: winston.format.simple(),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
   );
 }

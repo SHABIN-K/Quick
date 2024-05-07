@@ -52,7 +52,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.7.0",
-    "winston": "^3.13.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston": "^3.13.0"
   }
 }
