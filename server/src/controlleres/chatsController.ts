@@ -4,7 +4,9 @@ import db from '../config/prismadb';
 import { pusherServer } from '../config/pusher';
 
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId: email, chatId, isGroup, members, name } = req.body;
+  const { userId: email, chatId: userId, isGroup, members, name } = req.body;
+  console.log(userId);
+  console.log(email);
 
   try {
     const currentUser = await db.user.findUnique({
@@ -19,10 +21,8 @@ export const getChatController = async (req: Request, res: Response, next: NextF
       return next(ErrorResponse.unauthorized('Unauthorized: Invalid group chat data'));
     }
 
-    let newConversation;
-
     if (isGroup) {
-      newConversation = await db.conversation.create({
+      const newConversation = await db.conversation.create({
         data: {
           name,
           isGroup,
@@ -34,30 +34,63 @@ export const getChatController = async (req: Request, res: Response, next: NextF
           users: true,
         },
       });
-    } else {
-      const existingConversations = await db.conversation.findMany({
-        where: {
-          OR: [{ userIds: { equals: [currentUser.id, chatId] } }, { userIds: { equals: [chatId, currentUser.id] } }],
-        },
+
+      newConversation.users.forEach((user) => {
+        if (user.email) {
+          pusherServer.trigger(user.email, 'conversation:new', newConversation);
+        }
       });
 
-      newConversation =
-        existingConversations[0] ||
-        (await db.conversation.create({
-          data: {
-            users: {
-              connect: [{ id: currentUser.id }, { id: chatId }],
-            },
-          },
-          include: {
-            users: true,
-          },
-        }));
+      return res.status(200).json({
+        success: true,
+        message: 'Group chat created successfully',
+        data: newConversation,
+      });
     }
+
+    const existingConversations = await db.conversation.findMany({
+      where: {
+        OR: [{ userIds: { equals: [currentUser.id, userId] } }, { userIds: { equals: [userId, currentUser.id] } }],
+      },
+    });
+
+    const singleConversation = existingConversations[0];
+
+    if (singleConversation) {
+      return res.status(200).json({
+        success: true,
+        message: 'Chat found or created successfully',
+        data: singleConversation,
+      });
+    }
+
+    const newConversation = await db.conversation.create({
+      data: {
+        users: {
+          connect: [
+            {
+              id: currentUser.id,
+            },
+            {
+              id: userId,
+            },
+          ],
+        },
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    newConversation.users.map((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:new', newConversation);
+      }
+    });
 
     return res.status(200).json({
       success: true,
-      message: isGroup ? 'Group chat created successfully' : 'Chat found or created successfully',
+      message: 'Chat found or created successfully',
       data: newConversation,
     });
   } catch (error) {
@@ -354,6 +387,12 @@ export const deleteConversationByParamsController = async (req: Request, res: Re
           hasSome: [currentUser?.id ?? ''],
         },
       },
+    });
+
+    existingConversation.users.forEach((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:remove', existingConversation);
+      }
     });
 
     return res.status(200).json({
