@@ -69,9 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     if (getSession) {
       localStorage.setItem("user.profile", JSON.stringify(getSession));
-    } else {
-      localStorage.removeItem("user.profile");
-    }
+    } 
   }, [getSession]);
 
   return (
