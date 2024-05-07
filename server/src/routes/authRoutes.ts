@@ -4,6 +4,7 @@ import { loginController, logoutController, signupController, pusherController }
 
 const router = express.Router();
 
+// api/auth/signup
 router.post('/signup', signupValidation, signupController);
 
 router.post('/login', loginValidation, loginController);
