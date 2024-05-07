@@ -1,0 +1,32 @@
+{
+  "name": "quick",
+  "version": "1.0.0",
+  "description": "real time chat application",
+  "scripts": {
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHABIN-K/Quick.git"
+  },
+  "keywords": [
+    "quick",
+    "chatapplication",
+    "real-time",
+    "chatapp",
+    "fast",
+    "speedy"
+  ],
+  "author": "Mohammed shabin k",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SHABIN-K/Quick/issues"
+  },
+  "homepage": "https://github.com/SHABIN-K/Quick#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
+  }
+}
