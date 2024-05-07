@@ -31,8 +31,6 @@ const Body: React.FC<BodyProps> = ({ initialMessages }) => {
     bottomRef?.current?.scrollIntoView();
 
     const messageHandler = (message: FullMessageType) => {
-      console.log(message);
-
       axios.post(`/chats/conversations/${conversationId}`, {
         email: getSession?.email,
       });
