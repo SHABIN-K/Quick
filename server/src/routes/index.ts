@@ -1,8 +1,8 @@
 import express from 'express';
 
-import authRoute from './authRoutes';
-import usersRoute from './usersRoutes';
-import chatsRoute from './chatsRoutes';
+import authRoute from './auth';
+import usersRoute from './user';
+import chatsRoute from './chat';
 
 const router = express.Router();
 

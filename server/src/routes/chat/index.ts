@@ -7,7 +7,7 @@ import {
   geSingletMessagesController,
   getConversationByParamsController,
   deleteConversationByParamsController,
-} from '../controlleres/chatsController';
+} from '../../controlleres/chatsController';
 
 const router = express.Router();
 
