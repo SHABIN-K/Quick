@@ -1,7 +1,7 @@
 import Sidebar from "@/components/sidebar/Sidebar";
 import ConversationList from "./components/ConversationList";
 
-export default async function ChatLayout({
+export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode;

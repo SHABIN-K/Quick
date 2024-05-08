@@ -18,7 +18,7 @@ export const ProtectedLayout: React.FC<ProtectedtProps> = ({ children }) => {
     if (status === "unauthenticated") router.replace("/");
   }, [status, router]);
   // if the user is authorized, render the page
-  if (status === "authenticated") return <div>{children}</div>;
+  if (status === "authenticated") return <>{children}</>;
 
   // if the user refreshed the page or somehow navigated to the protected page
   return <LoadingModal />;
@@ -35,7 +35,7 @@ export const ProtectedAuthLayout: React.FC<ProtectedtProps> = ({
     if (status === "authenticated") router.replace("/chats");
   }, [status, router]);
   // if the user is authorized, render the page
-  if (status === "unauthenticated") return <div>{children}</div>;
+  if (status === "unauthenticated") return <>{children}</>;
 
   // if the user refreshed the page or somehow navigated to the protected page
   return <LoadingModal />;
