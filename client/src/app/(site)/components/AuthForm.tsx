@@ -2,7 +2,6 @@
 
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
@@ -18,7 +17,6 @@ interface ErrorObject {
 }
 
 const AuthForm = () => {
-  const router = useRouter();
   const { setSession } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +66,7 @@ const AuthForm = () => {
           //remove token fomr response data
           const { confirmToken, ...userData } = res?.data?.data;
           setSession?.(userData);
-          router.refresh();
+          window.location.reload();
         }
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
@@ -95,7 +93,7 @@ const AuthForm = () => {
           //remove token fomr response data
           const { accessToken, ...userData } = res.data.data;
           setSession?.(userData);
-          router.push("/chats");
+          window.location.reload();
         }
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
