@@ -9,11 +9,6 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-// default url
-app.get('/api', (_req, res) => {
-  res.status(200).json({ success: true, message: 'The API is up and running.' });
-});
-
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

@@ -1,8 +1,8 @@
 import morgan from 'morgan';
 import express from 'express';
 
-import routes from './routes';
-import logger from './helpers/logger';
+import baseRouter from './routes';
+import logger from './utils/logger';
 import { middleware } from './middlewares';
 import { errorHandler, notFoundHandler } from './error';
 
@@ -17,7 +17,7 @@ app.use(middleware);
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message) } }));
 
 // api/routes
-app.use(routes);
+app.use(baseRouter);
 
 // Error handlers
 app.use(errorHandler);
