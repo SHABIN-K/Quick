@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const AUTH_TOKEN = `Bearer ${Cookies.get("token")}`;
+const AUTH_TOKEN = `Bearer ${Cookies.get("-secure-node-authToken")}`;
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 const axiosPublic = axios.create({

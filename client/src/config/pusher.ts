@@ -1,7 +1,7 @@
 import Pusher from "pusher-js";
 import Cookies from "js-cookie";
 
-const auth = Cookies.get("token");
+const auth = Cookies.get("-secure-node-authToken");
 
 export const pusherClient = new Pusher(
   process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
