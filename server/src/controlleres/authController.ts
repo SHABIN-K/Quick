@@ -5,6 +5,7 @@ import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
 import { pusherServer } from '../config/pusher';
 import ErrorResponse from '../error/ErrorResponse';
+import { getServerUser } from '../hooks/getServerUser';
 import { generateTokens } from '../helpers/auth.helper';
 import { generatePass, profilePicGenerator } from '../helpers';
 
@@ -122,7 +123,7 @@ const loginController = async (req: Request, res: Response) => {
 
     // Store user details in session
     req.session.user = payload;
-   
+
     // Generate tokens
     const { accessToken, refreshToken } = await generateTokens({ payload });
 
@@ -169,8 +170,8 @@ const loginController = async (req: Request, res: Response) => {
  */
 const logoutController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = req.session.user?.id;
-    console.log(req.session.user);
+    const user = getServerUser(req, next);
+    const userId = user?.id;
 
     if (!userId) {
       return next(ErrorResponse.notFound('User ID not found in session'));
@@ -298,19 +299,24 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
   }
 };
 
+/**
+ * fetch pusher server response
+ * @param req The Express Request object.
+ * @param res The Express Response object.
+ * @param next The Express NextFunction for error handling.
+ * @returns A JSON response indicating the success or failure of the pusher fetch process.
+ */
 const pusherController = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('hey pusher');
-  const { email } = req.body;
-
+  const user = getServerUser(req, next);
   try {
-    if (email) {
+    if (!user?.email) {
       return next(ErrorResponse.badRequest('unauthorized'));
     }
-    console.log(req.body);
-    const socketId = req.body.socketId;
+
+    const socketId = req.body.socket_id;
     const channel = req.body.channel_name;
     const data = {
-      user_id: email,
+      user_id: user?.email,
     };
 
     const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
@@ -321,8 +327,7 @@ const pusherController = async (req: Request, res: Response, next: NextFunction)
       data: authResponse,
     });
   } catch (error) {
-    console.error('Error is getMessageController:', error);
-    return next(error);
+    return next(ErrorResponse.badRequest('An error occurred during pusher'));
   }
 };
 

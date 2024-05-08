@@ -27,6 +27,6 @@ router.get('/refresh-token', refreshController);
 router.post('/forgot-password', forgotPasswordController);
 
 // api/auth/pusher
-router.get('/pusher', pusherController);
+router.post('/pusher', pusherController);
 
 export default router;

@@ -1,19 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { jwtConfig } from '../config/jwtOption';
 
-export const generate = (email: string) => {
-  return jwt.sign({ email }, process.env.JWT_TOKEN_SECRET as string, {
-    expiresIn: 60 * 12,
-  });
-};
 
 export const verifyToken = (token: string) => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_TOKEN_SECRET as string, (err, decoded) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(decoded);
-      }
-    });
-  });
+  const decodedToken = jwt.verify(token, jwtConfig.ACCESS_TOKEN.secret as string);
+  return decodedToken;
 };
