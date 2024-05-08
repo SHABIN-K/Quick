@@ -9,8 +9,8 @@ import {
   Dispatch,
 } from "react";
 
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { useCookies } from "react-cookie";
 
 import { UserType } from "@/shared/types";
 
@@ -27,7 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [cookies] = useCookies(["token"]);
+  const auth_token = Cookies.get("-secure-node-authToken");
   const [status, setStatus] = useState<AuthStatus>("pending");
   const [getSession, setSession] = useState<UserType | null>(null);
   const router = useRouter();
@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const isAuthenticated = cookies.token ? true : false;
+        const isAuthenticated = auth_token ? true : false;
+
         setStatus(isAuthenticated ? "authenticated" : "unauthenticated");
 
         // Retrieve user data from local storage if authenticated
@@ -58,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     checkAuthentication();
-  }, [cookies]);
+  }, [auth_token]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -69,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     if (getSession) {
       localStorage.setItem("user.profile", JSON.stringify(getSession));
-    } 
+    }
   }, [getSession]);
 
   return (

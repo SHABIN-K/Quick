@@ -1,5 +1,7 @@
 import toast from "react-hot-toast";
 import { logoutApi } from "@/actions/getAuth";
+import Cookies from "js-cookie";
+
 
 async function useLogout() {
   try {
@@ -8,8 +10,7 @@ async function useLogout() {
     if (res.data && res.data.success) {
       // Redirect to the home page
       window.location.href = "/";
-
-      document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      Cookies.remove("-secure-node-authToken");
       localStorage.clear();
     } else {
       // Handle unsuccessful logout

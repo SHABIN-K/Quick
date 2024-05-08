@@ -1,7 +1,7 @@
 "use client";
 
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-import { useCookies } from "react-cookie";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -19,7 +19,6 @@ interface ErrorObject {
 const AuthForm = () => {
   const router = useRouter();
   const { status, setSession } = useSession();
-  const [, setCookie] = useCookies(["token"]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<ErrorObject>({});
@@ -66,17 +65,15 @@ const AuthForm = () => {
         });
 
         if (res?.data?.success) {
-          console.log(res?.data?.data);
-
           toast.success("Welcome to Quick! Your account is ready to use");
-          setCookie("token", res?.data?.data?.confirmToken, {
-            path: "/",
+          Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
+            expires: 7,
           });
 
           //remove token fomr response data
           const { confirmToken, ...userData } = res?.data?.data;
           setSession?.(userData);
-          router.push("/chats");
+          router.refresh();
         }
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
@@ -96,8 +93,8 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success(`Great to see you again, ${res?.data?.data?.name}!`);
-          setCookie("token", res?.data?.data?.accessToken, {
-            path: "/",
+          Cookies.set("-secure-node-authToken", res?.data?.data?.accessToken, {
+            expires: 7,
           });
 
           //remove token fomr response data
