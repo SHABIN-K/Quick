@@ -214,6 +214,70 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
   }
 };
 
+/**
+ * create new  generates access and refresh tokens upon 
+ * @param req The Express Request object.
+ * @param res The Express Response object.
+ * @param next The Express NextFunction for error handling.
+ * @returns A JSON response indicating the success or failure of the refreshtoken process.
+ */
+export const refreshController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Check if refresh token exists in the request body
+    const refreshToken = req.body.refreshToken;
+
+    if (!refreshToken) {
+      return next(ErrorResponse.badRequest('Refresh token is required'));
+    }
+
+    // Find the user associated with the refresh token
+    const userAccount = await db.account.findFirst({ where: { refresh_token: refreshToken }, include: { user: true } });
+
+    if (!userAccount) {
+      return next(ErrorResponse.unauthorized('Invalid refresh token'));
+    }
+
+    const payload: userPayload = {
+      id: userAccount.user.id,
+      name: userAccount.user.name as string,
+      email: userAccount.user.email as string,
+      username: userAccount.user.username as string,
+    };
+
+    const { accessToken, refreshToken: newRefreshToken } = await generateTokens({ payload });
+
+    // Set cookies with new tokens
+    res.cookie('authToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.APP_NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    });
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.APP_NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    });
+
+    // Send the new tokens in the response
+    return res.status(200).json({
+      success: true,
+      message: 'Tokens refreshed successfully',
+      data: {
+        id: userAccount.user.id,
+        name: userAccount.user.name,
+        username: userAccount.user.username,
+        email: userAccount.user.email,
+        profile: userAccount.user.profile,
+        confirmToken: accessToken,
+      },
+    });
+  } catch (error) {
+    console.error('Error in refreshController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during refreshing token'));
+  }
+};
+
 export const pusherController = async (req: Request, res: Response, next: NextFunction) => {
   console.log('hey pusher');
   const { email } = req.body;
