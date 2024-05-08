@@ -1,16 +1,17 @@
-import React from "react";
-
-import DesktopSidebar from "./DesktopSidebar";
+"use client";
 import MobileFooter from "./MobileFooter";
+import DesktopSidebar from "./DesktopSidebar";
+import { ProtectedLayout } from "../ProtectedLayout";
 
-async function Sidebar({ children }: { children: React.ReactNode }) {
+export default function Sidebar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="h-full">
-      <DesktopSidebar />
-      <MobileFooter />
-      <main className="lg:pl-20 h-full">{children}</main>
-    </div>
+    <ProtectedLayout>
+      <div className="h-full">
+        <DesktopSidebar />
+        <MobileFooter />
+        <main className="lg:pl-20 h-full">{children}</main>
+      </div>
+    </ProtectedLayout>
   );
 }
 
-export default Sidebar;

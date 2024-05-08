@@ -3,12 +3,13 @@
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { Button, Input } from "@/components";
 import { useSession } from "@/context/AuthContext";
 import { signInApi, signUpApi } from "@/actions/getAuth";
+import { ProtectedAuthLayout } from "@/components/ProtectedLayout";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -18,17 +19,11 @@ interface ErrorObject {
 
 const AuthForm = () => {
   const router = useRouter();
-  const { status, setSession } = useSession();
+  const { setSession } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<ErrorObject>({});
   const [variant, setVariant] = useState<Variant>("LOGIN");
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/chats");
-    }
-  }, [router, status]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -112,69 +107,73 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-      <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {variant === "REGISTER" && (
-            <>
-              <Input
-                id="name"
-                label="Name"
-                register={register}
-                errors={errors}
-                disabled={isLoading}
-                errorMsg={errMsg?.name ? errMsg.name : ""}
-              />
-              <Input
-                id="username"
-                label="Username"
-                register={register}
-                errors={errors}
-                disabled={isLoading}
-                errorMsg={errMsg?.username ? errMsg.username : ""}
-              />
-            </>
-          )}
-          <Input
-            id="email"
-            label="Email address"
-            type="email"
-            register={register}
-            errors={errors}
-            disabled={isLoading}
-            errorMsg={errMsg?.email ? errMsg.email : ""}
-          />
-          <Input
-            id="password"
-            label="Password"
-            type="password"
-            register={register}
-            errors={errors}
-            disabled={isLoading}
-            errorMsg={errMsg?.password ? errMsg.password : ""}
-          />
+    <ProtectedAuthLayout>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {variant === "REGISTER" && (
+              <>
+                <Input
+                  id="name"
+                  label="Name"
+                  register={register}
+                  errors={errors}
+                  disabled={isLoading}
+                  errorMsg={errMsg?.name ? errMsg.name : ""}
+                />
+                <Input
+                  id="username"
+                  label="Username"
+                  register={register}
+                  errors={errors}
+                  disabled={isLoading}
+                  errorMsg={errMsg?.username ? errMsg.username : ""}
+                />
+              </>
+            )}
+            <Input
+              id="email"
+              label="Email address"
+              type="email"
+              register={register}
+              errors={errors}
+              disabled={isLoading}
+              errorMsg={errMsg?.email ? errMsg.email : ""}
+            />
+            <Input
+              id="password"
+              label="Password"
+              type="password"
+              register={register}
+              errors={errors}
+              disabled={isLoading}
+              errorMsg={errMsg?.password ? errMsg.password : ""}
+            />
 
-          <span className="cursor-pointer text-xs text-gray-500 py-2 hover:underline">
-            forget password ?
-          </span>
+            <span className="cursor-pointer text-xs text-gray-500 py-2 hover:underline">
+              forget password ?
+            </span>
 
-          <div>
-            <Button disabled={isLoading} fullWidth type="submit">
-              {variant === "LOGIN" ? "Sign in" : "Register"}
-            </Button>
-          </div>
-        </form>
+            <div>
+              <Button disabled={isLoading} fullWidth type="submit">
+                {variant === "LOGIN" ? "Sign in" : "Register"}
+              </Button>
+            </div>
+          </form>
 
-        <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
-          <div>
-            {variant === "LOGIN" ? "New to Quick?" : "Already have an account?"}
-          </div>
-          <div onClick={toggleVariant} className="underline cursor-pointer">
-            {variant === "LOGIN" ? "Create an account" : "Login"}
+          <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
+            <div>
+              {variant === "LOGIN"
+                ? "New to Quick?"
+                : "Already have an account?"}
+            </div>
+            <div onClick={toggleVariant} className="underline cursor-pointer">
+              {variant === "LOGIN" ? "Create an account" : "Login"}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedAuthLayout>
   );
 };
 
