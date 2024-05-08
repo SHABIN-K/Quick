@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
 import ProfileDrawer from "./ProfileDrawer";
-import useActiveList from "@/hooks/useActiveList";
+import useActiveListStore from "@/store/useActiveList";
 
 interface HeaderProps {
   conversation: Conversation & { users: User[] };
@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ conversation }) => {
   const otherUser = useOtherUser(conversation);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const { members } = useActiveList();
+  const { members } = useActiveListStore();
   const isActive = members.indexOf(otherUser?.email!) !== -1;
 
   const statusText = useMemo(() => {

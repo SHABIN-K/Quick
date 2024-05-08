@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import useActiveList from "../hooks/useActiveList";
+import useActiveListStore from "../store/useActiveList";
 import { User, UserType } from "@/shared/types";
 
 interface AvatarProps {
@@ -10,7 +10,7 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ user }) => {
-  const { members } = useActiveList();
+  const { members } = useActiveListStore();
   const isActive = members.indexOf(user?.email!) !== -1;
 
   return (

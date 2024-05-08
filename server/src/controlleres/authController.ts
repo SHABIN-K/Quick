@@ -150,7 +150,7 @@ const loginController = async (req: Request, res: Response) => {
         username: user?.username,
         email: user?.email,
         profile: user?.profile,
-        accessToken,
+        confirmToken: accessToken,
       },
     });
   } catch (err) {

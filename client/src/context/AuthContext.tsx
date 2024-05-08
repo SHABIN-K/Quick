@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import { UserType } from "@/shared/types";
 
 type AuthStatus = "authenticated" | "unauthenticated" | "pending";
@@ -27,7 +28,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const auth_token = Cookies.get("-secure-node-authToken");
   const [status, setStatus] = useState<AuthStatus>("pending");
-
   const [getSession, setSession] = useState<UserType | null>(null);
 
   useEffect(() => {
@@ -58,6 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     checkAuthentication();
   }, [auth_token]);
+
 
   useEffect(() => {
     if (getSession) {

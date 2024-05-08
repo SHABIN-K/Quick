@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { IoClose, IoTrash } from "react-icons/io5";
 import { Fragment, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import useActiveList from "@/hooks/useActiveList";
+import useActiveListStore from "@/store/useActiveList";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const otherUser = useOtherUser(data);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { members } = useActiveList();
+  const { members } = useActiveListStore();
   const isActive = members.indexOf(otherUser?.email!) !== -1;
 
   const joinedDate = useMemo(() => {

@@ -7,7 +7,7 @@ interface ActiveListStore {
   set: (ids: string[]) => void;
 }
 
-const useActiveList = create<ActiveListStore>((set) => ({
+const useActiveListStore = create<ActiveListStore>((set) => ({
   members: [],
   add: (id) => set((state) => ({ members: [...state.members, id] })),
   remove: (id) =>
@@ -17,4 +17,4 @@ const useActiveList = create<ActiveListStore>((set) => ({
   set: (ids) => set({ members: ids }),
 }));
 
-export default useActiveList;
+export default useActiveListStore;

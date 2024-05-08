@@ -63,9 +63,7 @@ const AuthForm = () => {
             expires: 7,
           });
 
-          //remove token fomr response data
-          const { confirmToken, ...userData } = res?.data?.data;
-          setSession?.(userData);
+          setSession?.(res.data.data);
           window.location.reload();
         }
       } catch (err: any) {
@@ -86,13 +84,11 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success(`Great to see you again, ${res?.data?.data?.name}!`);
-          Cookies.set("-secure-node-authToken", res?.data?.data?.accessToken, {
+          Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
             expires: 7,
           });
 
-          //remove token fomr response data
-          const { accessToken, ...userData } = res.data.data;
-          setSession?.(userData);
+          setSession?.(res.data.data);
           window.location.reload();
         }
       } catch (err: any) {
