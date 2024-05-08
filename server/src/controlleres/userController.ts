@@ -4,7 +4,6 @@ import db from '../config/prismadb';
 
 export const getUsersController = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
-
   if (!email) next(ErrorResponse.badRequest('Email is missing or invalid'));
 
   try {

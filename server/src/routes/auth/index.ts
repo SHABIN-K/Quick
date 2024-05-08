@@ -6,6 +6,7 @@ import {
   signupController,
   refreshController,
   pusherController,
+  forgotPasswordController,
 } from '../../controlleres/authController';
 
 const router = express.Router();
@@ -21,6 +22,9 @@ router.get('/logout', logoutController);
 
 // api/auth/refresh-token
 router.get('/refresh-token', refreshController);
+
+// api/auth/forget-password
+router.post('/forgot-password', forgotPasswordController);
 
 // api/auth/pusher
 router.get('/pusher', pusherController);

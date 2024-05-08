@@ -22,7 +22,7 @@ declare module 'express-session' {
  * @param next The Express NextFunction object.
  * @returns A JSON response indicating the success or failure of the signup process.
  */
-export const signupController = async (req: Request, res: Response, next: NextFunction) => {
+const signupController = async (req: Request, res: Response, next: NextFunction) => {
   const { name, username, email, password } = req.validData || { name: '', username: '', email: '', password: '' };
   try {
     // generating password hash
@@ -91,7 +91,7 @@ export const signupController = async (req: Request, res: Response, next: NextFu
  * @param res The Express Response object.
  * @returns A JSON response indicating the success or failure of the login process.
  */
-export const loginController = async (req: Request, res: Response) => {
+const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.validDaata || { email: '', password: '' };
   const validationErrors: { [key: string]: string[] } = {};
   try {
@@ -122,7 +122,7 @@ export const loginController = async (req: Request, res: Response) => {
 
     // Store user details in session
     req.session.user = payload;
-
+   
     // Generate tokens
     const { accessToken, refreshToken } = await generateTokens({ payload });
 
@@ -167,9 +167,10 @@ export const loginController = async (req: Request, res: Response) => {
  * @param next The Express NextFunction for error handling.
  * @returns A JSON response indicating the success or failure of the logout process.
  */
-export const logoutController = async (req: Request, res: Response, next: NextFunction) => {
+const logoutController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.session.user?.id;
+    console.log(req.session.user);
 
     if (!userId) {
       return next(ErrorResponse.notFound('User ID not found in session'));
@@ -215,13 +216,13 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 };
 
 /**
- * create new  generates access and refresh tokens upon 
+ * create new  generates access and refresh tokens upon
  * @param req The Express Request object.
  * @param res The Express Response object.
  * @param next The Express NextFunction for error handling.
- * @returns A JSON response indicating the success or failure of the refreshtoken process.
+ * @returns A JSON response indicating the success or failure of the forgetpassword process.
  */
-export const refreshController = async (req: Request, res: Response, next: NextFunction) => {
+const refreshController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Check if refresh token exists in the request body
     const refreshToken = req.body.refreshToken;
@@ -278,7 +279,26 @@ export const refreshController = async (req: Request, res: Response, next: NextF
   }
 };
 
-export const pusherController = async (req: Request, res: Response, next: NextFunction) => {
+/**
+ * create new password by destorying the old password
+ * @param req The Express Request object.
+ * @param res The Express Response object.
+ * @param next The Express NextFunction for error handling.
+ * @returns A JSON response indicating the success or failure of the refreshtoken process.
+ */
+const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      message: 'Hello world',
+    });
+  } catch (error) {
+    console.error('Error in forgotPasswordController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during forget password'));
+  }
+};
+
+const pusherController = async (req: Request, res: Response, next: NextFunction) => {
   console.log('hey pusher');
   const { email } = req.body;
 
@@ -304,4 +324,13 @@ export const pusherController = async (req: Request, res: Response, next: NextFu
     console.error('Error is getMessageController:', error);
     return next(error);
   }
+};
+
+export {
+  signupController,
+  loginController,
+  logoutController,
+  refreshController,
+  forgotPasswordController,
+  pusherController,
 };
