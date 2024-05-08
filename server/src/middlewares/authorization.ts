@@ -2,7 +2,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 import ErrorResponse from '../error/ErrorResponse';
-import { verifyToken } from '../helpers/jwtHelper';
+import { verifyToken } from '../helpers/jwt.helper';
 
 interface ExtendedRequest extends Request {
   userData?: JwtPayload['data']; // Type from your JwtPayload interface

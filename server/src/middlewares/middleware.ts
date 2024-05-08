@@ -1,6 +1,7 @@
 import cors from 'cors';
 import helmet from 'helmet';
 import express from 'express';
+import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 
@@ -18,6 +19,16 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
+const sessionOptions = {
+  secret: process.env.APP_SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days (adjust as needed)
+  },
+};
+
 const middleware = [
   //requestLogger, // logger custom middleware
   rateLimit(limiterOptions), // requist limiter
@@ -26,7 +37,7 @@ const middleware = [
   express.json(),
   cookieParser(),
   express.urlencoded({ extended: true }),
+  session(sessionOptions),
 ];
-
 
 export default middleware;

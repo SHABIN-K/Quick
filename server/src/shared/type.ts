@@ -4,3 +4,10 @@ export type userType = {
   email: string;
   password: string;
 };
+
+export type userPayload = {
+  id: string;
+  name: string;
+  email: string;
+  username: string;
+};

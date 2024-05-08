@@ -2,7 +2,6 @@ import morgan from 'morgan';
 import express from 'express';
 
 import baseRouter from './routes';
-import logger from './utils/logger';
 import { middleware } from './middlewares';
 import { errorHandler, notFoundHandler } from './error';
 
@@ -13,8 +12,19 @@ const app = express();
 app.use(middleware);
 
 //logger
-
-app.use(morgan('combined', { stream: { write: (message) => logger.info(message) } }));
+app.use(
+  morgan(function (tokens, req, res) {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, 'content-length'),
+      '-',
+      tokens['response-time'](req, res),
+      'ms',
+    ].join(' ');
+  }),
+);
 
 // api/routes
 app.use(baseRouter);

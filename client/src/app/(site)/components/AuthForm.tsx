@@ -66,6 +66,8 @@ const AuthForm = () => {
         });
 
         if (res?.data?.success) {
+          console.log(res?.data?.data);
+
           toast.success("Welcome to Quick! Your account is ready to use");
           setCookie("token", res?.data?.data?.confirmToken, {
             path: "/",
