@@ -1,13 +1,15 @@
 import bcrypt from 'bcrypt';
+import { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
 import { pusherServer } from '../config/pusher';
+import { jwtConfig } from '../config/jwtOption';
 import ErrorResponse from '../error/ErrorResponse';
 import { getServerUser } from '../hooks/getServerUser';
 import { generateTokens } from '../helpers/auth.helper';
-import { generatePass, profilePicGenerator } from '../helpers';
+import { generatePass, profilePicGenerator, verifyToken } from '../helpers';
 
 declare module 'express-session' {
   interface SessionData {
@@ -225,25 +227,46 @@ const logoutController = async (req: Request, res: Response, next: NextFunction)
  */
 const refreshController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Check if refresh token exists in the request body
-    const refreshToken = req.body.refreshToken;
+    // Extract refresh token from cookies or headers
+    let refreshToken = req.cookies?.refreshToken;
 
+    if (!refreshToken) {
+      const authHeader = req.headers['authorization'];
+      const accessToken = authHeader && authHeader.split(' ')[1];
+
+      if (!accessToken) {
+        return next(ErrorResponse.badRequest('Access token is required'));
+      }
+
+      const userAccount = await db.account.findFirst({ where: { access_token: accessToken } });
+
+      if (!userAccount) {
+        return next(ErrorResponse.badRequest('Invalid access token'));
+      }
+
+      refreshToken = userAccount.refresh_token;
+    }
+
+    // Ensure refresh token is available
     if (!refreshToken) {
       return next(ErrorResponse.badRequest('Refresh token is required'));
     }
 
-    // Find the user associated with the refresh token
-    const userAccount = await db.account.findFirst({ where: { refresh_token: refreshToken }, include: { user: true } });
+    // Verify refresh token
+    const secret = jwtConfig.REFRESH_TOKEN.secret as string;
+    const decode = verifyToken(refreshToken as string, secret) as JwtPayload;
 
-    if (!userAccount) {
-      return next(ErrorResponse.unauthorized('Invalid refresh token'));
-    }
+    // Retrieve user data based on decoded token
+    const user = await db.user.findFirst({
+      where: { id: decode?.data?.id },
+    });
 
+    // Generate new tokens
     const payload: userPayload = {
-      id: userAccount.user.id,
-      name: userAccount.user.name as string,
-      email: userAccount.user.email as string,
-      username: userAccount.user.username as string,
+      id: decode?.data?.id,
+      name: decode?.data?.name,
+      email: decode?.data?.email,
+      username: decode.data.username,
     };
 
     const { accessToken, refreshToken: newRefreshToken } = await generateTokens({ payload });
@@ -266,11 +289,11 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
       success: true,
       message: 'Tokens refreshed successfully',
       data: {
-        id: userAccount.user.id,
-        name: userAccount.user.name,
-        username: userAccount.user.username,
-        email: userAccount.user.email,
-        profile: userAccount.user.profile,
+        id: decode?.data?.id,
+        name: decode?.data?.name,
+        username: decode?.data?.username,
+        email: decode?.data?.email,
+        profile: user?.profile,
         confirmToken: accessToken,
       },
     });

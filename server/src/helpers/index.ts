@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 /**
  * Generates a URL for a profile picture based on the given username.
@@ -12,7 +13,6 @@ export const profilePicGenerator = (username: string) => {
   return profilePicURL;
 };
 
-
 /**
  * Generates a hashed password using bcrypt with a specified number of salt rounds.
  * @param password The password to be hashed.
@@ -23,4 +23,15 @@ export const generatePass = async (password: string) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
   return hashedPassword;
+};
+
+/**
+ * verifying token using jwt with a access secret.
+ * @param token user authentication token
+ * @param secret The secret used to verifying the token
+ * @returns A decoded jwt token.
+ */
+export const verifyToken = (token: string, secret: string) => {
+  const decodedToken = jwt.verify(token, secret);
+  return decodedToken;
 };
