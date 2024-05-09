@@ -1,9 +1,10 @@
 export type UserType = {
-  id?: string;
-  email: string;
+  id: string;
   name: string;
-  profile: string;
+  email: string;
   username: string;
+  profile: string;
+  confirmToken: string;
 };
 
 export type User = {

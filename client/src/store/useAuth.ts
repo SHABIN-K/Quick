@@ -1,35 +1,24 @@
+import { UserType } from "@/shared/types";
 import { create } from "zustand";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  profile: string;
-  accessToken: string;
-}
-
 interface AuthState {
-  user: User;
-  setUser: (newUser: User) => void;
+  user: UserType;
+  setUser: (newUser: UserType) => void;
   clearAuth: () => void;
 }
 
-const initialState: User = {
+const initialState: UserType = {
   id: "",
   name: "",
   email: "",
   username: "",
   profile: "",
-  accessToken: "",
+  confirmToken: "",
 };
 
 const useAuthStore = create<AuthState>((set) => ({
   user: initialState,
-  setUser: (newUser) => {
-    console.log(newUser);
-    set({ user: newUser });
-  },
+  setUser: (newUser) => set({ user: newUser }),
   clearAuth: () => set({ user: initialState }),
 }));
 

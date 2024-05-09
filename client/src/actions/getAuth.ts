@@ -20,6 +20,8 @@ export const signInApi = ({
   password: string;
 }) => axios.post("/auth/login", { email, password }, { withCredentials: true });
 
-
 export const logoutApi = () =>
   axios.get("/auth/logout", { withCredentials: true });
+
+export const refreshTokenApi = () =>
+  axios.get("/auth/refresh-token", { withCredentials: true });

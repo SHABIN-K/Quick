@@ -10,8 +10,8 @@ import {
 } from "react";
 
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { UserType } from "@/shared/types";
+import useAuthStore from "@/store/useAuth";
 
 type AuthStatus = "authenticated" | "unauthenticated" | "pending";
 
@@ -26,6 +26,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { setUser } = useAuthStore();
   const auth_token = Cookies.get("-secure-node-authToken");
   const [status, setStatus] = useState<AuthStatus>("pending");
   const [getSession, setSession] = useState<UserType | null>(null);
@@ -44,6 +45,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             try {
               const userData = JSON.parse(storedData);
               setSession(userData);
+              setUser({
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                username: userData.username,
+                profile: userData.profile,
+                confirmToken: userData.confirmToken,
+              });
             } catch (error) {
               console.error("Error checking authentication:", error);
               setStatus("unauthenticated");
@@ -57,14 +66,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     checkAuthentication();
-  }, [auth_token]);
-
+  }, [auth_token, setUser]);
 
   useEffect(() => {
     if (getSession) {
       localStorage.setItem("user.profile", JSON.stringify(getSession));
+      setUser({
+        id: getSession.id,
+        name: getSession.name,
+        email: getSession.email,
+        username: getSession.username,
+        profile: getSession.profile,
+        confirmToken: getSession.confirmToken,
+      });
     }
-  }, [getSession]);
+  }, [getSession, setUser]);
 
   return (
     <AuthContext.Provider value={{ status, getSession, setSession }}>
