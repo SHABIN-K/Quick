@@ -14,7 +14,7 @@ router.use('/api/auth', authRoute);
 router.use('/api/chats', authenticate, chatsRoute);
 
 //user routes
-router.use('/api/users', usersRoute);
+router.use('/api/users', authenticate, usersRoute);
 
 router.use('/api', (req, res) => {
   res.status(200).json({ success: true, message: 'The API is up and running.' });

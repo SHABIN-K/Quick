@@ -13,15 +13,13 @@ export const authenticate = (req: ExtendedRequest, res: Response, next: NextFunc
   try {
     // Extract access token from cookies or headers
     const accessToken = req.headers?.authorization?.split(' ')[1];
-    console.log(accessToken);
-
+   
     if (!accessToken) return next(ErrorResponse.unauthorized('Unauthorized access.'));
 
     // Verify token
     const secret = jwtConfig.ACCESS_TOKEN.secret as string;
     const decode = verifyToken(accessToken as string, secret) as JwtPayload;
-    console.log(decode);
-
+ 
     if (!decode || !decode.data || !decode.data.email || !decode.data.id) {
       return next(ErrorResponse.badRequest('Invalid token data'));
     }
