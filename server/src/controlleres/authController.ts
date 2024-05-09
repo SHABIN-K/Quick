@@ -343,12 +343,8 @@ const pusherController = async (req: Request, res: Response, next: NextFunction)
     };
 
     const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
-
-    return res.status(200).json({
-      success: true,
-      message: 'pusher loged successfully',
-      data: authResponse,
-    });
+    
+    return res.send(authResponse)
   } catch (error) {
     return next(ErrorResponse.badRequest('An error occurred during pusher'));
   }
