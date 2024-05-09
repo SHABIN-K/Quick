@@ -9,7 +9,7 @@ function useRefreshToken() {
     const { id, name, email, username, profile, confirmToken } =
       response?.data?.data;
     setUser({ id, name, email, username, profile, confirmToken });
-    return response.data?.data;
+    return response.data;
   };
 
   return refresh;

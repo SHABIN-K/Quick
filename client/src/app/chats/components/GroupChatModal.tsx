@@ -1,12 +1,12 @@
-import { Button, Input, Select } from "@/components";
-import Modal from "@/components/Modal";
 import axios from "@/config/api";
+import Modal from "@/components/Modal";
 import { User } from "@/shared/types";
+import { Button, Input, Select } from "@/components";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 interface GroupChatModalProps {
   isOpen?: boolean;
