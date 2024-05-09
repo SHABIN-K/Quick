@@ -9,6 +9,7 @@ import { Button, Input } from "@/components";
 import { useSession } from "@/context/AuthContext";
 import { signInApi, signUpApi } from "@/actions/getAuth";
 import { ProtectedAuthLayout } from "@/components/ProtectedLayout";
+import Link from "next/link";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -144,9 +145,12 @@ const AuthForm = () => {
               errorMsg={errMsg?.password ? errMsg.password : ""}
             />
 
-            <span className="cursor-pointer text-xs text-gray-500 py-2 hover:underline">
+            <Link
+              href="/forget-pass"
+              className="cursor-pointer text-xs text-gray-500 py-2 hover:underline"
+            >
               forget password ?
-            </span>
+            </Link>
 
             <div>
               <Button disabled={isLoading} fullWidth type="submit">

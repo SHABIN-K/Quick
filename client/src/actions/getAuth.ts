@@ -23,5 +23,8 @@ export const signInApi = ({
 export const logoutApi = () =>
   axios.get("/auth/logout", { withCredentials: true });
 
+export const forgetPassApi = ({ email }: { email: string }) =>
+  axios.post("/auth/forgot-password", { email }, { withCredentials: true });
+
 export const refreshTokenApi = () =>
   axios.get("/auth/refresh-token", { withCredentials: true });

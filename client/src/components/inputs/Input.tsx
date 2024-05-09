@@ -12,6 +12,7 @@ interface InputProps {
   errors: FieldErrors;
   disabled?: boolean;
   errorMsg?: string | string[];
+  placeholder?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -23,6 +24,7 @@ const Input: React.FC<InputProps> = ({
   errors,
   disabled,
   errorMsg,
+  placeholder,
 }) => {
   return (
     <div>
@@ -38,6 +40,7 @@ const Input: React.FC<InputProps> = ({
           type={type}
           autoComplete={id}
           disabled={disabled}
+          placeholder={placeholder}
           {...register(id, { required })}
           className={clsx(
             `

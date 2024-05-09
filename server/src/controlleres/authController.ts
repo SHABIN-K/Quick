@@ -311,6 +311,16 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
  * @returns A JSON response indicating the success or failure of the refreshtoken process.
  */
 const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+  // validating email
+  if (
+    !email ||
+    !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+      email,
+    )
+  ) {
+    return next(ErrorResponse.badRequest('Enter your email'));
+  }
   try {
     return res.status(200).json({
       success: true,
@@ -343,8 +353,8 @@ const pusherController = async (req: Request, res: Response, next: NextFunction)
     };
 
     const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
-    
-    return res.send(authResponse)
+
+    return res.send(authResponse);
   } catch (error) {
     return next(ErrorResponse.badRequest('An error occurred during pusher'));
   }
