@@ -19,7 +19,7 @@ router.delete('/conversations/:conversationId', deleteConversationByParamsContro
 
 router.post('/conversations', getConversationController);
 
-router.post('/get-conversations', getSingleChatController);
+router.get('/get-conversations/:chatId', getSingleChatController);
 
 router.post('/get-messages', geSingletMessagesController);
 

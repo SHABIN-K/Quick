@@ -139,7 +139,7 @@ export const getConversationController = async (req: Request, res: Response, nex
 };
 
 export const getSingleChatController = async (req: Request, res: Response, next: NextFunction) => {
-  const { chatId } = req.body;
+  const { chatId } = req.params;
   try {
     // Fetch conversations for the current user
     const conversations = await db.conversation.findMany({
