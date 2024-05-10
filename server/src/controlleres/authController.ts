@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 
 import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
@@ -8,8 +8,9 @@ import { pusherServer } from '../config/pusher';
 import { jwtConfig } from '../config/jwtOption';
 import ErrorResponse from '../error/ErrorResponse';
 import { getServerUser } from '../hooks/getServerUser';
-import { generateTokens } from '../helpers/auth.helper';
-import { generatePass, profilePicGenerator, verifyToken } from '../helpers';
+import { compileHTMLEmailTemplate, sendMail } from '../helpers/mail.helper';
+import { generateAccessTokenAndRefreshToken } from '../helpers/auth.helper';
+import { generatePass, generateToken, profilePicGenerator, verifyToken } from '../helpers';
 
 declare module 'express-session' {
   interface SessionData {
@@ -54,7 +55,7 @@ const signupController = async (req: Request, res: Response, next: NextFunction)
 
     req.session.user = payload;
 
-    const { accessToken, refreshToken } = await generateTokens({ payload });
+    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken({ payload });
 
     // Set cookies with tokens
     res.cookie('authToken', accessToken, {
@@ -95,7 +96,7 @@ const signupController = async (req: Request, res: Response, next: NextFunction)
  * @returns A JSON response indicating the success or failure of the login process.
  */
 const loginController = async (req: Request, res: Response) => {
-  const { email, password } = req.validDaata || { email: '', password: '' };
+  const { email, password } = req.signUpData || { email: '', password: '' };
   const validationErrors: { [key: string]: string[] } = {};
   try {
     // Find user by email
@@ -127,7 +128,7 @@ const loginController = async (req: Request, res: Response) => {
     req.session.user = payload;
 
     // Generate tokens
-    const { accessToken, refreshToken } = await generateTokens({ payload });
+    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken({ payload });
 
     // Set cookies with tokens
     res.cookie('authToken', accessToken, {
@@ -269,7 +270,7 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
       username: decode.data.username,
     };
 
-    const { accessToken, refreshToken: newRefreshToken } = await generateTokens({ payload });
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessTokenAndRefreshToken({ payload });
 
     // Set cookies with new tokens
     res.cookie('authToken', accessToken, {
@@ -313,7 +314,6 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
 const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
   const validationErrors: { [key: string]: string[] } = {};
-  console.log(email);
 
   // validating email
   if (
@@ -339,13 +339,70 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
       });
     }
 
+    const secret = jwtConfig.RESET_PASSWORD_TOKEN.secret as string;
+    const payload = user.email;
+    const expiry = jwtConfig.RESET_PASSWORD_TOKEN.expiry as string;
+
+    //generate reset token
+    const token = generateToken(payload as string, secret, expiry);
+    const url = `${process.env.APP_WEB_URL}/forget-password/${token}`;
+
+    const emailTemplatePath = `./src/utils/template/reset-password-email.html`;
+    const emailContent = await compileHTMLEmailTemplate(emailTemplatePath, {
+      resetUrl: url,
+    });
+
+    // send mail
+    await sendMail(email, 'Forgot Password Link', emailContent);
+
     return res.status(200).json({
       success: true,
-      message: 'Hello world',
+      message: 'A password reset link has been sent to your email.',
     });
   } catch (error) {
     console.error('Error in forgotPasswordController:', error);
     return next(ErrorResponse.badRequest('An error occurred during forget password'));
+  }
+};
+
+/**
+ * Handles the reset password functionality.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response indicating the success or failure of the password reset.
+ */
+const resetPasswordController = async (req: Request, res: Response, next: NextFunction) => {
+  const { token, password } = req.resetPass || { password: '', token: '' };
+  try {
+    // Verify refresh token
+    const secret = jwtConfig.RESET_PASSWORD_TOKEN.secret as string;
+    const decode = verifyToken(token, secret) as JwtPayload;
+
+    if (!decode.key) return next(ErrorResponse.notFound('Invalid reset link'));
+
+    // generating password hash
+    const hashedpass = await generatePass(password);
+
+    // updateing to db
+    await db.user.update({
+      where: { email: decode.key },
+      data: {
+        hashedPassword: hashedpass,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password updated successfully',
+    });
+  } catch (error) {
+    if ((error as TokenExpiredError).name === 'TokenExpiredError')
+      return next(ErrorResponse.badRequest('Reset link expired, generate new one'));
+
+    console.error('Error in resetPasswordController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during reset password'));
   }
 };
 
@@ -383,5 +440,6 @@ export {
   logoutController,
   refreshController,
   forgotPasswordController,
+  resetPasswordController,
   pusherController,
 };

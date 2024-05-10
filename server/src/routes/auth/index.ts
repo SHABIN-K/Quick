@@ -1,5 +1,4 @@
 import express from 'express';
-import { loginValidation, signupValidation } from '../../middlewares/validations';
 import {
   loginController,
   logoutController,
@@ -7,7 +6,9 @@ import {
   refreshController,
   pusherController,
   forgotPasswordController,
+  resetPasswordController,
 } from '../../controlleres/authController';
+import { loginValidation, signupValidation, resetPassValidation } from '../../middlewares/validations';
 
 const router = express.Router();
 
@@ -25,6 +26,9 @@ router.get('/refresh-token', refreshController);
 
 // api/auth/forget-password
 router.post('/forgot-password', forgotPasswordController);
+
+// api/auth/forget-password
+router.post('/reset-password', resetPassValidation, resetPasswordController);
 
 // api/auth/pusher
 router.post('/pusher', pusherController);
