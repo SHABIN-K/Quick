@@ -8,6 +8,7 @@ export const jwtConfig = {
     expiry: process.env.APP_REFRESH_TOKEN_EXPIRY,
   },
   RESET_PASSWORD_TOKEN: {
+    secret: process.env.APP_RESET_PASSWORD_TOKEN_SECRET,
     expiry: process.env.APP_RESET_PASSWORD_TOKEN_EXPIRY_MINS,
   },
 };

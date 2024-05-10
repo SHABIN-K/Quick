@@ -312,6 +312,9 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
  */
 const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
+  const validationErrors: { [key: string]: string[] } = {};
+  console.log(email);
+
   // validating email
   if (
     !email ||
@@ -322,6 +325,20 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
     return next(ErrorResponse.badRequest('Enter your email'));
   }
   try {
+    // Find user by email
+    const user = await db.user.findFirst({
+      where: { email: email },
+    });
+    // invalid email
+    if (!user) {
+      validationErrors['email'] = ['Did you mistype your email address?'];
+
+      return res.status(400).json({
+        success: false,
+        message: validationErrors,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Hello world',

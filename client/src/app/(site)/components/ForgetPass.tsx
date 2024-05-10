@@ -1,8 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
+import { forgetPassApi } from "@/actions/getAuth";
 import { Button, Input } from "@/components";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 interface ErrorObject {
   [key: string]: string | string[];
@@ -23,7 +25,26 @@ const ForgetPass = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    console.log(data);
     setIsLoading(true);
+    try {
+      const res = await forgetPassApi({
+        email: data.email,
+      });
+
+      if (res?.data?.success) {
+        toast.success(
+          "Heads up! We've sent a password reset link to your inbox"
+        );
+        setTimeout(() => window.location.href = "/" , 1000);
+      }
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message;
+      setErrMsg(errMsg);
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,10 +71,10 @@ const ForgetPass = () => {
             errorMsg={errMsg?.email ? errMsg.email : ""}
             placeholder="name@mail.com"
           />
-        
-            <Button disabled={isLoading} fullWidth type="submit">
-              Reset password
-            </Button>
+
+          <Button disabled={isLoading} fullWidth type="submit">
+            Reset password
+          </Button>
         </form>
       </div>
     </div>

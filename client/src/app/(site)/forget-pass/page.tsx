@@ -8,7 +8,7 @@ const Home = () => {
         <Image
           alt="Logo"
           height="48"
-          width="65"
+          width="55"
           className="mx-auto w-auto"
           src="/images/quick-logo.png"
         />
