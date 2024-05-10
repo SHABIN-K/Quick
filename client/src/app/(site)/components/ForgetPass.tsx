@@ -25,7 +25,6 @@ const ForgetPass = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
     setIsLoading(true);
     try {
       const res = await forgetPassApi({
@@ -36,12 +35,12 @@ const ForgetPass = () => {
         toast.success(
           "Heads up! We've sent a password reset link to your inbox"
         );
-        setTimeout(() => window.location.href = "/" , 1000);
+        setTimeout(() => (window.location.href = "/"), 1000);
       }
     } catch (err: any) {
       const errMsg = err?.response?.data?.message;
       setErrMsg(errMsg);
-      console.log(err);
+      console.log(errMsg);
     } finally {
       setIsLoading(false);
     }

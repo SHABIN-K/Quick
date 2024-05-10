@@ -26,12 +26,24 @@ export const generatePass = async (password: string) => {
 };
 
 /**
- * verifying token using jwt with a access secret.
- * @param token user authentication token
- * @param secret The secret used to verifying the token
- * @returns A decoded jwt token.
+ * Verifies a token using jwt with a specified secret.
+ * @param token The user authentication token to be verified.
+ * @param secret The secret used to verify the token.
+ * @returns The decoded jwt token.
  */
 export const verifyToken = (token: string, secret: string) => {
   const decodedToken = jwt.verify(token, secret);
   return decodedToken;
+};
+
+/**
+ * Generates a token using the provided payload, secret, and expiry.
+ * @param payload - The payload to be included in the token.
+ * @param secret - The secret key used to sign the token.
+ * @param expiry - The expiration time for the token.
+ * @returns The generated token.
+ */
+export const generateToken = (payload: string, secret: string, expiry: string) => {
+  const generatedToken = jwt.sign({ key: payload }, secret, { expiresIn: expiry });
+  return generatedToken;
 };

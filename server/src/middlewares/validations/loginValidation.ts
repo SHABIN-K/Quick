@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 declare module 'express' {
   interface Request {
-    validDaata?: {
+    signUpData?: {
       email: string;
       password: string;
     };
@@ -25,7 +25,7 @@ const loginValidation = async (req: Request, res: Response, next: NextFunction) 
   try {
     const validatedData = await loginSchema.validate({ email, password }, { stripUnknown: true, abortEarly: false });
     // Set validated data to the request object
-    req.validDaata = validatedData;
+    req.signUpData = validatedData;
     next();
   } catch (err) {
     if (err instanceof yup.ValidationError) {

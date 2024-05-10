@@ -1,15 +1,30 @@
 import { create } from 'express-handlebars';
 import transporter from '../config/nodemailer';
-import { generateToken } from './jwt.helper';
 
-// rendering data with html to send over email
+/**
+ * Compiles an HTML email template with optional replacements.
+ * 
+ * @param HTMLTemplatePath - The path to the HTML template file.
+ * @param replacements - Optional replacements to be applied to the template.
+ * @returns A promise that resolves to the compiled HTML.
+ */
 export const compileHTMLEmailTemplate = (HTMLTemplatePath: string, replacements = {}) =>
   new Promise((resolve) => {
     const compiledHTML = create().render(HTMLTemplatePath, replacements);
     resolve(compiledHTML);
   });
 
-// Email sending using nodemailer
+
+
+
+/**
+ * Sends an email.
+ * 
+ * @param toEmail - The recipient's email address.
+ * @param subject - The subject of the email.
+ * @param htmlContent - The HTML content of the email.
+ * @returns A promise that resolves to an object with a success flag and a message indicating the status of the email sending.
+ */
 export const sendMail = (toEmail: string, subject: string, htmlContent: unknown) =>
   new Promise((resolve, reject) => {
     const mailOptions = {
@@ -25,9 +40,12 @@ export const sendMail = (toEmail: string, subject: string, htmlContent: unknown)
     });
   });
 
+
+
+
 // sending email verification otp to mail
 export const sendVerificationOtp = async (email: string) => {
-  const token = generateToken(email);
+  const token = 'aasdfasfasdfsdafsdafsd';
 
   // creating otp and save to db
   const otp = Math.floor(100000 + Math.random() * 900000);

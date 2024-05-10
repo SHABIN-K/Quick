@@ -3,7 +3,12 @@ import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
 import { jwtConfig } from '../config/jwtOption';
 
-export const generateTokens = async (props: {
+/**
+ * Generates an access token and a refresh token for a given user payload.
+ * @param props - The payload object containing user information.
+ * @returns An object containing the access token and refresh token.
+ */
+export const generateAccessTokenAndRefreshToken = async (props: {
   payload: userPayload;
 }): Promise<{ accessToken: string; refreshToken: string }> => {
   const { payload } = props;
