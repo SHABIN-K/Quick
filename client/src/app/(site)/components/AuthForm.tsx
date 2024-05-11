@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useCallback, useState } from "react";
@@ -9,7 +10,6 @@ import { Button, Input } from "@/components";
 import { useSession } from "@/context/AuthContext";
 import { signInApi, signUpApi } from "@/actions/getAuth";
 import { ProtectedAuthLayout } from "@/components/ProtectedLayout";
-import Link from "next/link";
 
 type Variant = "LOGIN" | "REGISTER";
 

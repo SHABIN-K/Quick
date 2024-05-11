@@ -354,7 +354,7 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
 
     //generate reset token
     const token = generateToken(payload as string, secret, expiry);
-    const url = `${process.env.APP_WEB_URL}/forget-password/${token}`;
+    const url = `${process.env.APP_WEB_URL}/forget-pass/${token}`;
 
     const emailTemplatePath = `./src/utils/template/reset-password-email.html`;
     const emailContent = await compileHTMLEmailTemplate(emailTemplatePath, {
@@ -384,7 +384,6 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
  */
 const resetPasswordController = async (req: Request, res: Response, next: NextFunction) => {
   const { token, password } = req.resetPass || { password: '', token: '' };
-  console.log(token, password);
 
   try {
     // Verify refresh token

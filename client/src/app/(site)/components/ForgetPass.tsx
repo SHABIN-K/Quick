@@ -1,10 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import { forgetPassApi } from "@/actions/getAuth";
 import { Button, Input } from "@/components";
+import { forgetPassApi } from "@/actions/getAuth";
+
+import Link from "next/link";
 import { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 interface ErrorObject {
   [key: string]: string | string[];
@@ -69,6 +71,13 @@ const ForgetPass = () => {
             errorMsg={errMsg?.email ? errMsg.email : ""}
             placeholder="name@mail.com"
           />
+
+          <Link
+            href="/"
+            className="cursor-pointer text-xs text-blue-500 py-2 hover:underline"
+          >
+            Return to login?
+          </Link>
 
           <Button disabled={isLoading} fullWidth type="submit">
             Reset password
