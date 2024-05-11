@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { Request, Response, NextFunction } from 'express';
-import { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
+import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 
 import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
@@ -384,12 +384,14 @@ const forgotPasswordController = async (req: Request, res: Response, next: NextF
  */
 const resetPasswordController = async (req: Request, res: Response, next: NextFunction) => {
   const { token, password } = req.resetPass || { password: '', token: '' };
+  console.log(token, password);
+
   try {
     // Verify refresh token
     const secret = jwtConfig.RESET_PASSWORD_TOKEN.secret as string;
     const decode = verifyToken(token, secret) as JwtPayload;
 
-    if (!decode.key) return next(ErrorResponse.notFound('Invalid reset link'));
+    if (!decode.key) return next(ErrorResponse.forbidden('Invalid reset link'));
 
     // generating password hash
     const hashedpass = await generatePass(password);
@@ -408,7 +410,8 @@ const resetPasswordController = async (req: Request, res: Response, next: NextFu
     });
   } catch (error) {
     if ((error as TokenExpiredError).name === 'TokenExpiredError')
-      return next(ErrorResponse.badRequest('Reset link expired, generate new one'));
+      return next(ErrorResponse.forbidden('The Reset link has expired, please request a new one.'));
+    else if ((error as JsonWebTokenError).name) return next(ErrorResponse.forbidden('Invalid reset link'));
 
     console.error('Error in resetPasswordController:', error);
     return next(ErrorResponse.badRequest('An error occurred during reset password'));

@@ -144,13 +144,15 @@ const AuthForm = () => {
               disabled={isLoading}
               errorMsg={errMsg?.password ? errMsg.password : ""}
             />
-
-            <Link
-              href="/forget-pass"
-              className="cursor-pointer text-xs text-gray-500 py-2 hover:underline"
-            >
-              forget password ?
-            </Link>
+            
+            {variant === "LOGIN" && (
+              <Link
+                href="/forget-pass"
+                className="cursor-pointer text-xs text-gray-500 py-2 hover:underline"
+              >
+                forget password ?
+              </Link>
+            )}
 
             <div>
               <Button disabled={isLoading} fullWidth type="submit">
