@@ -40,7 +40,6 @@ const ForgetPass = () => {
     } catch (err: any) {
       const errMsg = err?.response?.data?.message;
       setErrMsg(errMsg);
-      console.log(errMsg);
     } finally {
       setIsLoading(false);
     }

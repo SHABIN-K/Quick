@@ -64,10 +64,9 @@ const ResetPass = () => {
       var errMsg = err?.response?.data;
       if (errMsg?.status === 403) {
         toast.error(errMsg?.message);
-        //setTimeout(() => (window.location.href = "/forget-pass"), 1000);
+        setTimeout(() => (window.location.href = "/forget-pass"), 1000);
       }
       setErrMsg(errMsg.message);
-      console.log(err);
     } finally {
       setIsLoading(false);
     }
