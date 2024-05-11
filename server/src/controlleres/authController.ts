@@ -46,6 +46,15 @@ const signupController = async (req: Request, res: Response, next: NextFunction)
       },
     });
 
+    const emailTemplatePath = `./src/utils/template/welcome-email.html`;
+    const emailContent = await compileHTMLEmailTemplate(emailTemplatePath, {
+      user_name: newUser.name,
+      start_Url: `${process.env.APP_WEB_URL}/chats`,
+    });
+
+    // send mail
+    await sendMail(email, 'Welcome to Quick - Chat with the Speed of Life!', emailContent);
+
     const payload = {
       id: newUser.id,
       name,
