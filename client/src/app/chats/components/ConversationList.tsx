@@ -1,10 +1,12 @@
 "use client";
 
 import clsx from "clsx";
+import { find } from "lodash";
 import { useRouter } from "next/navigation";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import { useEffect, useMemo, useState } from "react";
 
+import useAuthStore from "@/store/useAuth";
 import GroupChatModal from "./GroupChatModal";
 import { getUsers } from "@/actions/getUsers";
 import { pusherClient } from "@/config/pusher";
@@ -12,8 +14,6 @@ import ConversationBox from "./ConversationBox";
 import { getConversations } from "@/actions/getChats";
 import useConversation from "@/hooks/useConversation";
 import { FullConversationType, User } from "@/shared/types";
-import { find } from "lodash";
-import useAuthStore from "@/store/useAuth";
 
 const ConversationList = () => {
   const router = useRouter();

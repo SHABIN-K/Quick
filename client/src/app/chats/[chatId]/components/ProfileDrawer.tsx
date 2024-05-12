@@ -1,15 +1,15 @@
 "use client";
 
+import { format } from "date-fns";
+import { IoClose, IoTrash } from "react-icons/io5";
+import { Fragment, useMemo, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+
 import Avatar from "@/components/Avatar";
 import ConfirmModal from "./ConfirmModal";
 import useOtherUser from "@/hooks/useOtherUser";
 import AvatarGroup from "@/components/AvatarGroup";
 import { Conversation, User } from "@/shared/types";
-
-import { format } from "date-fns";
-import { IoClose, IoTrash } from "react-icons/io5";
-import { Fragment, useMemo, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
 import useActiveListStore from "@/store/useActiveList";
 
 interface ProfileDrawerProps {

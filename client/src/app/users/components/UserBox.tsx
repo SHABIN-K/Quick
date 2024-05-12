@@ -1,7 +1,7 @@
-import Avatar from "@/components/Avatar";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+import Avatar from "@/components/Avatar";
 import { UserType } from "@/shared/types";
 import { getChats } from "@/actions/getChats";
 import LoadingModal from "@/components/LoadingModal";

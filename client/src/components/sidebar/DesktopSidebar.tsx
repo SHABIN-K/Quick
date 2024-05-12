@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 
-import useNavigation from "@/hooks/useNavigation";
-
 import Avatar from "../Avatar";
 import DesktopItem from "./DesktopItem";
-import SettingsModal from "./SettingsModal";
 import useAuthStore from "@/store/useAuth";
+import SettingsModal from "./SettingsModal";
+import useNavigation from "@/hooks/useNavigation";
 
 const DesktopSidebar = () => {
   const { session } = useAuthStore();

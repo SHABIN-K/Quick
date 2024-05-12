@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { usePathname } from "next/navigation";
-
 import { HiChat } from "react-icons/hi";
+import { usePathname } from "next/navigation";
 import { HiArrowLeftOnRectangle, HiUsers } from "react-icons/hi2";
 
 import useLogout from "./useLogout";

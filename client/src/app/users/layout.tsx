@@ -1,5 +1,5 @@
-import Sidebar from "@/components/sidebar/Sidebar";
 import UserList from "./components/UserList";
+import Sidebar from "@/components/sidebar/Sidebar";
 
 export default async function UsersLayout({
   children,

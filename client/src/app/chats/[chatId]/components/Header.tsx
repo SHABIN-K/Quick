@@ -1,13 +1,14 @@
 "use client";
 
-import Avatar from "@/components/Avatar";
-import AvatarGroup from "@/components/AvatarGroup";
-import useOtherUser from "@/hooks/useOtherUser";
-import { User, Conversation } from "@/shared/types";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
+
+import Avatar from "@/components/Avatar";
 import ProfileDrawer from "./ProfileDrawer";
+import useOtherUser from "@/hooks/useOtherUser";
+import AvatarGroup from "@/components/AvatarGroup";
+import { User, Conversation } from "@/shared/types";
 import useActiveListStore from "@/store/useActiveList";
 
 interface HeaderProps {

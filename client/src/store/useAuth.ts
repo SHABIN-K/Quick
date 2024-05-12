@@ -1,5 +1,6 @@
-import { UserType } from "@/shared/types";
 import { create } from "zustand";
+
+import { UserType } from "@/shared/types";
 
 interface AuthState {
   session: UserType;

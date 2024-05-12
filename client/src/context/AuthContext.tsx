@@ -8,8 +8,8 @@ import {
   ReactNode,
   Dispatch,
 } from "react";
-
 import Cookies from "js-cookie";
+
 import { UserType } from "@/shared/types";
 import useAuthStore from "@/store/useAuth";
 

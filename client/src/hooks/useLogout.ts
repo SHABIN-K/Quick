@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+
 import { logoutApi } from "@/api/Auth";
 
 async function useLogout() {

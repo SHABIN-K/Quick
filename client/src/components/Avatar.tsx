@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 
-import useActiveListStore from "../store/useActiveList";
 import { User, UserType } from "@/shared/types";
+import useActiveListStore from "../store/useActiveList";
 
 interface AvatarProps {
   user?: User | UserType;

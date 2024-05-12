@@ -1,7 +1,8 @@
 "use client";
 
-import { User } from "@/shared/types";
 import Image from "next/image";
+
+import { User } from "@/shared/types";
 
 interface AvatarGroupProps {
   users?: User[];

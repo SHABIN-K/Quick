@@ -1,8 +1,9 @@
 "use client";
 
-import LoadingModal from "./LoadingModal";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect } from "react";
+
+import LoadingModal from "./LoadingModal";
 import { useSession } from "@/context/AuthContext";
 
 interface ProtectedtProps {

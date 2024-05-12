@@ -1,10 +1,12 @@
 "use client";
-import { getConversationById, getMessages } from "@/actions/getChats";
-import EmptyState from "@/components/EmptyState";
-import Header from "./components/Header";
+
+import { useEffect, useState } from "react";
+
 import Body from "./components/Body";
 import Form from "./components/Form";
-import { useEffect, useState } from "react";
+import Header from "./components/Header";
+import EmptyState from "@/components/EmptyState";
+import { getConversationById, getMessages } from "@/actions/getChats";
 
 interface IParams {
   chatId: string;

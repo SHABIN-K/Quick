@@ -1,11 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
 import UserBox from "./UserBox";
 import { UserType } from "@/shared/types";
-
-import { getUsers } from "@/actions/getUsers";
 import useAuthStore from "@/store/useAuth";
+import { getUsers } from "@/actions/getUsers";
 
 const UserList = () => {
   const { session } = useAuthStore();

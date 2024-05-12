@@ -1,6 +1,7 @@
-import { FullConversationType, User } from "@/shared/types";
-import useAuthStore from "@/store/useAuth";
 import { useMemo } from "react";
+import useAuthStore from "@/store/useAuth";
+
+import { FullConversationType, User } from "@/shared/types";
 
 const useOtherUser = (
   conversation: FullConversationType | { users: User[] }

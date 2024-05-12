@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import Modal from "../Modal";
+import Button from "../Button";
 import axios from "@/config/api";
 import Input from "../inputs/Input";
 import { UserType } from "@/shared/types";
-import Button from "../Button";
 
 interface SettingsModalProps {
   isOpen?: boolean;
