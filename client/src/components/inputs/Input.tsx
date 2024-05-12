@@ -67,6 +67,9 @@ const Input: React.FC<InputProps> = ({
           )}
         />
         {errorMsg && <p className="text-xs text-red-600 mt-1">{errorMsg[0]}</p>}
+        {errors[id] && (
+          <p className="text-xs text-red-600 mt-1">Please fill in this field</p>
+        )}
       </div>
     </div>
   );

@@ -92,6 +92,7 @@ const ResetPass = () => {
             errors={errors}
             disabled={isLoading}
             errorMsg={errMsg?.password ? errMsg.password : ""}
+            required={true}
             placeholder="•••••••"
           />
           <Input
@@ -101,6 +102,7 @@ const ResetPass = () => {
             register={register}
             errors={errors}
             disabled={isLoading}
+            required={true}
             errorMsg={errMsg?.confirmPassword ? errMsg.confirmPassword : ""}
             placeholder="•••••••"
           />

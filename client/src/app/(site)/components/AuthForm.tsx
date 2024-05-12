@@ -65,7 +65,7 @@ const AuthForm = () => {
           });
 
           setSession?.(res.data.data);
-          window.location.reload();
+          setTimeout(() => (window.location.href = "/chats"), 1500);
         }
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
@@ -90,7 +90,7 @@ const AuthForm = () => {
           });
 
           setSession?.(res.data.data);
-          window.location.reload();
+          setTimeout(() => (window.location.href = "/chats"), 1500);
         }
       } catch (err: any) {
         const errMsg = err?.response?.data?.message;
@@ -115,6 +115,7 @@ const AuthForm = () => {
                   errors={errors}
                   disabled={isLoading}
                   errorMsg={errMsg?.name ? errMsg.name : ""}
+                  required={true}
                 />
                 <Input
                   id="username"
@@ -123,6 +124,7 @@ const AuthForm = () => {
                   errors={errors}
                   disabled={isLoading}
                   errorMsg={errMsg?.username ? errMsg.username : ""}
+                  required={true}
                 />
               </>
             )}
@@ -134,6 +136,7 @@ const AuthForm = () => {
               errors={errors}
               disabled={isLoading}
               errorMsg={errMsg?.email ? errMsg.email : ""}
+              required={true}
             />
             <Input
               id="password"
@@ -143,8 +146,9 @@ const AuthForm = () => {
               errors={errors}
               disabled={isLoading}
               errorMsg={errMsg?.password ? errMsg.password : ""}
+              required={true}
             />
-            
+
             {variant === "LOGIN" && (
               <Link
                 href="/forget-pass"
