@@ -54,48 +54,50 @@ test("should allow the user to Login", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("should allow the user to forget password", async ({ page }) => {
-  //get the sign in button
-  await page.getByText("forget password ?").click();
+test.describe("should allow to user to Forget passworde", () => {
+  test("Request for Password Reset Instructions", async ({ page }) => {
+    //get the sign in button
+    await page.getByText("forget password ?").click();
 
-  // wait for the page to redirect to the forget page
-  await page.waitForURL("**/forget-pass");
-  await expect(
-    page.getByRole("heading", { name: "Forgot your password?" })
-  ).toBeVisible();
+    // wait for the page to redirect to the forget page
+    await page.waitForURL("**/forget-pass");
+    await expect(
+      page.getByRole("heading", { name: "Forgot your password?" })
+    ).toBeVisible();
 
-  //fill the form with the email
-  await page.locator("[name=email]").fill("1@1.com");
+    //fill the form with the email
+    await page.locator("[name=email]").fill("1@1.com");
 
-  // click the Forget button
-  await page.getByRole("button", { name: "Reset password" }).click();
+    // click the Forget button
+    await page.getByRole("button", { name: "Reset password" }).click();
 
-  // wait for the page to redirect to the chat page
-  await page.goto(APP_WEB_URL);
+    // wait for the page to redirect to the chat page
+    await page.goto(APP_WEB_URL);
 
-  await expect(page.getByText("New to Quick?")).toBeVisible();
-});
+    await expect(page.getByText("New to Quick?")).toBeVisible();
+  });
 
-test("should allow the user to Reset password", async ({ page }) => {
-  await page.goto(`${APP_WEB_URL}/forget-pass/token`);
+  test("create new password", async ({ page }) => {
+    await page.goto(`${APP_WEB_URL}/forget-pass/token`);
 
-  // wait for the Reset page
-  await expect(
-    page.getByRole("heading", { name: "Create new password?" })
-  ).toBeVisible();
+    // wait for the Reset page
+    await expect(
+      page.getByRole("heading", { name: "Create new password?" })
+    ).toBeVisible();
 
-  //fill the form with the email
-  await page.getByLabel("New password").fill("12345678");
-  await page.getByLabel("Confirm Password").fill("12345678");
+    //fill the form with the email
+    await page.getByLabel("New password").fill("12345678");
+    await page.getByLabel("Confirm Password").fill("12345678");
 
-  // click the Forget button
-  await page.getByRole("button", { name: "Reset password" }).click();
+    // click the Forget button
+    await page.getByRole("button", { name: "Reset password" }).click();
 
-  // wait for the page to redirect to the chat page
-  await page.waitForURL("**/forget-pass");
-  await expect(
-    page.getByRole("heading", { name: "Forgot your password?" })
-  ).toBeVisible();
+    // wait for the page to redirect to the chat page
+    await page.waitForURL("**/forget-pass");
+    await expect(
+      page.getByRole("heading", { name: "Forgot your password?" })
+    ).toBeVisible();
+  });
 });
 
 test.afterAll(async () => {
