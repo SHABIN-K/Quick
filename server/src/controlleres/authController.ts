@@ -7,7 +7,6 @@ import { userPayload } from '../shared/type';
 import { pusherServer } from '../config/pusher';
 import { jwtConfig } from '../config/jwtOption';
 import ErrorResponse from '../error/ErrorResponse';
-import { getServerUser } from '../hooks/getServerUser';
 import { compileHTMLEmailTemplate, sendMail } from '../helpers/mail.helper';
 import { generateAccessTokenAndRefreshToken } from '../helpers/auth.helper';
 import { generatePass, generateToken, profilePicGenerator, verifyToken } from '../helpers';
@@ -181,10 +180,9 @@ const loginController = async (req: Request, res: Response) => {
  * @returns A JSON response indicating the success or failure of the logout process.
  */
 const logoutController = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = getServerUser(req, next);
-    const userId = user?.id;
+  const { id: userId } = req.body;
 
+  try {
     if (!userId) {
       return next(ErrorResponse.notFound('User ID not found in session'));
     }
@@ -321,7 +319,7 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
  * @returns A JSON response indicating the success or failure of the refreshtoken process.
  */
 const forgotPasswordController = async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body;
+  const { emailId: email } = req.params;
   const validationErrors: { [key: string]: string[] } = {};
 
   // validating email

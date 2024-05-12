@@ -1,11 +1,12 @@
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-import { logoutApi } from "@/actions/getAuth";
+import { logoutApi } from "@/api/Auth";
 
 async function useLogout() {
+  const data = window.localStorage.getItem("user.profile");
+  const user = JSON.parse(data as string);
   try {
-    const res = await logoutApi();
-
+    const res = await logoutApi({ id: user?.id });
     if (res.data && res.data.success) {
       // Redirect to the home page
       window.location.href = "/";

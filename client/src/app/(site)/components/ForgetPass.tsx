@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
+import { forgetPassApi } from "@/api/Auth";
 import { Button, Input } from "@/components";
-import { forgetPassApi } from "@/actions/getAuth";
 
 import Link from "next/link";
 import { useState } from "react";

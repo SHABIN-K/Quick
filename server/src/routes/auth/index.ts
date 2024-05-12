@@ -19,13 +19,13 @@ router.post('/signup', signupValidation, signupController);
 router.post('/login', loginValidation, loginController);
 
 // api/auth/logout
-router.get('/logout', logoutController);
+router.post('/logout', logoutController);
 
 // api/auth/refresh-token
 router.get('/refresh-token', refreshController);
 
 // api/auth/forget-password
-router.post('/forgot-password', forgotPasswordController);
+router.get('/forgot-password/:emailId', forgotPasswordController);
 
 // api/auth/forget-password
 router.post('/reset-password', resetPassValidation, resetPasswordController);

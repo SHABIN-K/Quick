@@ -7,8 +7,8 @@ import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { Button, Input } from "@/components";
+import { signInApi, signUpApi } from "@/api/Auth";
 import { useSession } from "@/context/AuthContext";
-import { signInApi, signUpApi } from "@/actions/getAuth";
 import { ProtectedAuthLayout } from "@/components/ProtectedLayout";
 
 type Variant = "LOGIN" | "REGISTER";
@@ -49,7 +49,7 @@ const AuthForm = () => {
     setIsLoading(true);
 
     if (variant === "REGISTER") {
-      //Axios Register
+      //Register
       try {
         const res = await signUpApi({
           name: data.name,
@@ -76,7 +76,7 @@ const AuthForm = () => {
     }
 
     if (variant === "LOGIN") {
-      //Axios login
+      //login
       try {
         const res = await signInApi({
           email: data.email,

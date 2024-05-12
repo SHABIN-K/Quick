@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
+import { resetPassApi } from "@/api/Auth";
 import { Button, Input } from "@/components";
-import { resetPassApi } from "@/actions/getAuth";
 
 import { useState } from "react";
 import toast from "react-hot-toast";

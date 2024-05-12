@@ -1,5 +1,5 @@
 import useAuthStore from "@/store/useAuth";
-import { refreshTokenApi } from "@/actions/getAuth";
+import { refreshTokenApi } from "@/api/Auth";
 
 function useRefreshToken() {
   const { setSession } = useAuthStore();
