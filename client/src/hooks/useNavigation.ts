@@ -1,15 +1,20 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
-import useLogout from "./useLogout";
+import useOpenStore from "@/store/useOpen";
 import useConversation from "./useConversation";
+
+//icons
 import { GrChat } from "react-icons/gr";
 import { HiOutlineLogout } from "react-icons/hi";
 import { RiSettings5Line, RiUser2Line, RiGroupLine } from "react-icons/ri";
 
 const useRoutes = () => {
+  const { setIsOpen } = useOpenStore();
   const pathname = usePathname();
   const { conversationId } = useConversation();
+
+  const handleLogOut = useCallback(() => setIsOpen(true), [setIsOpen]);
 
   const routes = useMemo(
     () => [
@@ -44,12 +49,12 @@ const useRoutes = () => {
       {
         label: "Logout",
         href: "#",
-        onClick: useLogout,
+        onClick: handleLogOut,
         icon: HiOutlineLogout,
         mobileOnly: true,
       },
     ],
-    [pathname, conversationId]
+    [pathname, conversationId, handleLogOut]
   );
 
   return routes;

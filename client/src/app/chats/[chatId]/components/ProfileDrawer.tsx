@@ -1,15 +1,20 @@
 "use client";
 
 import { format } from "date-fns";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { IoClose, IoTrash } from "react-icons/io5";
-import { Fragment, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 
+import axios from "@/config/api";
 import Avatar from "@/components/Avatar";
-import ConfirmModal from "./ConfirmModal";
+import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import AvatarGroup from "@/components/AvatarGroup";
 import { Conversation, User } from "@/shared/types";
+import ConfirmModal from "@/components/ConfirmModal";
+import useConversation from "@/hooks/useConversation";
 import useActiveListStore from "@/store/useActiveList";
 
 interface ProfileDrawerProps {
@@ -25,10 +30,16 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onClose,
   data,
 }) => {
+  const router = useRouter();
+  const { session } = useAuthStore();
+  const { members } = useActiveListStore();
+  const { conversationId } = useConversation();
+
   const otherUser = useOtherUser(data);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { members } = useActiveListStore();
   const isActive = members.indexOf(otherUser?.email!) !== -1;
 
   const joinedDate = useMemo(() => {
@@ -45,11 +56,33 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
     }
     return isActive ? "Active" : "Offline";
   }, [data, isActive]);
+
+  const onDelete = useCallback(() => {
+    setIsLoading(true);
+
+    axios
+      .delete(`/chats/conversations/${conversationId}`, {
+        data: { email: session?.email },
+      })
+      .then(() => {
+        onClose();
+        router.push("/chats");
+        router.refresh();
+      })
+      .catch(() => toast.error("Something went wrong!"))
+      .finally(() => setIsLoading(false));
+  }, [conversationId, router, onClose, session?.email]);
   return (
     <>
       <ConfirmModal
         isOpen={confirmOpen}
         onClose={() => setConfirmOpen(false)}
+        title="Delete conversation"
+        desc="Are you sure you want to delete this conversation? This action
+        cannot be undone."
+        buttonLabel="Delete"
+        onClick={onDelete}
+        isLoading={isLoading}
       />
       <Transition.Root show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={onClose}>
