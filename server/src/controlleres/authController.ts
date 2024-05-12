@@ -425,16 +425,16 @@ const resetPasswordController = async (req: Request, res: Response, next: NextFu
  * @returns A JSON response indicating the success or failure of the pusher fetch process.
  */
 const pusherController = async (req: Request, res: Response, next: NextFunction) => {
-  const user = getServerUser(req, next);
+  const { user } = req.body;
   try {
-    if (!user?.email) {
+    if (!user) {
       return next(ErrorResponse.badRequest('unauthorized'));
     }
 
     const socketId = req.body.socket_id;
     const channel = req.body.channel_name;
     const data = {
-      user_id: user?.email,
+      user_id: user,
     };
 
     const authResponse = pusherServer.authorizeChannel(socketId, channel, data);

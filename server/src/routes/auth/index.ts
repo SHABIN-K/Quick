@@ -31,6 +31,6 @@ router.post('/forgot-password', forgotPasswordController);
 router.post('/reset-password', resetPassValidation, resetPasswordController);
 
 // api/auth/pusher
-router.post('/pusher', pusherController);
+router.post('/pusher-auth', pusherController);
 
 export default router;

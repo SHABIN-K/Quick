@@ -1,15 +1,15 @@
 import Pusher from "pusher-js";
-import Cookies from "js-cookie";
 
-const auth = Cookies.get("-secure-node-authToken");
+const data = window.localStorage.getItem("user.profile");
+const user = JSON.parse(data as string);
 
 export const pusherClient = new Pusher(
   process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
   {
     channelAuthorization: {
-      endpoint: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/pusher`,
+      endpoint: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/pusher-auth`,
       transport: "ajax",
-      headers: { Authorization: `Bearer ${auth}` },
+      params: { user: user?.email },
     },
     cluster: "ap2",
   }
