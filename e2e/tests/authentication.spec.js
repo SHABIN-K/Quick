@@ -54,7 +54,7 @@ test("should allow the user to Login", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.describe("should allow to user to Forget passworde", () => {
+test.describe("should allow to user to Forget password", () => {
   test("Request for Password Reset Instructions", async ({ page }) => {
     //get the sign in button
     await page.getByText("forget password ?").click();
