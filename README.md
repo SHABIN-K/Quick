@@ -44,6 +44,14 @@ E.g. "chore(grunt): Updated Grunt tasks for better task automation and build pro
 
 # articles :
 
+### jwt token
+
 - https://tkacz.pro/how-to-securely-store-jwt-tokens/
 - https://dev.to/gkoniaris/how-to-securely-store-jwt-tokens-51cf
 - https://blog.theashishmaurya.me/handling-jwt-access-and-refresh-token-using-axios-in-react-app
+
+### handle indexDb
+
+- https://dev.to/esponges/indexeddb-your-offline-and-serverless-db-in-your-browser-with-react-3hm7
+- https://github.com/pmndrs/zustand/discussions/1721
+- https://webkul.com/blog/how-to-use-indexeddb-dexie-in-nextjs/
