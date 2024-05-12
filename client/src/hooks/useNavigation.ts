@@ -1,10 +1,11 @@
 import { useMemo } from "react";
-import { HiChat } from "react-icons/hi";
 import { usePathname } from "next/navigation";
-import { HiArrowLeftOnRectangle, HiUsers } from "react-icons/hi2";
 
 import useLogout from "./useLogout";
 import useConversation from "./useConversation";
+import { GrChat } from "react-icons/gr";
+import { HiOutlineLogout } from "react-icons/hi";
+import { RiSettings5Line, RiUser2Line, RiGroupLine } from "react-icons/ri";
 
 const useRoutes = () => {
   const pathname = usePathname();
@@ -13,22 +14,39 @@ const useRoutes = () => {
   const routes = useMemo(
     () => [
       {
-        label: "Chat",
+        label: "Chats",
         href: "/chats",
-        icon: HiChat,
+        icon: GrChat,
         active: pathname === "/chats" || !!conversationId,
+        mobileOnly: false,
       },
       {
-        label: "Users",
+        label: "Groups",
         href: "/users",
-        icon: HiUsers,
+        icon: RiGroupLine,
         active: pathname === "/users",
+        mobileOnly: false,
+      },
+      {
+        label: "Profile",
+        href: "/users",
+        icon: RiUser2Line,
+        active: pathname === "/users",
+        mobileOnly: false,
+      },
+      {
+        label: "Settings",
+        href: "/users",
+        icon: RiSettings5Line,
+        active: pathname === "/users",
+        mobileOnly: true,
       },
       {
         label: "Logout",
         href: "#",
         onClick: useLogout,
-        icon: HiArrowLeftOnRectangle,
+        icon: HiOutlineLogout,
+        mobileOnly: true,
       },
     ],
     [pathname, conversationId]

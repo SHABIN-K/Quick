@@ -3,20 +3,22 @@
 import clsx from "clsx";
 import Link from "next/link";
 
-interface DesktopItemProps {
+interface DisplayItemProps {
   label: string;
   icon: any;
   href: string;
   onClick?: () => void;
   active?: boolean;
+  mobileOnly?: boolean;
 }
 
-const DesktopItem: React.FC<DesktopItemProps> = ({
+const DisplayItem: React.FC<DisplayItemProps> = ({
   label,
   icon: Icon,
   href,
   onClick,
   active,
+  mobileOnly,
 }) => {
   const handleClick = () => {
     if (onClick) {
@@ -29,9 +31,11 @@ const DesktopItem: React.FC<DesktopItemProps> = ({
       href={href}
       onClick={handleClick}
       className={clsx(
-        `groupflexgap-x-3rounded-mdp-3text-smleading-6font-semiboldtext-gray-500hover:text-blackhover:bg-gray-100`,
-        active && "bg-gray-100 text-black"
+        `group flex p-4 text-sm leading-6 font-semibold text-gray-500 hover:text-sky-500 hover:bg-sky-50 rounded-lg`,
+        active && "bg-sky-50 text-sky-500",
+        mobileOnly ? "w-full justify-center" : "tooltip tooltip-bottom"
       )}
+      data-tip={label}
     >
       <Icon className="h-6 w-6 shrink-0" />
       <span className="sr-only">{label}</span>
@@ -39,4 +43,4 @@ const DesktopItem: React.FC<DesktopItemProps> = ({
   );
 };
 
-export default DesktopItem;
+export default DisplayItem;

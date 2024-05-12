@@ -13,6 +13,10 @@ const config: Config = {
     require("@tailwindcss/forms")({
       strategy: "class",
     }),
+    require("daisyui"),
   ],
+  daisyui: {
+    darkTheme: "light",
+  },
 };
 export default config;
