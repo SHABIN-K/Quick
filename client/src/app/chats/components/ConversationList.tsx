@@ -9,15 +9,15 @@ import GroupChatModal from "./GroupChatModal";
 import { getUsers } from "@/actions/getUsers";
 import { pusherClient } from "@/config/pusher";
 import ConversationBox from "./ConversationBox";
-import { useSession } from "@/context/AuthContext";
 import { getConversations } from "@/actions/getChats";
 import useConversation from "@/hooks/useConversation";
 import { FullConversationType, User } from "@/shared/types";
 import { find } from "lodash";
+import useAuthStore from "@/store/useAuth";
 
 const ConversationList = () => {
   const router = useRouter();
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
   const { conversationId, isOpen } = useConversation();
 
   const [users, setUsers] = useState<User[]>([]);
@@ -27,7 +27,7 @@ const ConversationList = () => {
   useEffect(() => {
     const fetchConverstations = async () => {
       try {
-        const email = getSession?.email as string;
+        const email = session?.email as string;
         if (email) {
           const users = await getUsers({ email });
           setUsers(users.data.data);
@@ -42,11 +42,11 @@ const ConversationList = () => {
     };
 
     fetchConverstations();
-  }, [getSession]);
+  }, [session]);
 
   const pusherKey = useMemo(() => {
-    return getSession?.email;
-  }, [getSession?.email]);
+    return session?.email;
+  }, [session?.email]);
 
   useEffect(() => {
     if (!pusherKey) {
@@ -107,7 +107,7 @@ const ConversationList = () => {
     <>
       <GroupChatModal
         users={users}
-        currentUser={getSession?.email as string}
+        currentUser={session?.email as string}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

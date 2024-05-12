@@ -5,9 +5,6 @@ import { pusherServer } from '../config/pusher';
 
 export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId: userId, isGroup, members, name } = req.body;
-  console.log(userId);
-  console.log(email);
-
   try {
     const currentUser = await db.user.findUnique({
       where: { email: email },

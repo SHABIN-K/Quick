@@ -5,7 +5,7 @@ import { format } from "date-fns";
 
 import Avatar from "@/components/Avatar";
 import { FullMessageType } from "@/shared/types";
-import { useSession } from "@/context/AuthContext";
+import useAuthStore from "@/store/useAuth";
 
 interface MessageBoxProps {
   data: FullMessageType;
@@ -13,9 +13,9 @@ interface MessageBoxProps {
 }
 
 const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
 
-  const isOwn = getSession?.email === data?.sender?.email;
+  const isOwn = session?.email === data?.sender?.email;
   
   const seenList = (data.seen || [])
     .filter((user) => user.email !== data?.sender?.email)

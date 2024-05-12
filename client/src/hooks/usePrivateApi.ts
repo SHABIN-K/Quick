@@ -6,7 +6,7 @@ import useRefreshToken from "./useRefreshToken";
 
 const usePrivateApi = () => {
   const refresh = useRefreshToken();
-  const { user } = useAuthStore();
+  const { session } = useAuthStore();
 
   useEffect(() => {
     // Add a request interceptor
@@ -16,7 +16,7 @@ const usePrivateApi = () => {
 
         if (!config.headers.Authorization) {
           // eslint-disable-next-line no-param-reassign
-          config.headers.Authorization = `Bearer ${user?.confirmToken}`;
+          config.headers.Authorization = `Bearer ${session?.confirmToken}`;
         }
         return config;
       },
@@ -50,7 +50,7 @@ const usePrivateApi = () => {
       privateApi.interceptors.request.eject(requestIntercept);
       privateApi.interceptors.response.eject(responseIntercept);
     };
-  }, [refresh, user?.confirmToken]);
+  }, [refresh, session?.confirmToken]);
 
   return privateApi;
 };

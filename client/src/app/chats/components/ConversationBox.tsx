@@ -7,8 +7,8 @@ import { useCallback, useMemo } from "react";
 import Avatar from "@/components/Avatar";
 import useOtherUser from "@/hooks/useOtherUser";
 import AvatarGroup from "@/components/AvatarGroup";
-import { useSession } from "@/context/AuthContext";
 import { FullConversationType } from "@/shared/types";
+import useAuthStore from "@/store/useAuth";
 
 interface ConversationBoxProps {
   data: FullConversationType;
@@ -20,7 +20,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
   selected,
 }) => {
   const router = useRouter();
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
 
   const handleClick = useCallback(() => {
@@ -34,8 +34,8 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
   }, [data.messages]);
 
   const userEmail = useMemo(() => {
-    return getSession?.email;
-  }, [getSession?.email]);
+    return session?.email;
+  }, [session?.email]);
 
   const hasSeen = useMemo(() => {
     if (!lastMessage) {

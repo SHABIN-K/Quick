@@ -5,11 +5,11 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { HiPaperAirplane } from "react-icons/hi2";
 import MessageInput from "./MessageInput";
 import axios from "@/config/api";
-import { useSession } from "@/context/AuthContext";
+import useAuthStore from "@/store/useAuth";
 
 const Form = () => {
   const { conversationId } = useConversation();
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
 
   const {
     register,
@@ -28,7 +28,7 @@ const Form = () => {
     axios.post("/chats/messages", {
       ...data,
       conversationId,
-      userId: getSession?.email,
+      userId: session?.email,
     });
   };
 

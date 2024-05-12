@@ -5,16 +5,16 @@ import useConversation from "@/hooks/useConversation";
 import { FullMessageType } from "@/shared/types";
 import MessageBox from "./MessageBox";
 import axios from "@/config/api";
-import { useSession } from "@/context/AuthContext";
 import { pusherClient } from "@/config/pusher";
 import { find } from "lodash";
+import useAuthStore from "@/store/useAuth";
 
 interface BodyProps {
   initialMessages: FullMessageType[];
 }
 
 const Body: React.FC<BodyProps> = ({ initialMessages }) => {
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
   const { conversationId } = useConversation();
 
   const [messages, setMessages] = useState(initialMessages);
@@ -22,9 +22,9 @@ const Body: React.FC<BodyProps> = ({ initialMessages }) => {
 
   useEffect(() => {
     axios.post(`/chats/conversations/${conversationId}`, {
-      email: getSession?.email,
+      email: session?.email,
     });
-  }, [conversationId, getSession?.email]);
+  }, [conversationId, session?.email]);
 
   useEffect(() => {
     pusherClient.subscribe(conversationId);
@@ -32,7 +32,7 @@ const Body: React.FC<BodyProps> = ({ initialMessages }) => {
 
     const messageHandler = (message: FullMessageType) => {
       axios.post(`/chats/conversations/${conversationId}`, {
-        email: getSession?.email,
+        email: session?.email,
       });
 
       setMessages((current) => {
@@ -66,7 +66,7 @@ const Body: React.FC<BodyProps> = ({ initialMessages }) => {
       pusherClient.unbind("messages:new", messageHandler);
       pusherClient.unbind("message:update", updateMessageHandler);
     };
-  }, [conversationId, getSession?.email]);
+  }, [conversationId, session?.email]);
 
   return (
     <div className="flex-1 overflow-y-auto">

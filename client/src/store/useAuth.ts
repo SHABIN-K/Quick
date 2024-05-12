@@ -2,8 +2,8 @@ import { UserType } from "@/shared/types";
 import { create } from "zustand";
 
 interface AuthState {
-  user: UserType;
-  setUser: (newUser: UserType) => void;
+  session: UserType;
+  setSession: (newUser: UserType) => void;
   clearAuth: () => void;
 }
 
@@ -17,9 +17,9 @@ const initialState: UserType = {
 };
 
 const useAuthStore = create<AuthState>((set) => ({
-  user: initialState,
-  setUser: (newUser) => set({ user: newUser }),
-  clearAuth: () => set({ user: initialState }),
+  session: initialState,
+  setSession: (newUser) => set({ session: newUser }),
+  clearAuth: () => set({ session: initialState }),
 }));
 
 export default useAuthStore;

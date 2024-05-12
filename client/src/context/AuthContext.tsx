@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { setUser } = useAuthStore();
+  const { setSession: setUser } = useAuthStore();
   const auth_token = Cookies.get("-secure-node-authToken");
   const [status, setStatus] = useState<AuthStatus>("pending");
   const [getSession, setSession] = useState<UserType | null>(null);

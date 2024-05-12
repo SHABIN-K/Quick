@@ -7,18 +7,18 @@ import useNavigation from "@/hooks/useNavigation";
 import Avatar from "../Avatar";
 import DesktopItem from "./DesktopItem";
 import SettingsModal from "./SettingsModal";
-import { useSession } from "@/context/AuthContext";
+import useAuthStore from "@/store/useAuth";
 
 const DesktopSidebar = () => {
-  const currentUser = useSession();
+  const { session } = useAuthStore();
   const routes = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      {currentUser?.getSession && (
+      {session && (
         <SettingsModal
-          currentUser={currentUser?.getSession}
+          currentUser={session}
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
         />
@@ -43,9 +43,7 @@ const DesktopSidebar = () => {
             onClick={() => setIsOpen(true)}
             className="cursor-pointer hover:opacity-75 transition"
           >
-            {currentUser?.getSession && (
-              <Avatar user={currentUser?.getSession} />
-            )}
+            {session && <Avatar user={session} />}
           </div>
         </nav>
       </div>

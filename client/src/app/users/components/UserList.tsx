@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import UserBox from "./UserBox";
 import { UserType } from "@/shared/types";
 
-import { useSession } from "@/context/AuthContext";
 import { getUsers } from "@/actions/getUsers";
+import useAuthStore from "@/store/useAuth";
 
 const UserList = () => {
-  const { getSession } = useSession();
+  const { session } = useAuthStore();
   const [users, setUsers] = useState<UserType[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const email = getSession?.email as string;
+        const email = session?.email as string;
         if (email) {
           const response = await getUsers({ email });
           setUsers(response.data.data);
@@ -27,7 +27,7 @@ const UserList = () => {
     };
 
     fetchUsers();
-  }, [getSession]);
+  }, [session]);
 
   return (
     <aside className="fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-auto border-r border-gray-200 block w-full left-0">
@@ -39,7 +39,7 @@ const UserList = () => {
           <UserBox
             key={user.id}
             data={user}
-            currentUser={getSession?.email as string}
+            currentUser={session?.email as string}
           />
         ))}
       </div>
