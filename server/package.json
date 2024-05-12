@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node server.ts",
     "dev": "nodemon --exec ts-node server.ts",
+    "test": "cross-env DOTENV_CONFIG_PATH=.env.test nodemon",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint src/**/*.{ts,tsx}",
@@ -43,6 +44,7 @@
     "@types/nodemailer": "^6.4.14",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
