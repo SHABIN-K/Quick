@@ -34,9 +34,9 @@ const useRoutes = () => {
       },
       {
         label: "Profile",
-        href: "/users",
+        href: "/profile",
         icon: RiUser2Line,
-        active: pathname === "/users",
+        active: pathname === "/profile",
         mobileOnly: false,
       },
       {
