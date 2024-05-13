@@ -1,7 +1,10 @@
 import Pusher from "pusher-js";
 
-const data = window.localStorage.getItem("user.profile");
-const user = JSON.parse(data as string);
+let user;
+if (typeof window !== "undefined") {
+  const data = localStorage.getItem("user.profile");
+  user = JSON.parse(data as string);
+}
 
 export const pusherClient = new Pusher(
   process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
