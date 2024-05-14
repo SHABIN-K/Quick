@@ -9,7 +9,6 @@ import { useEffect, useMemo, useState } from "react";
 import SearchBar from "./SearchBar";
 import useAuthStore from "@/store/useAuth";
 import GroupChatModal from "./GroupChatModal";
-import { getUsers } from "@/actions/getUsers";
 import { pusherClient } from "@/config/pusher";
 import ConversationBox from "./ConversationBox";
 import useConversation from "@/hooks/useConversation";
@@ -18,13 +17,13 @@ import { FullConversationType, User } from "@/shared/types";
 interface ConversationProps {
   title: string;
   feed: FullConversationType[] | undefined;
-  users?: User[];
+  userData?: User[] | undefined;
 }
 
 const ConversationList: React.FC<ConversationProps> = ({
   title,
   feed,
-  users: userData,
+  userData,
 }) => {
   const router = useRouter();
   const { session } = useAuthStore();
@@ -35,23 +34,14 @@ const ConversationList: React.FC<ConversationProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchConverstations = async () => {
-      try {
-        const email = session?.email as string;
-        if (email) {
-          const users = await getUsers({ email });
-          setUsers(users.data.data);
-        } else {
-          console.error("Error: user is undefined");
-        }
-      } catch (error) {
-        console.error("Error fetching conversations:", error);
-      }
-    };
+    setUsers(userData || []);
     setItems(feed);
-    fetchConverstations();
-  }, [feed, session]);
+  }, [feed, userData]);
 
+  /**
+   * Returns the pusher key based on the session email.
+   * @returns The pusher key.
+   */
   const pusherKey = useMemo(() => {
     return session?.email;
   }, [session?.email]);
@@ -124,11 +114,11 @@ const ConversationList: React.FC<ConversationProps> = ({
       )}
       <aside
         className={clsx(
-          `fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-[350px] lg:block overflow-y-auto bg-sky-50`,
+          `fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-auto bg-sky-50`,
           isOpen ? "hidden" : "block w-full left-0"
         )}
       >
-        <div className="px-5 w-full">
+        <div className="px-2.5">
           <div className="flex justify-between mb-4 pt-4 mt-2">
             <h2 className="text-xl font-semibold text-neutral-800">{title}</h2>
             {title === "Groups" && (

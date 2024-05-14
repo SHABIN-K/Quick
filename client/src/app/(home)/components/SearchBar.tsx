@@ -9,7 +9,7 @@ const SearchBar = () => {
       <input
         type="search"
         placeholder="Search or Start new chat"
-        className="w-full p-4 ps-10 text-sm text-gray-900 rounded-lg bg-sky-100 outline-none cursor-text"
+        className="w-full p-4 ps-10 text-sm font-medium text-gray-900 rounded-lg bg-sky-100 outline-none cursor-text"
       />
     </div>
   );

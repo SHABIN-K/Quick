@@ -2,8 +2,8 @@
 
 import clsx from "clsx";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import Avatar from "@/components/Avatar";
 import useAuthStore from "@/store/useAuth";
@@ -21,12 +21,13 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
   selected,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
 
   const handleClick = useCallback(() => {
-    router.push(`/chats/${data.id}`);
-  }, [data.id, router]);
+    router.push(`${pathname}/${data.id}`);
+  }, [data.id, pathname, router]);
 
   const lastMessage = useMemo(() => {
     const messages = data.messages || [];
@@ -67,8 +68,8 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
     <div
       onClick={handleClick}
       className={clsx(
-        `w-full, relative flex items-center space-x-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer p-3`,
-        selected ? "bg-neutral-100" : "bg-white"
+        `w-full, relative flex items-center space-x-3 hover:bg-sky-100 rounded-lg transition cursor-pointer p-3`,
+        selected ? "bg-sky-100" : ""
       )}
     >
       {data.isGroup ? (
@@ -79,7 +80,7 @@ const ConversationBox: React.FC<ConversationBoxProps> = ({
       <div className="min-w-0 flex-1">
         <div className="focus:outline-none">
           <div className="flex justify-between items-center mb-1">
-            <p className="text-md font-medium text-gray-900">
+            <p className="text-sm font-medium text-gray-900">
               {data.name || otherUser.name}
             </p>
             {lastMessage?.createdAt && (
