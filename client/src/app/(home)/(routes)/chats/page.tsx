@@ -5,7 +5,7 @@ import clsx from "clsx";
 import EmptyState from "@/components/EmptyState";
 import useConversation from "@/hooks/useConversation";
 
-const Home = () => {
+const Chats = () => {
   const { isOpen } = useConversation();
   return (
     <div
@@ -16,4 +16,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Chats;
