@@ -31,9 +31,9 @@ const useRoutes = () => {
       },
       {
         label: "Groups",
-        href: "/users",
+        href: "/group",
         icon: RiGroupLine,
-        active: pathname === "/users",
+        active: pathname === "/group",
         mobileOnly: false,
       },
       {
