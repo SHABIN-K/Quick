@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 
 import Avatar from "../Avatar";
 import DisplayItem from "./DisplayItems";
@@ -16,17 +15,15 @@ import useNavigation from "@/hooks/useNavigation";
 const DesktopSidebar = () => {
   const routes = useNavigation();
   const { session } = useAuthStore();
-  const { isOpen: isLogout, setIsOpen: setIsLogout } = useOpenStore();
-
-  const [isOpen, setIsOpen] = useState(false);
+  const { isLogout, setIsLogout, isSettings, setIsSettings } = useOpenStore();
 
   return (
     <>
       {session && (
         <SettingsModal
           currentUser={session}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
+          isOpen={isSettings}
+          onClose={() => setIsSettings(false)}
         />
       )}
       <ConfirmModal
@@ -79,7 +76,6 @@ const DesktopSidebar = () => {
             ))}
           </ul>
           <div
-            onClick={() => setIsOpen(true)}
             className="cursor-pointer hover:opacity-75 transition ring-2 ring-sky-500 rounded-full p-1 mt-2"
           >
             {session && <Avatar user={session} />}

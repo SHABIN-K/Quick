@@ -10,11 +10,15 @@ import { HiOutlineLogout } from "react-icons/hi";
 import { RiSettings5Line, RiUser2Line, RiGroupLine } from "react-icons/ri";
 
 const useRoutes = () => {
-  const { setIsOpen } = useOpenStore();
   const pathname = usePathname();
   const { conversationId } = useConversation();
+  const { setIsLogout, setIsSettings } = useOpenStore();
 
-  const handleLogOut = useCallback(() => setIsOpen(true), [setIsOpen]);
+  const handleLogOut = useCallback(() => setIsLogout(true), [setIsLogout]);
+  const handleSettings = useCallback(
+    () => setIsSettings(true),
+    [setIsSettings]
+  );
 
   const routes = useMemo(
     () => [
@@ -41,20 +45,18 @@ const useRoutes = () => {
       },
       {
         label: "Settings",
-        href: "/users",
+        onClick: handleSettings,
         icon: RiSettings5Line,
-        active: pathname === "/users",
         mobileOnly: true,
       },
       {
         label: "Logout",
-        href: "#",
         onClick: handleLogOut,
         icon: HiOutlineLogout,
         mobileOnly: true,
       },
     ],
-    [pathname, conversationId, handleLogOut]
+    [pathname, conversationId, handleLogOut, handleSettings]
   );
 
   return routes;

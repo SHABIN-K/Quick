@@ -1,13 +1,17 @@
 import { create } from "zustand";
 
 interface openState {
-  isOpen: boolean;
-  setIsOpen: (isLoading: boolean) => void;
+  isLogout: boolean;
+  setIsLogout: (isLoading: boolean) => void;
+  isSettings: boolean;
+  setIsSettings: (isLoading: boolean) => void;
 }
 
 const useOpenStore = create<openState>((set) => ({
-  isOpen: false,
-  setIsOpen: (value) => set({ isOpen: value }),
+  isLogout: false,
+  setIsLogout: (value) => set({ isLogout: value }),
+  isSettings: false,
+  setIsSettings: (value) => set({ isSettings: value }),
 }));
 
 export default useOpenStore;

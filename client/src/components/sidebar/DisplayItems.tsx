@@ -6,7 +6,7 @@ import Link from "next/link";
 interface DisplayItemProps {
   label: string;
   icon: any;
-  href: string;
+  href?: string;
   onClick?: () => void;
   active?: boolean;
   mobileOnly?: boolean;
@@ -28,7 +28,7 @@ const DisplayItem: React.FC<DisplayItemProps> = ({
 
   return (
     <Link
-      href={href}
+      href={href || ""}
       onClick={handleClick}
       className={clsx(
         `group flex p-4 text-sm leading-6 font-semibold text-gray-500 hover:text-sky-500 hover:bg-sky-50 rounded-lg`,
