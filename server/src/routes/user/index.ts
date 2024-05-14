@@ -1,9 +1,13 @@
 import express from 'express';
-import { getUsersController, updateUserController } from '../../controlleres/userController';
+import { getUsersController, getAllUsersController, updateUserController } from '../../controlleres/userController';
 
 const router = express.Router();
 
-router.post('/get-users', getUsersController);
+//api/users/get-users
+router.get('/get-users', getUsersController);
+
+///
+router.post('/get-users', getAllUsersController);
 
 router.post('/update-user', updateUserController);
 

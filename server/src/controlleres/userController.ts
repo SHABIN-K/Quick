@@ -2,7 +2,58 @@ import { Request, Response, NextFunction } from 'express';
 import ErrorResponse from '../error/ErrorResponse';
 import db from '../config/prismadb';
 
+/**
+ * Retrieves the list of users from the database.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response containing the list of users.
+ */
 export const getUsersController = async (req: Request, res: Response, next: NextFunction) => {
+  // Access session data
+  const user = req.userSession;
+  // Ensure email is available in userSession
+  if (!user?.email) {
+    return next(ErrorResponse.forbidden('Unauthorized: Invalid group chat data'));
+  }
+
+  try {
+    const conversation = await db.conversation.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      where: {
+        isGroup: false,
+        userIds: {
+          has: user?.id,
+        },
+      },
+      include: {
+        users: {
+          where: {
+            id: {
+              not: user?.id,
+            },
+          },
+        },
+      },
+    });
+
+    // Extract only the 'users' array from each conversation
+    const users = conversation.map((value) => value.users);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Users fetched successfully',
+      data: users,
+    });
+  } catch (error) {
+    console.error('Error in getUsersController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get users'));
+  }
+};
+
+export const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
   if (!email) next(ErrorResponse.badRequest('Email is missing or invalid'));
 
