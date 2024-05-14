@@ -40,7 +40,7 @@ export const getUsersController = async (req: Request, res: Response, next: Next
     });
 
     // Extract only the 'users' array from each conversation
-    const users = conversation.map((value) => value.users);
+    const users = conversation.map((value) => value.users).flat();
 
     return res.status(200).json({
       success: true,
