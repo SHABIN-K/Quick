@@ -2,12 +2,12 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import Avatar from "@/components/Avatar";
-import { UserType } from "@/shared/types";
+import { User } from "@/shared/types";
 import { getChats } from "@/actions/getChats";
 import LoadingModal from "@/components/LoadingModal";
 
 interface UserBoxProps {
-  data: UserType;
+  data: User;
   currentUser: string;
 }
 
@@ -39,7 +39,7 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
       {isLoading && <LoadingModal />}
       <div
         onClick={handleClick}
-        className="w-full relative flex items-center space-x-3 bg-white p-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer"
+        className="w-full relative flex items-center space-x-3 p-3 hover:bg-sky-100 rounded-lg transition cursor-pointer"
       >
         <Avatar user={data} />
         <div className="min-w-0 flex-1">

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import ErrorResponse from '../error/ErrorResponse';
+
 import db from '../config/prismadb';
+import ErrorResponse from '../error/ErrorResponse';
 
 /**
  * Retrieves the list of users from the database.
@@ -14,7 +15,7 @@ export const getUsersController = async (req: Request, res: Response, next: Next
   const user = req.userSession;
   // Ensure email is available in userSession
   if (!user?.email) {
-    return next(ErrorResponse.forbidden('Unauthorized: Invalid group chat data'));
+    return next(ErrorResponse.forbidden('Unauthorized: no access '));
   }
 
   try {
@@ -53,9 +54,24 @@ export const getUsersController = async (req: Request, res: Response, next: Next
   }
 };
 
+
+/**
+ * Retrieves all users from the database, excluding the current user.
+ * Requires the user to be authenticated and have an email in the session.
+ * Returns a JSON response with the list of users.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response with the list of users.
+ */
 export const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body;
-  if (!email) next(ErrorResponse.badRequest('Email is missing or invalid'));
+  // Access session data
+  const user = req.userSession;
+  // Ensure email is available in userSession
+  if (!user?.email) {
+    return next(ErrorResponse.forbidden('Unauthorized: no access '));
+  }
 
   try {
     const users = await db.user.findMany({
@@ -64,28 +80,19 @@ export const getAllUsersController = async (req: Request, res: Response, next: N
       },
       where: {
         NOT: {
-          email: email,
+          email: user?.email,
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        profile: true,
-        createdAt: true,
-        updatedAt: true,
       },
     });
 
     return res.status(200).json({
       success: true,
-      message: 'Users fetched successfully',
+      message: 'All Users fetched successfully',
       data: users,
     });
   } catch (error) {
-    console.error('Error in chatsController:', error);
-    return next(error);
+    console.error('Error in getAllUsersController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get all users'));
   }
 };
 

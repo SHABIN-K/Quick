@@ -15,7 +15,7 @@ const router = express.Router();
 //api/chats/get-conversations
 router.get('/get-chats', getChatController);
 
-//api/chats/get--groupchats
+//api/chats/get-groupchats
 router.get('/get-groupchats', getGroupChatController);
 
 ///

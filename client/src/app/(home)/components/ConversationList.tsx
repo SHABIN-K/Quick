@@ -2,10 +2,11 @@
 
 import clsx from "clsx";
 import { find } from "lodash";
-import { useRouter } from "next/navigation";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
+import UserBox from "./UserBox";
 import SearchBar from "./SearchBar";
 import useAuthStore from "@/store/useAuth";
 import GroupChatModal from "./GroupChatModal";
@@ -16,7 +17,7 @@ import { FullConversationType, User } from "@/shared/types";
 
 interface ConversationProps {
   title: string;
-  feed: FullConversationType[] | undefined;
+  feed?: FullConversationType[] | undefined;
   userData?: User[] | undefined;
 }
 
@@ -26,6 +27,7 @@ const ConversationList: React.FC<ConversationProps> = ({
   userData,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { session } = useAuthStore();
   const { conversationId, isOpen } = useConversation();
 
@@ -175,6 +177,14 @@ const ConversationList: React.FC<ConversationProps> = ({
                   path={title === "Chats" ? "chats" : "group"}
                 />
               ))}
+          {pathname === "/users" &&
+            users.map((user) => (
+              <UserBox
+                key={user.id}
+                data={user}
+                currentUser={session?.email as string}
+              />
+            ))}
         </div>
       </aside>
     </>

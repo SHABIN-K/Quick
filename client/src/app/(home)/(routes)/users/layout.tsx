@@ -3,22 +3,21 @@
 import { useEffect, useState } from "react";
 
 import usePrivateApi from "@/hooks/usePrivateApi";
-import { FullConversationType } from "@/shared/types";
 import ConversationList from "../../components/ConversationList";
 
-export default function ChatLayout({
+export default function UsersLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const api = usePrivateApi();
-  const [feed, setFeed] = useState<FullConversationType[]>();
+  const [users, setUsers] = useState();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await api.get("/chats/get-chats");
-        setFeed(res.data.data);
+        const user = await api.get("/users/all");
+        setUsers(user.data.data);
       } catch (error) {
         console.error("Error fetching:", error);
       }
@@ -29,7 +28,7 @@ export default function ChatLayout({
 
   return (
     <div className="h-full">
-      <ConversationList title="Chats" feed={feed} />
+      <ConversationList title="People" userData={users} />
       {children}
     </div>
   );
