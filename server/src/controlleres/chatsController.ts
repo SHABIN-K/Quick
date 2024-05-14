@@ -11,7 +11,6 @@ declare module 'express' {
   }
 }
 
-
 /**
  * Retrieves conversations for the current user.
  * @param req - The request object.
@@ -19,7 +18,7 @@ declare module 'express' {
  * @param next - The next function.
  * @returns A JSON response with the fetched conversations.
  */
-export const getConversationController = async (req: Request, res: Response, next: NextFunction) => {
+export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
   // Access session data
   const user = req.userSession;
 
@@ -62,7 +61,57 @@ export const getConversationController = async (req: Request, res: Response, nex
   }
 };
 
-export const getChatController = async (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Retrieves Group conversations for the current user.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response with the fetched conversations.
+ */
+export const getGroupChatController = async (req: Request, res: Response, next: NextFunction) => {
+  // Access session data
+  const user = req.userSession;
+
+  try {
+    // Ensure email is available in userSession
+    if (!user?.email) {
+      return next(ErrorResponse.forbidden('Unauthorized: Invalid group chat data'));
+    }
+
+    // Fetch conversations for the current user
+    const conversations = await db.conversation.findMany({
+      orderBy: {
+        lastMessageAt: 'desc',
+      },
+      where: {
+        isGroup: true,
+        userIds: {
+          has: user?.id,
+        },
+      },
+      include: {
+        users: true,
+        messages: {
+          include: {
+            seen: true,
+            sender: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'chats founded',
+      data: conversations,
+    });
+  } catch (error) {
+    console.error('Error in getGroupChatController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get Group chats'));
+  }
+};
+
+export const getcreateChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId: userId, isGroup, members, name } = req.body;
   try {
     const currentUser = await db.user.findUnique({

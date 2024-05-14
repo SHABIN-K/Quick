@@ -12,8 +12,6 @@ const usePrivateApi = () => {
     // Add a request interceptor
     const requestIntercept = privateApi.interceptors.request.use(
       (config) => {
-        console.log("config request::", config);
-
         if (!config.headers.Authorization) {
           // eslint-disable-next-line no-param-reassign
           config.headers.Authorization = `Bearer ${session?.confirmToken}`;
@@ -28,7 +26,7 @@ const usePrivateApi = () => {
       (response) => response,
       async (err) => {
         console.log("response::", err);
-
+        console.log(err.response);
         const prvsRequest = err?.config;
         if (
           err?.response &&

@@ -1,8 +1,9 @@
 import express from 'express';
 import {
+  getcreateChatController,
   getChatController,
-  getConversationController,
   getSingleChatController,
+  getGroupChatController,
   getMessagesController,
   geSingletMessagesController,
   getConversationByParamsController,
@@ -12,12 +13,13 @@ import {
 const router = express.Router();
 
 //api/chats/get-conversations
-router.get('/get-chats', getConversationController);
+router.get('/get-chats', getChatController);
 
+//api/chats/get--groupchats
+router.get('/get-groupchats', getGroupChatController);
 
-
-
-router.post('/get-chat', getChatController);
+///
+router.post('/get-chat', getcreateChatController);
 
 router.post('/conversations/:conversationId', getConversationByParamsController);
 
