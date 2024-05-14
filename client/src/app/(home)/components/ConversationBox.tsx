@@ -2,8 +2,8 @@
 
 import clsx from "clsx";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { usePathname, useRouter } from "next/navigation";
 
 import Avatar from "@/components/Avatar";
 import useAuthStore from "@/store/useAuth";
@@ -14,20 +14,21 @@ import { FullConversationType } from "@/shared/types";
 interface ConversationBoxProps {
   data: FullConversationType;
   selected?: boolean;
+  path?: string;
 }
 
 const ConversationBox: React.FC<ConversationBoxProps> = ({
   data,
   selected,
+  path,
 }) => {
   const router = useRouter();
-  const pathname = usePathname();
   const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
 
   const handleClick = useCallback(() => {
-    router.push(`${pathname}/${data.id}`);
-  }, [data.id, pathname, router]);
+    router.push(`/${path}/${data.id}`);
+  }, [data.id, path, router]);
 
   const lastMessage = useMemo(() => {
     const messages = data.messages || [];

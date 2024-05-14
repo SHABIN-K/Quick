@@ -31,6 +31,10 @@ const ConversationList: React.FC<ConversationProps> = ({
 
   const [users, setUsers] = useState<User[]>([]);
   const [items, setItems] = useState<FullConversationType[]>();
+
+  const [searchText, setSearchText] = useState<string>("");
+  const [searchedData, setSearchedData] = useState<FullConversationType[]>();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -114,7 +118,7 @@ const ConversationList: React.FC<ConversationProps> = ({
       )}
       <aside
         className={clsx(
-          `fixed inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-auto bg-sky-50`,
+          `fixed top-0 inset-y-0 pb-20 lg:pb-0 lg:left-20 lg:w-80 lg:block overflow-y-hidden bg-sky-50`,
           isOpen ? "hidden" : "block w-full left-0"
         )}
       >
@@ -124,7 +128,7 @@ const ConversationList: React.FC<ConversationProps> = ({
             {title === "Groups" && (
               <div
                 onClick={() => setIsModalOpen(true)}
-                className="rounded-full p-2 bg-gray-100 text-gray-600 cursor-pointer hover:opacity-75 transition tooltip tooltip-bottom mr-4"
+                className="rounded-full p-2 text-gray-600 cursor-pointer hover:opacity-75 transition tooltip tooltip-left mr-4"
                 data-tip="Create Group"
               >
                 <MdOutlineGroupAdd size={20} />
@@ -132,15 +136,45 @@ const ConversationList: React.FC<ConversationProps> = ({
             )}
           </div>
           <div className="flex flex-col mb-3">
-            <SearchBar />
-          </div>
-          {items?.map((item) => (
-            <ConversationBox
-              key={item.id}
-              data={item}
-              selected={conversationId === item.id}
+            <SearchBar
+              value={searchText}
+              data={items}
+              setSearchText={setSearchText}
+              setSearchedData={setSearchedData}
             />
-          ))}
+          </div>
+        </div>
+        <div
+          className="px-2.5 overflow-y-auto scrollbar"
+          style={{ maxHeight: "calc(100vh - 64px)" }}
+        >
+          {searchText && searchedData && searchedData.length === 0 && (
+            <div className="pl-6 w-full justify-center">
+              <h2>No Result</h2>
+            </div>
+          )}
+          {!searchText && items && items.length === 0 && (
+            <div className="pl-6 w-full justify-center">
+              <h2>Create new chats</h2>
+            </div>
+          )}
+          {searchText
+            ? searchedData?.map((item) => (
+                <ConversationBox
+                  key={item.id}
+                  data={item}
+                  selected={conversationId === item.id}
+                  path={title === "Chats" ? "chats" : "group"}
+                />
+              ))
+            : items?.map((item) => (
+                <ConversationBox
+                  key={item.id}
+                  data={item}
+                  selected={conversationId === item.id}
+                  path={title === "Chats" ? "chats" : "group"}
+                />
+              ))}
         </div>
       </aside>
     </>

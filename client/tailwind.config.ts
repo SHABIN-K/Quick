@@ -14,6 +14,7 @@ const config: Config = {
       strategy: "class",
     }),
     require("daisyui"),
+    require("tailwind-scrollbar"),
   ],
   daisyui: {
     darkTheme: "light",
