@@ -6,8 +6,9 @@ import useConversation from "./useConversation";
 
 //icons
 import { GrChat } from "react-icons/gr";
+import { FaUsers } from "react-icons/fa";
 import { HiOutlineLogout } from "react-icons/hi";
-import { RiSettings5Line, RiUser2Line, RiGroupLine } from "react-icons/ri";
+import { RiSettings5Line, RiGroupLine } from "react-icons/ri";
 
 const useRoutes = () => {
   const pathname = usePathname();
@@ -37,10 +38,10 @@ const useRoutes = () => {
         mobileOnly: false,
       },
       {
-        label: "Profile",
-        href: "/profile",
-        icon: RiUser2Line,
-        active: pathname === "/profile",
+        label: "Global",
+        href: "/users",
+        icon: FaUsers,
+        active: pathname === "/users",
         mobileOnly: false,
       },
       {
