@@ -11,13 +11,17 @@ import {
 
 const router = express.Router();
 
+//api/chats/get-conversations
+router.get('/get-chats', getConversationController);
+
+
+
+
 router.post('/get-chat', getChatController);
 
 router.post('/conversations/:conversationId', getConversationByParamsController);
 
 router.delete('/conversations/:conversationId', deleteConversationByParamsController);
-
-router.post('/conversations', getConversationController);
 
 router.get('/get-conversations/:chatId', getSingleChatController);
 
