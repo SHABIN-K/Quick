@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/SHABIN-K/Quick#readme",
   "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.12",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0"
   }
