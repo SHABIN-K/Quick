@@ -10,7 +10,7 @@ interface IParams {
   chatId: string;
 }
 
-const ConversationId = ({ params }: { params: IParams }) => {
+const GroupId = ({ params }: { params: IParams }) => {
   const api = usePrivateApi();
 
   const [conversation, setConversation] = useState(null);
@@ -59,4 +59,4 @@ const ConversationId = ({ params }: { params: IParams }) => {
   );
 };
 
-export default ConversationId;
+export default GroupId;
