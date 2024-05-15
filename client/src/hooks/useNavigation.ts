@@ -2,7 +2,6 @@ import { useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 import useOpenStore from "@/store/useOpen";
-import useConversation from "./useConversation";
 
 //icons
 import { GrChat } from "react-icons/gr";
@@ -12,7 +11,6 @@ import { RiSettings5Line, RiGroupLine } from "react-icons/ri";
 
 const useRoutes = () => {
   const pathname = usePathname();
-  const { conversationId } = useConversation();
   const { setIsLogout, setIsSettings } = useOpenStore();
 
   const handleLogOut = useCallback(() => setIsLogout(true), [setIsLogout]);
@@ -27,14 +25,14 @@ const useRoutes = () => {
         label: "Chats",
         href: "/chats",
         icon: GrChat,
-        active: pathname === "/chats" || !!conversationId,
+        active: pathname.startsWith("/chats"),
         mobileOnly: false,
       },
       {
         label: "Groups",
         href: "/group",
         icon: RiGroupLine,
-        active: pathname === "/group",
+        active: pathname.startsWith("/group"),
         mobileOnly: false,
       },
       {
@@ -48,16 +46,18 @@ const useRoutes = () => {
         label: "Settings",
         onClick: handleSettings,
         icon: RiSettings5Line,
+        active: false,
         mobileOnly: true,
       },
       {
         label: "Logout",
         onClick: handleLogOut,
         icon: HiOutlineLogout,
+        active: false,
         mobileOnly: true,
       },
     ],
-    [pathname, conversationId, handleLogOut, handleSettings]
+    [pathname, handleSettings, handleLogOut]
   );
 
   return routes;

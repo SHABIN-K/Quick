@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 test.afterEach(async ({ page }, testInfo) => {
   await page.screenshot({
-    path: `./snapshot/${testInfo.title}-shot.png`,
+    path: `./tests/snapshot/${testInfo.title}-shot.png`,
   });
 
   console.log(`Finished ${testInfo.title} with status ${testInfo.status}`);
