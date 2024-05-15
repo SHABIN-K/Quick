@@ -12,7 +12,7 @@ interface MessageBoxProps {
   isLast?: boolean;
 }
 
-const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
+const GroupMsgBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
   const { session } = useAuthStore();
 
   const isOwn = session?.email === data?.sender?.email;
@@ -24,6 +24,9 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
 
   return (
     <div className={clsx("flex gap-3 p-4", isOwn && "justify-end")}>
+      <div className={clsx(isOwn && "hidden")}>
+        <Avatar user={data.sender} />
+      </div>
       <div
         className={clsx(
           "flex flex-col w-full max-w-[320px] leading-1.5 p-2.5 border-gray-200",
@@ -32,6 +35,12 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
             : "rounded-e-2xl rounded-es-2xl bg-sky-200"
         )}
       >
+        <div className={clsx("flex items-center", isOwn && "hidden")}>
+          <span className="text-sm font-semibold text-gray-900">
+            {data.sender.name}
+          </span>
+        </div>
+
         <p className="text-sm font-normal py-2.5 text-gray-900 ">{data.body}</p>
         <span className="text-xs text-gray-400">
           {format(new Date(data.createdAt), "p")}
@@ -46,4 +55,4 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
   );
 };
 
-export default MessageBox;
+export default GroupMsgBox;

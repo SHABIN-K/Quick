@@ -1,40 +1,39 @@
 "use client";
 
 import { find } from "lodash";
+import { FiLock } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 
-import axios from "@/config/api";
 import MessageBox from "./MessageBox";
-import useAuthStore from "@/store/useAuth";
+import GroupMsgBox from "./GroupMsgBox";
 import { pusherClient } from "@/config/pusher";
 import { FullMessageType } from "@/shared/types";
+import usePrivateApi from "@/hooks/usePrivateApi";
 import useConversation from "@/hooks/useConversation";
 
 interface BodyProps {
   initialMessages: FullMessageType[];
+  chatType: string;
 }
 
-const Body: React.FC<BodyProps> = ({ initialMessages }) => {
-  const { session } = useAuthStore();
+const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
+  const api = usePrivateApi();
   const { conversationId } = useConversation();
 
   const [messages, setMessages] = useState(initialMessages);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    axios.post(`/chats/conversations/${conversationId}`, {
-      email: session?.email,
-    });
-  }, [conversationId, session?.email]);
+    api.get(`/chats/${conversationId}/seen`);
+    setMessages(initialMessages);
+  }, [api, conversationId, initialMessages]);
 
   useEffect(() => {
     pusherClient.subscribe(conversationId);
     bottomRef?.current?.scrollIntoView();
 
     const messageHandler = (message: FullMessageType) => {
-      axios.post(`/chats/conversations/${conversationId}`, {
-        email: session?.email,
-      });
+      api.get(`/chats/${conversationId}/seen`);
 
       setMessages((current) => {
         if (find(current, { id: message.id })) {
@@ -67,17 +66,42 @@ const Body: React.FC<BodyProps> = ({ initialMessages }) => {
       pusherClient.unbind("messages:new", messageHandler);
       pusherClient.unbind("message:update", updateMessageHandler);
     };
-  }, [conversationId, session?.email]);
+  }, [api, conversationId]);
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      {messages.map((message, i) => (
-        <MessageBox
-          isLast={i === messages.length - 1}
-          key={message.id}
-          data={message}
-        />
-      ))}
+    <div className="flex-1 overflow-y-scroll body-scroll">
+      <div className="flex flex-col items-center mt-3">
+        <div className="bg-sky-100 text-black text-xs p-1.5 rounded-md font-thin tracking-tighter text-center h-14">
+          <p className="flex ">
+            <FiLock />
+            Messages and calls are end-to-end encrypted.
+          </p>
+          <p>No one outside of this chat,not even Whatsapp,</p>
+          <p>can read or listen to them.</p>
+        </div>
+      </div>
+      {chatType === "chat" ? (
+        <>
+          {messages.map((message, i) => (
+            <MessageBox
+              isLast={i === messages.length - 1}
+              key={message.id}
+              data={message}
+            />
+          ))}
+        </>
+      ) : (
+        <>
+          {messages.map((message, i) => (
+            <GroupMsgBox
+              isLast={i === messages.length - 1}
+              key={message.id}
+              data={message}
+            />
+          ))}
+        </>
+      )}
+
       <div ref={bottomRef} className="pt-24" />
     </div>
   );
