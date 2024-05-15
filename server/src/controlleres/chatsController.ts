@@ -144,6 +144,102 @@ export const getSingleChatController = async (req: Request, res: Response, next:
   }
 };
 
+/**
+ * Retrieves a conversation by its ID and returns the conversation data along with the last message.
+ * Also updates the "seen" status of the last message and triggers pusher events.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns The conversation data and the updated message.
+ */
+export const getChatByParamsController = async (req: Request, res: Response, next: NextFunction) => {
+  // Access session data
+  const user = req.userSession;
+
+  const { Id } = req.params;
+  try {
+    const currentUser = await db.user.findUnique({
+      where: { email: user?.email },
+    });
+
+    if (!currentUser?.id || !currentUser?.email) {
+      return next(ErrorResponse.unauthorized('unauthorized'));
+    }
+
+    // Fetch conversation for the current user
+    const conversation = await db.conversation.findUnique({
+      where: {
+        id: Id,
+      },
+      include: {
+        messages: {
+          include: {
+            seen: true,
+          },
+        },
+        users: true,
+      },
+    });
+
+    if (!conversation) {
+      return next(ErrorResponse.badRequest('Invalid ID'));
+    }
+
+    // Find the last message
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+
+    if (!lastMessage) {
+      return res.status(200).json({
+        success: true,
+        message: 'conversation founded',
+        data: conversation,
+      });
+    }
+
+    // Update seen of last message
+    const updatedMessage = await db.message.update({
+      where: {
+        id: lastMessage.id,
+      },
+      include: {
+        sender: true,
+        seen: true,
+      },
+      data: {
+        seen: {
+          connect: {
+            id: currentUser?.id,
+          },
+        },
+      },
+    });
+
+    await pusherServer.trigger(currentUser?.email, 'conversation:update', {
+      id: Id,
+      messages: [updatedMessage],
+    });
+
+    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+      return res.status(200).json({
+        success: true,
+        message: 'conversation founded',
+        data: conversation,
+      });
+    }
+
+    await pusherServer.trigger(Id!, 'message:update', updatedMessage);
+
+    return res.status(200).json({
+      success: true,
+      message: 'updatedMessage',
+      data: updatedMessage,
+    });
+  } catch (error) {
+    console.error('Error is getMessageController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get messages'));
+  }
+};
+
 ///
 
 ///
@@ -341,92 +437,6 @@ export const getMessagesControllerr = async (req: Request, res: Response, next: 
       success: true,
       message: 'message founded',
       data: newMessage,
-    });
-  } catch (error) {
-    console.error('Error is getMessageController:', error);
-    return next(error);
-  }
-};
-
-export const getConversationByParamsController = async (req: Request, res: Response, next: NextFunction) => {
-  const { conversationId } = req.params;
-  const { email } = req.body;
-
-  try {
-    const currentUser = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    if (!currentUser?.id || !currentUser?.email) {
-      return next(ErrorResponse.badRequest('unauthorized'));
-    }
-    // Fetch conversation for the current user
-    const conversation = await db.conversation.findUnique({
-      where: {
-        id: conversationId,
-      },
-      include: {
-        messages: {
-          include: {
-            seen: true,
-          },
-        },
-        users: true,
-      },
-    });
-
-    if (!conversation) {
-      return next(ErrorResponse.badRequest('Invalid ID'));
-    }
-
-    // Find the last message
-    const lastMessage = conversation.messages[conversation.messages.length - 1];
-
-    if (!lastMessage) {
-      return res.status(200).json({
-        success: true,
-        message: 'conversation founded',
-        data: conversation,
-      });
-    }
-
-    // Update seen of last message
-    const updatedMessage = await db.message.update({
-      where: {
-        id: lastMessage.id,
-      },
-      include: {
-        sender: true,
-        seen: true,
-      },
-      data: {
-        seen: {
-          connect: {
-            id: currentUser?.id,
-          },
-        },
-      },
-    });
-
-    await pusherServer.trigger(currentUser?.email, 'conversation:update', {
-      id: conversationId,
-      messages: [updatedMessage],
-    });
-
-    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
-      return res.status(200).json({
-        success: true,
-        message: 'conversation founded',
-        data: conversation,
-      });
-    }
-
-    await pusherServer.trigger(conversationId!, 'message:update', updatedMessage);
-
-    return res.status(200).json({
-      success: true,
-      message: 'updatedMessage',
-      data: updatedMessage,
     });
   } catch (error) {
     console.error('Error is getMessageController:', error);
