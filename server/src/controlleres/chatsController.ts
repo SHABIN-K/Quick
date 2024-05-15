@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import ErrorResponse from '../error/ErrorResponse';
+
 import db from '../config/prismadb';
-import { pusherServer } from '../config/pusher';
 import { userPayload } from '../shared/type';
+import { pusherServer } from '../config/pusher';
+import ErrorResponse from '../error/ErrorResponse';
 
 // Extend the Request type to include the userSession property
 declare module 'express' {
@@ -111,6 +112,41 @@ export const getGroupChatController = async (req: Request, res: Response, next: 
   }
 };
 
+/**
+ * Retrieves a single chat based on the provided Id.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns The JSON response containing the fetched conversation.
+ */
+export const getSingleChatController = async (req: Request, res: Response, next: NextFunction) => {
+  const { Id } = req.params;
+
+  try {
+    // Fetch conversations for the current user
+    const conversations = await db.conversation.findMany({
+      where: {
+        id: Id,
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'converstaion founded',
+      data: conversations,
+    });
+  } catch (error) {
+    console.error('Error is getSingleChatController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get single chats'));
+  }
+};
+
+///
+
+///
 export const getcreateChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId: userId, isGroup, members, name } = req.body;
   try {
@@ -204,30 +240,6 @@ export const getcreateChatController = async (req: Request, res: Response, next:
   }
 };
 
-export const getSingleChatController = async (req: Request, res: Response, next: NextFunction) => {
-  const { chatId } = req.params;
-  try {
-    // Fetch conversations for the current user
-    const conversations = await db.conversation.findMany({
-      where: {
-        id: chatId,
-      },
-      include: {
-        users: true,
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'converstaion founded',
-      data: conversations,
-    });
-  } catch (error) {
-    console.error('Error is getSingleChatController:', error);
-    return next(error);
-  }
-};
-
 export const geSingletMessagesController = async (req: Request, res: Response, next: NextFunction) => {
   const { chatId } = req.body;
   try {
@@ -256,7 +268,7 @@ export const geSingletMessagesController = async (req: Request, res: Response, n
   }
 };
 
-export const getMessagesController = async (req: Request, res: Response, next: NextFunction) => {
+export const getMessagesControllerr = async (req: Request, res: Response, next: NextFunction) => {
   const { message, image, conversationId, userId: email } = req.body;
   try {
     const currentUser = await db.user.findUnique({
