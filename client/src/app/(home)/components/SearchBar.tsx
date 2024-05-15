@@ -2,15 +2,33 @@ import Fuse from "fuse.js";
 import { IoSearch } from "react-icons/io5";
 import { ChangeEvent, useMemo } from "react";
 
-import { FullConversationType } from "@/shared/types";
+import { FullConversationType, User } from "@/shared/types";
 
 interface SearchInputProps {
   value?: string;
-  data: FullConversationType[] | undefined;
+  data?: FullConversationType[] | User[] | undefined;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   setSearchedData: React.Dispatch<
-    React.SetStateAction<FullConversationType[] | undefined>
+    React.SetStateAction<FullConversationType[] | User[] | undefined>
   >;
+  pathname: string;
+}
+
+interface ChatsOptionsType {
+  includeScore: boolean;
+  keys: {
+    name: string;
+    getFn: (value: FullConversationType) => string;
+  }[];
+  threshold: number;
+}
+interface UserOptionsType {
+  includeScore: boolean;
+  keys: {
+    name: string;
+    getFn: (value: User) => string;
+  }[];
+  threshold: number;
 }
 
 const SearchBar: React.FC<SearchInputProps> = ({
@@ -18,9 +36,11 @@ const SearchBar: React.FC<SearchInputProps> = ({
   data,
   setSearchText,
   setSearchedData,
+  pathname,
 }) => {
   const fuse = useMemo(() => {
-    return new Fuse(data as FullConversationType[], {
+    const ChatsOptions: ChatsOptionsType = {
+      includeScore: true,
       keys: [
         {
           name: "name",
@@ -40,8 +60,24 @@ const SearchBar: React.FC<SearchInputProps> = ({
         },
       ],
       threshold: 0.2,
-    });
-  }, [data]);
+    };
+
+    const UserOptions: UserOptionsType = {
+      includeScore: true,
+      keys: [
+        { name: "name", getFn: (value) => value.name as string },
+        { name: "username", getFn: (value) => value.username as string },
+        { name: "email", getFn: (value) => value.email as string },
+      ],
+      threshold: 0.2,
+    };
+
+    if (pathname === "/users") {
+      return new Fuse(data as User[], UserOptions);
+    } else {
+      return new Fuse(data as FullConversationType[], ChatsOptions);
+    }
+  }, [data, pathname]);
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);

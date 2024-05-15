@@ -35,7 +35,9 @@ const ConversationList: React.FC<ConversationProps> = ({
   const [items, setItems] = useState<FullConversationType[]>();
 
   const [searchText, setSearchText] = useState<string>("");
-  const [searchedData, setSearchedData] = useState<FullConversationType[]>();
+  const [searchedData, setSearchedData] = useState<
+    FullConversationType[] | User[] | undefined
+  >();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -140,9 +142,10 @@ const ConversationList: React.FC<ConversationProps> = ({
           <div className="flex flex-col mb-3">
             <SearchBar
               value={searchText}
-              data={items}
+              data={pathname === "/users" ? users : items}
               setSearchText={setSearchText}
               setSearchedData={setSearchedData}
+              pathname={pathname}
             />
           </div>
         </div>
@@ -160,31 +163,46 @@ const ConversationList: React.FC<ConversationProps> = ({
               <h2>Create new chats</h2>
             </div>
           )}
-          {searchText
-            ? searchedData?.map((item) => (
-                <ConversationBox
-                  key={item.id}
-                  data={item}
-                  selected={conversationId === item.id}
-                  path={title === "Chats" ? "chats" : "group"}
-                />
-              ))
-            : items?.map((item) => (
-                <ConversationBox
-                  key={item.id}
-                  data={item}
-                  selected={conversationId === item.id}
-                  path={title === "Chats" ? "chats" : "group"}
-                />
-              ))}
-          {pathname === "/users" &&
-            users.map((user) => (
-              <UserBox
-                key={user.id}
-                data={user}
-                currentUser={session?.email as string}
-              />
-            ))}
+
+          {pathname === "/users" ? (
+            <>
+              {searchText
+                ? searchedData?.map((user) => (
+                    <UserBox
+                      key={user.id}
+                      data={user as User}
+                      currentUser={session?.email as string}
+                    />
+                  ))
+                : users.map((user) => (
+                    <UserBox
+                      key={user.id}
+                      data={user}
+                      currentUser={session?.email as string}
+                    />
+                  ))}
+            </>
+          ) : (
+            <>
+              {searchText
+                ? searchedData?.map((item) => (
+                    <ConversationBox
+                      key={item.id}
+                      data={item as FullConversationType}
+                      selected={conversationId === item.id}
+                      path={title === "Chats" ? "chats" : "group"}
+                    />
+                  ))
+                : items?.map((item) => (
+                    <ConversationBox
+                      key={item.id}
+                      data={item}
+                      selected={conversationId === item.id}
+                      path={title === "Chats" ? "chats" : "group"}
+                    />
+                  ))}
+            </>
+          )}
         </div>
       </aside>
     </>
