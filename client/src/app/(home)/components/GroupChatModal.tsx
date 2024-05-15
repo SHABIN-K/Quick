@@ -3,11 +3,10 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
-import axios from "@/config/api";
 import Modal from "@/components/Modal";
 import { User } from "@/shared/types";
+import usePrivateApi from "@/hooks/usePrivateApi";
 import { Button, Input, Select } from "@/components";
-
 
 interface GroupChatModalProps {
   isOpen?: boolean;
@@ -22,6 +21,7 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
   users,
   currentUser,
 }) => {
+  const api = usePrivateApi();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,8 +43,8 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    axios
-      .post("/chats/get-chat", {
+    api
+      .post("/chats/create-chat", {
         ...data,
         userId: currentUser,
         isGroup: true,

@@ -240,9 +240,14 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
   }
 };
 
-///
 
-///
+/**
+ * Handles the creation of a chat or retrieval of an existing chat.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response indicating the success status and the created/retrieved chat data.
+ */
 export const getcreateChatController = async (req: Request, res: Response, next: NextFunction) => {
   const { userId: email, chatId: userId, isGroup, members, name } = req.body;
   try {
@@ -335,6 +340,12 @@ export const getcreateChatController = async (req: Request, res: Response, next:
     return next(error);
   }
 };
+
+
+
+///
+
+///
 
 export const geSingletMessagesController = async (req: Request, res: Response, next: NextFunction) => {
   const { chatId } = req.body;

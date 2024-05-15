@@ -1,9 +1,9 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import Avatar from "@/components/Avatar";
 import { User } from "@/shared/types";
-import { getChats } from "@/actions/getChats";
+import Avatar from "@/components/Avatar";
+import usePrivateApi from "@/hooks/usePrivateApi";
 import LoadingModal from "@/components/LoadingModal";
 
 interface UserBoxProps {
@@ -12,13 +12,14 @@ interface UserBoxProps {
 }
 
 const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
+  const api = usePrivateApi();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await getChats({
+      const response = await api.post("/chats/create-chat", {
         userId: currentUser,
         chatId: data.id as string,
       });
@@ -32,7 +33,7 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentUser, data.id, router]);
+  }, [api, currentUser, data.id, router]);
 
   return (
     <>

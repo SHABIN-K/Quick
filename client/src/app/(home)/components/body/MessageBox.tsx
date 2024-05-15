@@ -3,7 +3,6 @@
 import clsx from "clsx";
 import { format } from "date-fns";
 
-import Avatar from "@/components/Avatar";
 import useAuthStore from "@/store/useAuth";
 import { FullMessageType } from "@/shared/types";
 
