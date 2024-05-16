@@ -7,7 +7,7 @@ import {
   getGroupChatController,
   geSingletMessagesController,
   getChatByParamsController,
-  deleteConversationByParamsController,
+  deleteChatController,
 } from '../../controlleres/chatsController';
 import { createMessagesControllerr, getMessagesController } from '../../controlleres/msgController';
 
@@ -35,10 +35,9 @@ router.get('/:Id/seen', getChatByParamsController);
 //api/chats/create-chat
 router.post('/create-chat', getcreateChatController);
 
+router.delete('/delete-chat/:Id', deleteChatController);
+
 ///
-
-router.delete('/conversations/:conversationId', deleteConversationByParamsController);
-
 router.get('/get-conversations/:chatId', getSingleChatController);
 
 router.post('/get-messages', geSingletMessagesController);

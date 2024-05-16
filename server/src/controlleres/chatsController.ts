@@ -337,6 +337,60 @@ export const getcreateChatController = async (req: Request, res: Response, next:
   }
 };
 
+
+/**
+ * Deletes a chat conversation.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response indicating the success of the operation and the deleted conversation data.
+ */
+export const deleteChatController = async (req: Request, res: Response, next: NextFunction) => {
+  const { Id } = req.params;
+  const user = req.userSession;
+
+  try {
+    // Fetch conversation for the current user
+    const existingConversation = await db.conversation.findUnique({
+      where: {
+        id: Id,
+      },
+      include: {
+        users: true,
+      },
+    });
+
+    if (!existingConversation) {
+      return next(ErrorResponse.badRequest('Invalid ID'));
+    }
+
+    // Find the last message
+    const deletedConversation = await db.conversation.deleteMany({
+      where: {
+        id: Id,
+        userIds: {
+          hasSome: [user?.id ?? ''],
+        },
+      },
+    });
+
+    existingConversation.users.forEach((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:remove', existingConversation);
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'conversation deleted successfully',
+      data: deletedConversation,
+    });
+  } catch (error) {
+    console.error('Error is deleteChatController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during delete chat'));
+  }
+};
+
 ///
 
 ///
@@ -362,56 +416,6 @@ export const geSingletMessagesController = async (req: Request, res: Response, n
       success: true,
       message: 'message founded',
       data: message,
-    });
-  } catch (error) {
-    console.error('Error is getMessageController:', error);
-    return next(error);
-  }
-};
-
-export const deleteConversationByParamsController = async (req: Request, res: Response, next: NextFunction) => {
-  const { conversationId } = req.params;
-  const { email } = req.body;
-
-  try {
-    const currentUser = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    // Fetch conversation for the current user
-    const existingConversation = await db.conversation.findUnique({
-      where: {
-        id: conversationId,
-      },
-      include: {
-        users: true,
-      },
-    });
-
-    if (!existingConversation) {
-      return next(ErrorResponse.badRequest('Invalid ID'));
-    }
-
-    // Find the last message
-    const deletedConversation = await db.conversation.deleteMany({
-      where: {
-        id: conversationId,
-        userIds: {
-          hasSome: [currentUser?.id ?? ''],
-        },
-      },
-    });
-
-    existingConversation.users.forEach((user) => {
-      if (user.email) {
-        pusherServer.trigger(user.email, 'conversation:remove', existingConversation);
-      }
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'conversation deleted successfully',
-      data: deletedConversation,
     });
   } catch (error) {
     console.error('Error is getMessageController:', error);

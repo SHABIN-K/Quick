@@ -41,7 +41,9 @@ const GroupMsgBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
           </span>
         </div>
 
-        <p className="text-sm font-normal py-2.5 text-gray-900 ">{data.body}</p>
+        <p className="text-sm font-normal py-2.5 text-gray-900 break-words select-text">
+          {data.body}
+        </p>
         <span className="text-xs text-gray-400">
           {format(new Date(data.createdAt), "p")}
         </span>
