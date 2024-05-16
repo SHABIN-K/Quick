@@ -5,12 +5,10 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import axios from "@/config/api";
 import MessageInput from "./MessageInput";
-import useAuthStore from "@/store/useAuth";
 import useConversation from "@/hooks/useConversation";
 
 const Form = () => {
   const { conversationId } = useConversation();
-  const { session } = useAuthStore();
 
   const {
     register,
@@ -26,10 +24,9 @@ const Form = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setValue("message", "", { shouldValidate: true });
 
-    axios.post("/chats/messages", {
+    axios.post("/chats/msg/create-msg", {
       ...data,
       conversationId,
-      userId: session?.email,
     });
   };
 

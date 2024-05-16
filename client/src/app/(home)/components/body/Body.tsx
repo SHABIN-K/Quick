@@ -71,12 +71,12 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
   return (
     <div className="flex-1 overflow-y-scroll body-scroll">
       <div className="flex flex-col items-center mt-3">
-        <div className="bg-sky-100 text-black text-xs p-1.5 rounded-md font-thin tracking-tighter text-center h-14">
+        <div className="bg-sky-100 text-black font-normal text-xs p-1.5 rounded-md tracking-tighter text-center h-14">
           <p className="flex ">
             <FiLock />
             Messages and calls are end-to-end encrypted.
           </p>
-          <p>No one outside of this chat,not even Whatsapp,</p>
+          <p>No one outside of this chat,not even Quick,</p>
           <p>can read or listen to them.</p>
         </div>
       </div>
