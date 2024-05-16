@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { IoVideocamOutline } from "react-icons/io5";
 import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
 
 import Avatar from "@/components/Avatar";
@@ -13,9 +14,10 @@ import useActiveListStore from "@/store/useActiveList";
 
 interface HeaderProps {
   conversation: Conversation & { users: User[] };
+  chatType: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ conversation }) => {
+const Header: React.FC<HeaderProps> = ({ conversation, chatType }) => {
   const otherUser = useOtherUser(conversation);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -40,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ conversation }) => {
       <div className="bg-white w-full flex border-b-[1px] sm:px-4 py-3 px-4 lg:px-6 justify-between items-center shadow-sm">
         <div className="flex gap-3 items-center">
           <Link
-            href="/chats"
+            href={chatType === "chats" ? "/chats" : "/group"}
             className="lg:hidden block text-sky-500 hover:text-sky-600 transition cursor-pointer"
           >
             <HiChevronLeft size={32} />
@@ -57,11 +59,19 @@ const Header: React.FC<HeaderProps> = ({ conversation }) => {
             </span>
           </div>
         </div>
-        <HiEllipsisHorizontal
-          size={32}
-          onClick={() => setDrawerOpen(true)}
-          className="text-sky-500 cursor-pointer hover:text-sky-600 transition"
-        />
+        <div className="flex items-center gap-x-3 flex-row-reverse">
+          <HiEllipsisHorizontal
+            size={32}
+            onClick={() => setDrawerOpen(true)}
+            className="text-gray-500 cursor-pointer hover:text-sky-600 transition"
+          />
+          {chatType === "chats" && (
+            <IoVideocamOutline
+              onClick={() => setDrawerOpen(true)}
+              className="w-7 h-6 text-gray-500 cursor-pointer hover:text-sky-600 transition"
+            />
+          )}
+        </div>
       </div>
     </>
   );

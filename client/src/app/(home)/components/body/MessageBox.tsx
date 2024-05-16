@@ -31,7 +31,9 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
             : "rounded-e-2xl rounded-es-2xl bg-sky-200"
         )}
       >
-        <p className="text-sm font-normal py-2.5 text-gray-900 break-words select-text">{data.body}</p>
+        <p className="text-sm font-normal text-gray-900 break-words select-text">
+          {data.body}
+        </p>
         <span className="text-xs text-gray-400">
           {format(new Date(data.createdAt), "p")}
         </span>

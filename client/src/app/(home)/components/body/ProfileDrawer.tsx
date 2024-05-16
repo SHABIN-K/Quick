@@ -7,10 +7,9 @@ import { IoClose, IoTrash } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useCallback, useMemo, useState } from "react";
 
-import axios from "@/config/api";
 import Avatar from "@/components/Avatar";
-import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
+import usePrivateApi from "@/hooks/usePrivateApi";
 import AvatarGroup from "@/components/AvatarGroup";
 import { Conversation, User } from "@/shared/types";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -30,8 +29,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onClose,
   data,
 }) => {
+  const api = usePrivateApi();
   const router = useRouter();
-  const { session } = useAuthStore();
   const { members } = useActiveListStore();
   const { conversationId } = useConversation();
 
@@ -60,10 +59,8 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const onDelete = useCallback(() => {
     setIsLoading(true);
 
-    axios
-      .delete(`/chats/conversations/${conversationId}`, {
-        data: { email: session?.email },
-      })
+    api
+      .delete(`/chats/delete-chat/${conversationId}`)
       .then(() => {
         onClose();
         router.push("/chats");
@@ -71,7 +68,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
       })
       .catch(() => toast.error("Something went wrong!"))
       .finally(() => setIsLoading(false));
-  }, [conversationId, router, onClose, session?.email]);
+  }, [api, conversationId, onClose, router]);
   return (
     <>
       <ConfirmModal

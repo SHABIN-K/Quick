@@ -51,7 +51,7 @@ const ConversationId = ({ params }: { params: IParams }) => {
   return (
     <div className="lg:pl-80 h-full">
       <div className="h-full flex flex-col">
-        <Header conversation={conversation} />
+        <Header conversation={conversation} chatType="chats" />
         <Body initialMessages={messages || []} chatType="chat" />
         <Form />
       </div>
