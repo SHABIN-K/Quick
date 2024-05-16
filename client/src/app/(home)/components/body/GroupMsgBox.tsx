@@ -31,8 +31,8 @@ const GroupMsgBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
         className={clsx(
           "flex flex-col w-full max-w-[320px] leading-1.5 p-2.5 border-gray-200",
           isOwn
-            ? "rounded-s-2xl rounded-b-2xl bg-sky-100"
-            : "rounded-e-2xl rounded-es-2xl bg-sky-200"
+            ? "rounded-s-2xl rounded-b-2xl bg-sky-200"
+            : "rounded-e-2xl rounded-es-2xl bg-sky-300"
         )}
       >
         <div className={clsx("flex items-center", isOwn && "hidden")}>
@@ -41,7 +41,7 @@ const GroupMsgBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
           </span>
         </div>
 
-        <p className="text-sm font-normal py-2.5 text-gray-900 break-words select-text">
+        <p className="text-sm font-normal text-gray-900 break-words select-text">
           {data.body}
         </p>
         <span className="text-xs text-gray-400">
