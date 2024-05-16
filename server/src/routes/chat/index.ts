@@ -5,18 +5,21 @@ import {
   getChatController,
   getSingleChatController,
   getGroupChatController,
-  getMessagesControllerr,
   geSingletMessagesController,
   getChatByParamsController,
   deleteConversationByParamsController,
 } from '../../controlleres/chatsController';
-import { getMessagesController } from '../../controlleres/msgController';
+import { createMessagesControllerr, getMessagesController } from '../../controlleres/msgController';
 
 const router = express.Router();
 
 //api/chats/msg/get-messages/:Id
 router.get('/msg/get-messages/:Id', getMessagesController);
 
+//api/chats/create-msg
+router.post('/msg/create-msg', createMessagesControllerr);
+
+//chats
 //api/chats/get-chats
 router.get('/get-chats', getChatController);
 
@@ -31,6 +34,7 @@ router.get('/:Id/seen', getChatByParamsController);
 
 //api/chats/create-chat
 router.post('/create-chat', getcreateChatController);
+
 ///
 
 router.delete('/conversations/:conversationId', deleteConversationByParamsController);
@@ -38,7 +42,5 @@ router.delete('/conversations/:conversationId', deleteConversationByParamsContro
 router.get('/get-conversations/:chatId', getSingleChatController);
 
 router.post('/get-messages', geSingletMessagesController);
-
-router.post('/messages', getMessagesControllerr);
 
 export default router;

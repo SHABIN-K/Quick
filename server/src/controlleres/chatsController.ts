@@ -240,7 +240,6 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
   }
 };
 
-
 /**
  * Handles the creation of a chat or retrieval of an existing chat.
  * @param req - The request object.
@@ -249,13 +248,10 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
  * @returns A JSON response indicating the success status and the created/retrieved chat data.
  */
 export const getcreateChatController = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId: email, chatId: userId, isGroup, members, name } = req.body;
+  const user = req.userSession;
+  const { chatId: userId, isGroup, members, name } = req.body;
   try {
-    const currentUser = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    if (!currentUser?.id || !currentUser?.email) {
+    if (!user?.id || !user?.email) {
       return next(ErrorResponse.badRequest('Unauthorized'));
     }
 
@@ -269,7 +265,7 @@ export const getcreateChatController = async (req: Request, res: Response, next:
           name,
           isGroup,
           users: {
-            connect: [...members.map((member: { value: string }) => ({ id: member.value })), { id: currentUser.id }],
+            connect: [...members.map((member: { value: string }) => ({ id: member.value })), { id: user.id }],
           },
         },
         include: {
@@ -292,7 +288,7 @@ export const getcreateChatController = async (req: Request, res: Response, next:
 
     const existingConversations = await db.conversation.findMany({
       where: {
-        OR: [{ userIds: { equals: [currentUser.id, userId] } }, { userIds: { equals: [userId, currentUser.id] } }],
+        OR: [{ userIds: { equals: [user.id, userId] } }, { userIds: { equals: [userId, user.id] } }],
       },
     });
 
@@ -311,7 +307,7 @@ export const getcreateChatController = async (req: Request, res: Response, next:
         users: {
           connect: [
             {
-              id: currentUser.id,
+              id: user.id,
             },
             {
               id: userId,
@@ -337,11 +333,9 @@ export const getcreateChatController = async (req: Request, res: Response, next:
     });
   } catch (error) {
     console.error('Error in getChatController:', error);
-    return next(error);
+    return next(ErrorResponse.badRequest('An error occurred during create chat'));
   }
 };
-
-
 
 ///
 
@@ -368,86 +362,6 @@ export const geSingletMessagesController = async (req: Request, res: Response, n
       success: true,
       message: 'message founded',
       data: message,
-    });
-  } catch (error) {
-    console.error('Error is getMessageController:', error);
-    return next(error);
-  }
-};
-
-export const getMessagesControllerr = async (req: Request, res: Response, next: NextFunction) => {
-  const { message, image, conversationId, userId: email } = req.body;
-  try {
-    const currentUser = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    // Fetch message for the current user
-    const newMessage = await db.message.create({
-      data: {
-        body: message,
-        image: image,
-        conversation: {
-          connect: {
-            id: conversationId,
-          },
-        },
-        sender: {
-          connect: {
-            id: currentUser?.id,
-          },
-        },
-        seen: {
-          connect: {
-            id: currentUser?.id,
-          },
-        },
-      },
-      include: {
-        seen: true,
-        sender: true,
-      },
-    });
-
-    const updatedConversation = await db.conversation.update({
-      where: {
-        id: conversationId,
-      },
-      data: {
-        lastMessageAt: new Date(),
-        messages: {
-          connect: {
-            id: newMessage.id,
-          },
-        },
-      },
-      include: {
-        users: true,
-        messages: {
-          include: {
-            seen: true,
-          },
-        },
-      },
-    });
-
-    await pusherServer.trigger(conversationId, 'messages:new', newMessage);
-
-    const lastMsg = updatedConversation.messages[updatedConversation.messages.length - 1];
-
-    updatedConversation.users.map((user) => {
-      if (user?.email) {
-        pusherServer.trigger(user.email, 'conversation:update', {
-          id: conversationId,
-          message: [lastMsg],
-        });
-      }
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'message founded',
-      data: newMessage,
     });
   } catch (error) {
     console.error('Error is getMessageController:', error);
