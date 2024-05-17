@@ -69,7 +69,7 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
   }, [api, conversationId]);
 
   return (
-    <div className="flex-1 overflow-y-scroll body-scroll  body-pattern bg-[url(/background.jpg)]">
+    <div className="flex-1 overflow-y-scroll body-scroll bg-[url(/background.jpg)]">
       <div className="flex flex-col items-center mt-3">
         <div className="bg-sky-500 text-white font-normal text-xs p-1.5 rounded-md tracking-tighter text-center h-14">
           <p className="flex ">

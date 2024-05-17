@@ -5,8 +5,8 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import Modal from "@/components/Modal";
 import useUsersStore from "@/store/useUsers";
+import { Button, Select } from "@/components";
 import usePrivateApi from "@/hooks/usePrivateApi";
-import { Button, Input, Select } from "@/components";
 
 interface AddMemberModalProps {
   isOpen?: boolean;
