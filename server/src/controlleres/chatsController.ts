@@ -337,7 +337,6 @@ export const getcreateChatController = async (req: Request, res: Response, next:
   }
 };
 
-
 /**
  * Deletes a chat conversation.
  * @param req - The request object.
@@ -391,34 +390,51 @@ export const deleteChatController = async (req: Request, res: Response, next: Ne
   }
 };
 
-///
+/**
+ * update chat members.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response indicating the success of the operation and the deleted conversation data.
+ */
+export const updateChatController = async (req: Request, res: Response, next: NextFunction) => {
+  const user = req.userSession;
+  const { groupId, isGroup, members } = req.body;
 
-///
-
-export const geSingletMessagesController = async (req: Request, res: Response, next: NextFunction) => {
-  const { chatId } = req.body;
   try {
-    // Fetch message for the current user
-    const message = await db.message.findMany({
-      where: {
-        conversationId: chatId,
+    if (!user?.id || !user?.email) {
+      return next(ErrorResponse.badRequest('Unauthorized'));
+    }
+
+    if (isGroup && !members) {
+      return next(ErrorResponse.unauthorized('Unauthorized: Invalid group chat data'));
+    }
+
+    const updatedGroup = await db.conversation.update({
+      where: { id: groupId },
+      data: {
+        users: {
+          connect: [...members.map((member: { value: string }) => ({ id: member.value })), { id: user.id }],
+        },
       },
       include: {
-        sender: true,
-        seen: true,
+        users: true,
       },
-      orderBy: {
-        createdAt: 'asc',
-      },
+    });
+
+    updatedGroup.users.forEach((user) => {
+      if (user.email) {
+        pusherServer.trigger(user.email, 'conversation:new', updatedGroup);
+      }
     });
 
     return res.status(200).json({
       success: true,
-      message: 'message founded',
-      data: message,
+      message: 'Group chat udpated successfully',
+      // data: updatedGroup,
     });
   } catch (error) {
-    console.error('Error is getMessageController:', error);
-    return next(error);
+    console.error('Error in updateChatController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during add member'));
   }
 };

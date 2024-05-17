@@ -11,13 +11,13 @@ import { Button, Input, Select } from "@/components";
 interface AddMemberModalProps {
   isOpen?: boolean;
   onClose: () => void;
-  currentUser: string;
+  groupId: string;
 }
 
 const AddMemberModal: React.FC<AddMemberModalProps> = ({
   isOpen,
   onClose,
-  currentUser,
+  groupId: chatId,
 }) => {
   const router = useRouter();
   const api = usePrivateApi();
@@ -34,11 +34,10 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-
     api
       .patch("/chats/add-members", {
         ...data,
-        userId: currentUser,
+        groupId: chatId,
         isGroup: true,
       })
       .then(() => {
@@ -61,7 +60,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
               <Select
                 disabled={isLoading}
                 label="Members"
-                options={users[0].map((user: { id: any; name: any }) => ({
+                options={users[0]?.map((user: { id: any; name: any }) => ({
                   value: user.id,
                   label: user.name,
                 }))}

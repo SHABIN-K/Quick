@@ -74,6 +74,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
       .catch(() => toast.error("Something went wrong!"))
       .finally(() => setIsLoading(false));
   }, [api, conversationId, onClose, router]);
+
   return (
     <>
       <ConfirmModal
@@ -87,9 +88,9 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         isLoading={isLoading}
       />
       <AddMemberModal
-        currentUser={session?.email as string}
         isOpen={addMember}
         onClose={() => setAddMember(false)}
+        groupId={data.id}
       />
       <Transition.Root show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={onClose}>
