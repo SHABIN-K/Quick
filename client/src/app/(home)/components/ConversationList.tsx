@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import UserBox from "./UserBox";
 import SearchBar from "./SearchBar";
 import useAuthStore from "@/store/useAuth";
-import GroupChatModal from "./GroupChatModal";
+import GroupChatModal from "./modal/GroupChatModal";
 import { pusherClient } from "@/config/pusher";
 import ConversationBox from "./ConversationBox";
 import useConversation from "@/hooks/useConversation";

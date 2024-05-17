@@ -8,6 +8,7 @@ export type UserType = {
 };
 
 export type User = {
+  map(arg0: (user: { id: any; name: any; }) => { value: any; label: any; }): Record<string, any>[];
   id: string;
   name?: string;
   username?: string;

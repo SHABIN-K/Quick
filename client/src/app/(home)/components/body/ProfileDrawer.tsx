@@ -3,11 +3,13 @@
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { IoClose, IoTrash } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useCallback, useMemo, useState } from "react";
+import { IoClose, IoTrash, IoPersonAddOutline } from "react-icons/io5";
 
+import UserBox from "../UserBox";
 import Avatar from "@/components/Avatar";
+import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import usePrivateApi from "@/hooks/usePrivateApi";
 import AvatarGroup from "@/components/AvatarGroup";
@@ -15,6 +17,7 @@ import { Conversation, User } from "@/shared/types";
 import ConfirmModal from "@/components/ConfirmModal";
 import useConversation from "@/hooks/useConversation";
 import useActiveListStore from "@/store/useActiveList";
+import AddMemberModal from "../modal/AddMembetModal";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
@@ -29,14 +32,16 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   onClose,
   data,
 }) => {
-  const api = usePrivateApi();
   const router = useRouter();
+  const api = usePrivateApi();
+  const { session } = useAuthStore();
   const { members } = useActiveListStore();
   const { conversationId } = useConversation();
 
   const otherUser = useOtherUser(data);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [addMember, setAddMember] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const isActive = members.indexOf(otherUser?.email!) !== -1;
@@ -81,6 +86,11 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         onClick={onDelete}
         isLoading={isLoading}
       />
+      <AddMemberModal
+        currentUser={session?.email as string}
+        isOpen={addMember}
+        onClose={() => setAddMember(false)}
+      />
       <Transition.Root show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={onClose}>
           <Transition.Child
@@ -106,7 +116,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                   leaveTo="translate-x-full"
                 >
                   <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                    <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                    <div className="flex h-full flex-col overflow-hidden bg-white py-6 shadow-xl  overflow-y-auto body-scroll">
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-end">
                           <div className="ml-3 flex h-7 items-center">
@@ -123,7 +133,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                       </div>
                       <div className="relative mt-6 flex-1 px-4 sm:px-6">
                         <div className="flex flex-col items-center">
-                          <div className="mb-2">
+                          <div className="mb-4">
                             {data.isGroup ? (
                               <AvatarGroup users={data.users} />
                             ) : (
@@ -135,6 +145,19 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                             {statusText}
                           </div>
                           <div className="flex gap-10 my-8">
+                            {data.isGroup && (
+                              <div
+                                onClick={() => setAddMember(true)}
+                                className="flex flex-col gap-3 items-center cursor-pointer hover:opacity-75"
+                              >
+                                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+                                  <IoPersonAddOutline size={20} />
+                                </div>
+                                <div className="text-sm font-light text-neutral-600">
+                                  Add member
+                                </div>
+                              </div>
+                            )}
                             <div
                               onClick={() => setConfirmOpen(true)}
                               className="flex flex-col gap-3 items-center cursor-pointer hover:opacity-75"
@@ -154,10 +177,14 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                                   <dt className="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
                                     Emails
                                   </dt>
-                                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
-                                    {data.users
-                                      .map((user) => user.email)
-                                      .join(", ")}
+                                  <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 overflow-auto">
+                                    {data.users.map((user) => (
+                                      <UserBox
+                                        key={user.id}
+                                        data={user as User}
+                                        currentUser={session?.email as string}
+                                      />
+                                    ))}
                                   </dd>
                                 </div>
                               )}

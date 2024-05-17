@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import useUsersStore from "@/store/useUsers";
 import EmptyState from "@/components/EmptyState";
 import usePrivateApi from "@/hooks/usePrivateApi";
 import { Header, Body, Form } from "@/app/(home)/components/body";
@@ -12,6 +13,7 @@ interface IParams {
 
 const GroupId = ({ params }: { params: IParams }) => {
   const api = usePrivateApi();
+  const { addUser } = useUsersStore();
 
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState(null);
@@ -29,6 +31,11 @@ const GroupId = ({ params }: { params: IParams }) => {
         //get messages from chat id
         const msg = await api.get(`/chats/msg/get-messages/${chatId}`);
         setMessages(msg.data.data);
+
+        //get all users
+        const user = await api.get("/users/get-users");
+     
+        addUser(user.data.data);
       } catch (err: any) {
         console.error("Error fetching:", err);
         setError(err.message);
@@ -36,7 +43,7 @@ const GroupId = ({ params }: { params: IParams }) => {
     };
 
     fetch();
-  }, [api, params.chatId]);
+  }, [addUser, api, params.chatId]);
 
   if (error || !conversation) {
     return (
