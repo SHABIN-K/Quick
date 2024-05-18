@@ -111,17 +111,21 @@ const loginController = async (req: Request, res: Response) => {
     const user = await db.user.findFirst({
       where: { email: email },
     });
+
     // invalid email
     if (!user) {
       validationErrors['email'] = ['Did you mistype your email address?'];
     }
 
-    // Handle invalid email
-    const match = await bcrypt.compare(password, user?.hashedPassword as string);
-
     // Handle invalid password
+    const match = await bcrypt.compare(password, user?.hashedPassword as string);
+ 
     if (!match) {
       validationErrors['password'] = ['Oops! The password you entered does not match.'];
+      return res.status(400).json({
+        success: false,
+        message: validationErrors,
+      });
     }
 
     // Construct payload for tokens
@@ -165,6 +169,7 @@ const loginController = async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({
       success: false,
       message: validationErrors,
