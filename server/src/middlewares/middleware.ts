@@ -14,7 +14,8 @@ const limiterOptions = {
 };
 
 const corsOptions = {
-  origin: process.env.APP_WEB_URL || 'http://localhost:3000',
+  //origin: process.env.APP_WEB_URL || 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://192.168.156.37:3000', 'https://quickv.vercel.app'],
   credentials: true,
   optionsSuccessStatus: 200,
 };
