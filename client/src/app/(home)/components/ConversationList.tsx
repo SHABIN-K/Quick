@@ -67,7 +67,7 @@ const ConversationList: React.FC<ConversationProps> = ({
           return current;
         }
 
-        return [conversation, ...(current as FullConversationType[])];
+        return [conversation, ...(current || [])];
       });
     };
 

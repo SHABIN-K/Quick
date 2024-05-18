@@ -19,8 +19,8 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
   const handleClick = useCallback(async () => {
     setIsLoading(true);
     try {
+
       const response = await api.post("/chats/create-chat", {
-        userId: currentUser,
         chatId: data.id as string,
       });
 
@@ -33,7 +33,7 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [api, currentUser, data.id, router]);
+  }, [api, data, router]);
 
   return (
     <>

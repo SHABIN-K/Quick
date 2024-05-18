@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { format } from "date-fns";
+import { BiCheckDouble } from "react-icons/bi";
 
 import useAuthStore from "@/store/useAuth";
 import { FullMessageType } from "@/shared/types";
@@ -34,14 +35,16 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
         <p className="text-sm font-normal text-gray-900 break-words select-text">
           {data.body}
         </p>
-        <span className="text-xs text-gray-400">
-          {format(new Date(data.createdAt), "p")}
-        </span>
-        {isLast && isOwn && seenList.length > 0 && (
-          <div className="text-xs font-light text-gray-500">
-            {`Seen by ${seenList}`}
-          </div>
-        )}
+        <div className="flex justify-between">
+          <span className="text-xs text-gray-400">
+            {format(new Date(data.createdAt), "p")}
+          </span>
+          {isLast && isOwn && seenList.length > 0 && (
+            <div className="text-xs font-light text-gray-500">
+              <BiCheckDouble className="w-4 h-4" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

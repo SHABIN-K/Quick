@@ -55,3 +55,6 @@ E.g. "chore(grunt): Updated Grunt tasks for better task automation and build pro
 - https://dev.to/esponges/indexeddb-your-offline-and-serverless-db-in-your-browser-with-react-3hm7
 - https://github.com/pmndrs/zustand/discussions/1721
 - https://webkul.com/blog/how-to-use-indexeddb-dexie-in-nextjs/
+
+### hande webrtc
+- https://medium.com/@aysunitai/building-a-simple-video-chat-app-with-react-and-peerjs-5650cf89569d
