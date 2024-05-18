@@ -256,7 +256,7 @@ export const getcreateChatController = async (req: Request, res: Response, next:
     }
 
     if (isGroup && (!members || members.length < 2 || !name)) {
-      return next(ErrorResponse.unauthorized('Unauthorized: Invalid group chat data'));
+      return next(ErrorResponse.unauthorized('Add two members and a group name to create a group chat'));
     }
 
     if (isGroup) {
@@ -304,6 +304,7 @@ export const getcreateChatController = async (req: Request, res: Response, next:
 
     const newConversation = await db.conversation.create({
       data: {
+        isGroup: false,
         users: {
           connect: [
             {
