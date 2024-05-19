@@ -3,6 +3,7 @@ import express from 'express';
 import authRoute from './auth';
 import usersRoute from './user';
 import chatsRoute from './chat';
+import videoCallRoute from './videocall';
 import { authenticate } from '../middlewares';
 
 const router = express.Router();
@@ -15,6 +16,9 @@ router.use('/api/chats', authenticate, chatsRoute);
 
 //user routes
 router.use('/api/users', authenticate, usersRoute);
+
+//videocall routes
+router.use('/api/video-call', authenticate, videoCallRoute);
 
 router.use('/api', (req, res) => {
   res.status(200).json({ success: true, message: 'The API is up and running.' });

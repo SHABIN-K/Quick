@@ -181,17 +181,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         start video call
                       </p>
                     </div>
-                    <div className="flex mt-5 gap-4">
-                      <IoClose
-                        className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
-                        onClick={onClose}
-                      />
-                      <IoVideocam
-                        className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
-                        onClick={() => initiateCall(remotePeerIdValue)}
-                      />
-                    </div>
-                    <div className="flex">
+                    <div className="flex gap-7">
                       <video
                         ref={currentUserVideoRef}
                         autoPlay
@@ -199,6 +189,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         style={{
                           width: "300px",
                           height: "200px",
+                          borderRadius: "14px",
                           backgroundColor: "black",
                         }}
                       />
@@ -209,14 +200,25 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         style={{
                           width: "300px",
                           height: "200px",
+                          borderRadius: "14px",
                           backgroundColor: "black",
                         }}
                       />
                     </div>
-                    <IoClose
-                      className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
-                      onClick={endCall}
-                    />
+                    <div className="flex mt-5 gap-4">
+                      <IoClose
+                        className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                        onClick={endCall}
+                      />
+                      <IoClose
+                        className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                        onClick={onClose}
+                      />
+                      <IoVideocam
+                        className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
+                        onClick={() => initiateCall(remotePeerIdValue)}
+                      />
+                    </div>
                   </div>
                 </div>
               </Dialog.Panel>
