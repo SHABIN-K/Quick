@@ -9,6 +9,7 @@ import { Fragment, useState, useRef, useEffect } from "react";
 import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@/shared/types";
+import toast from "react-hot-toast";
 
 interface AddMemberModalProps {
   isOpen?: boolean;
@@ -25,53 +26,28 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   const otherUser = useOtherUser(data);
   const { session } = useAuthStore();
 
+  const [incomingCall, setIncomingCall] = useState<MediaConnection | null>(
+    null
+  );
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
+
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
-  const peerInstance = useRef<Peer | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const peerInstance = useRef<Peer | null>(null);
 
   useEffect(() => {
     const peer = new Peer();
 
     peer.on("open", (id: string) => {
       console.log("My peer ID is: " + id);
-      if (session?.id) {
-        setRemotePeerIdValue(session?.id);
-      }
+      setRemotePeerIdValue(id);
     });
 
     peer.on("call", (call: MediaConnection) => {
       console.log("Receiving call from: " + call.peer);
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((mediaStream) => {
-            mediaStreamRef.current = mediaStream;
-            if (currentUserVideoRef.current) {
-              currentUserVideoRef.current.srcObject = mediaStream;
-              currentUserVideoRef.current.play();
-            }
-            call.answer(mediaStream);
-            call.on("stream", (remoteStream) => {
-              console.log("Received remote stream: ", remoteStream);
-              if (remoteVideoRef.current) {
-                remoteVideoRef.current.srcObject = remoteStream;
-                remoteVideoRef.current.play();
-              }
-            });
-            call.on("error", (err) => {
-              console.error("Call error: ", err);
-            });
-          })
-          .catch((error) => {
-            console.error("Error accessing media devices.", error);
-          });
-      } else {
-        console.error(
-          "Media devices API or getUserMedia method is not available."
-        );
-      }
+      setIncomingCall(call);
+      toast.success("Incoming call");
     });
 
     peerInstance.current = peer;
@@ -80,7 +56,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
       peer.destroy();
       releaseMediaDevices();
     };
-  }, [session?.id]);
+  }, []);
 
   const initiateCall = (remotePeerId: string) => {
     console.log("Calling peer: " + remotePeerId);
@@ -132,10 +108,37 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   };
 
   const endCall = () => {
-    if (peerInstance.current) {
-      peerInstance.current.destroy();
+    if (incomingCall) {
+      incomingCall.close();
     }
     releaseMediaDevices();
+    setIncomingCall(null);
+  };
+
+  const handleAcceptCall = () => {
+    if (incomingCall && mediaStreamRef.current) {
+      incomingCall.answer(mediaStreamRef.current);
+      incomingCall.on("stream", (remoteStream) => {
+        console.log("Received remote stream: ", remoteStream);
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = remoteStream;
+          remoteVideoRef.current.play();
+        }
+      });
+      incomingCall.on("error", (err) => {
+        console.error("Call error: ", err);
+      });
+      toast.success("Call accepted");
+    }
+    setIncomingCall(null);
+  };
+
+  const handleRejectCall = () => {
+    if (incomingCall) {
+      incomingCall.close();
+    }
+    toast.error("Call rejected");
+    setIncomingCall(null);
   };
 
   return (
@@ -218,6 +221,22 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
                         onClick={() => initiateCall(remotePeerIdValue)}
                       />
+                      {incomingCall && (
+                        <Fragment>
+                          <button
+                            className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-100"
+                            onClick={handleAcceptCall}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="h-12 w-12 p-3 bg-red-500 hover:bg-red-600 rounded-full text-gray-100"
+                            onClick={handleRejectCall}
+                          >
+                            Reject
+                          </button>
+                        </Fragment>
+                      )}
                     </div>
                   </div>
                 </div>
