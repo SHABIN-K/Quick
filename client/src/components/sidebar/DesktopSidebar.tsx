@@ -44,7 +44,7 @@ const DesktopSidebar = () => {
               alt="Logo"
               height="48"
               width="48"
-              src="/images/quick-logo.png"
+              src="/quick-logo.png"
             />
           </Link>
           <ul role="list" className="flex flex-col items-center mt-2 space-y-1">

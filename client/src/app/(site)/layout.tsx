@@ -13,7 +13,7 @@ export default function ChatLayout({
           height="48"
           width="65"
           className="mx-auto w-auto"
-          src="/images/quick-logo.png"
+          src="/quick-logo.png"
         />
         {children}
       </div>
