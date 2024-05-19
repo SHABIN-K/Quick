@@ -54,11 +54,14 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
             }
             call.answer(mediaStream);
             call.on("stream", (remoteStream) => {
-              console.log("Received remote stream");
+              console.log("Received remote stream: ", remoteStream);
               if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = remoteStream;
                 remoteVideoRef.current.play();
               }
+            });
+            call.on("error", (err) => {
+              console.error("Call error: ", err);
             });
           })
           .catch((error) => {
@@ -94,11 +97,14 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
           if (peerInstance.current) {
             const call = peerInstance.current.call(remotePeerId, mediaStream);
             call.on("stream", (remoteStream) => {
-              console.log("Received remote stream");
+              console.log("Received remote stream: ", remoteStream);
               if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = remoteStream;
                 remoteVideoRef.current.play();
               }
+            });
+            call.on("error", (err) => {
+              console.error("Call error: ", err);
             });
           }
         })
