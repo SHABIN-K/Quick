@@ -17,7 +17,6 @@ export const pusherController = async (req: Request, res: Response, next: NextFu
     if (!user) {
       return next(ErrorResponse.badRequest('unauthorized'));
     }
-    console.log(user);
     const socketId = req.body.socket_id;
     const channel = req.body.channel_name;
 
