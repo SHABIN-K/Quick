@@ -26,6 +26,7 @@
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "memorystore": "^1.6.7",
     "nodemailer": "^6.9.13",
     "pusher": "^5.2.0",
     "uuid": "^9.0.1",

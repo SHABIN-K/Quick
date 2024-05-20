@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { Channel } from "pusher-js";
 import Peer, { MediaConnection } from "peerjs";
 import { IoClose, IoVideocam } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, useRef, useEffect, useCallback } from "react";
 
 import useAuthStore from "@/store/useAuth";
+import { pusherClient } from "@/config/pusher";
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@/shared/types";
 
@@ -34,32 +36,47 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const peerInstance = useRef<Peer | null>(null);
+  const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
   // Function to handle accepting an incoming call
-  const handleAcceptCall = useCallback(() => {
-    if (incomingCall) {
-      // Answer the incoming call with current media stream
-      const stream = mediaStreamRef.current;
-      if (stream) {
-        incomingCall.answer(stream);
-        // Event listener for when remote stream is received
-        incomingCall.on("stream", (remoteStream) => {
-          console.log("Received remote stream: ", remoteStream);
-          if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = remoteStream;
-            remoteVideoRef.current.play();
-          }
+  const handleAcceptCall = useCallback(async (callerId: MediaConnection) => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
         });
-        // Event listener for call errors
-        incomingCall.on("error", (err) => {
-          console.error("Call error: ", err);
-        });
-        toast.success("Call accepted");
+        mediaStreamRef.current = mediaStream;
+        if (currentUserVideoRef.current) {
+          currentUserVideoRef.current.srcObject = mediaStream;
+          currentUserVideoRef.current.play();
+        }
+
+        if (peerInstance.current) {
+          const call = peerInstance.current.call(callerId, mediaStream);
+          call.on("stream", (remoteStream) => {
+            console.log("Received remote stream: ", remoteStream);
+            if (remoteVideoRef.current) {
+              remoteVideoRef.current.srcObject = remoteStream;
+              remoteVideoRef.current.play();
+            }
+          });
+          call.on("error", (err) => {
+            console.error("Call error: ", err);
+          });
+          toast.success("Call accepted");
+        }
+      } catch (error) {
+        console.error("Error accessing media devices.", error);
       }
+    } else {
+      console.error(
+        "Media devices API or getUserMedia method is not available."
+      );
     }
     // Reset incoming call state
     setIncomingCall(null);
-  }, [incomingCall]);
+  }, []);
 
   // Function to handle rejecting an incoming call
   const handleRejectCall = useCallback(() => {
@@ -73,6 +90,64 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   }, [incomingCall]);
 
   useEffect(() => {
+    let channel = activeChannel;
+
+    if (!channel) {
+      channel = pusherClient.subscribe("private-video-call");
+      setActiveChannel(channel);
+    }
+
+    channel.bind("pusher:subscription_succeeded", (hello: any) => {
+      console.log(hello);
+      console.log("Successfully subscribed to the video call channel.");
+    });
+
+    channel.bind(
+      "incoming-call",
+      ({
+        callerId,
+        calleeId,
+      }: {
+        callerId: MediaConnection;
+        calleeId: string;
+      }) => {
+        if (calleeId === session.id) {
+          console.log("Incoming call from: ", callerId);
+          toast((t) => (
+            <span>
+              Incoming call
+              <button
+                onClick={() => {
+                  handleRejectCall();
+                  toast.dismiss(t.id);
+                }}
+              >
+                reject
+              </button>
+              <button
+                onClick={() => {
+                  handleAcceptCall(callerId); // Pass callerId to handleAcceptCall
+                  toast.dismiss(t.id);
+                }}
+              >
+                answer
+              </button>
+            </span>
+          ));
+          setIncomingCall(callerId); // Store callerId for potential video call display
+        }
+      }
+    );
+
+    return () => {
+      if (activeChannel) {
+        pusherClient.unsubscribe("private-video-call");
+        setActiveChannel(null);
+      }
+    };
+  }, [activeChannel, handleAcceptCall, handleRejectCall, session.id]);
+
+  useEffect(() => {
     const peer = new Peer();
 
     peer.on("open", (id: string) => {
@@ -84,27 +159,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     peer.on("call", (call: MediaConnection) => {
       console.log("Receiving call from: " + call.peer);
       setIncomingCall(call);
-      toast((t) => (
-        <span>
-          Incoming call
-          <button
-            onClick={() => {
-              handleRejectCall();
-              toast.dismiss(t.id);
-            }}
-          >
-            reject
-          </button>
-          <button
-            onClick={() => {
-              handleAcceptCall();
-              toast.dismiss(t.id);
-            }}
-          >
-            answer
-          </button>
-        </span>
-      ));
     });
 
     // Save the Peer instance to the ref
@@ -120,32 +174,24 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
 
   // Function to initiate a call to a remote peer
   const initiateCall = (remotePeerId: string) => {
-    console.log("Calling peer: " + remotePeerId);
-    // Check if getUserMedia is supported by the browser
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      // Get user media with video and audio
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
-          // Set media stream to the currentUserVideoRef
           mediaStreamRef.current = mediaStream;
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = mediaStream;
             currentUserVideoRef.current.play();
           }
 
-          // Make a call to the remote peer
           if (peerInstance.current) {
             const call = peerInstance.current.call(remotePeerId, mediaStream);
-            // Event listener for when remote stream is received
             call.on("stream", (remoteStream) => {
-              console.log("Received remote stream: ", remoteStream);
               if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = remoteStream;
                 remoteVideoRef.current.play();
               }
             });
-            // Event listener for call errors
             call.on("error", (err) => {
               console.error("Call error: ", err);
             });
@@ -161,7 +207,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     }
   };
 
-  // Function to release media devices
   const releaseMediaDevices = () => {
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -175,15 +220,11 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     }
   };
 
-  // Function to end the ongoing call
   const endCall = () => {
-    // Close incoming call connection
     if (incomingCall) {
       incomingCall.close();
     }
-    // Release media devices
     releaseMediaDevices();
-    // Reset incoming call state
     setIncomingCall(null);
   };
 
@@ -267,7 +308,23 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
                         onClick={() => initiateCall(remotePeerIdValue)}
                       />
-                      {incomingCall && (
+                    </div>
+                  </div>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition.Root>
+  );
+};
+
+export default VideoCall;
+
+/* 
+
+ {incomingCall && (
                         <Fragment>
                           <button
                             className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-100"
@@ -283,16 +340,5 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                           </button>
                         </Fragment>
                       )}
-                    </div>
-                  </div>
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
-        </div>
-      </Dialog>
-    </Transition.Root>
-  );
-};
 
-export default VideoCall;
+*/
