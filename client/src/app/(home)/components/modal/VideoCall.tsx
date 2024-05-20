@@ -53,7 +53,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
         }
 
         if (peerInstance.current) {
-          const call = peerInstance.current.call(callerId, mediaStream);
+          const call = peerInstance.current.call(callerId.peer, mediaStream);
           call.on("stream", (remoteStream) => {
             console.log("Received remote stream: ", remoteStream);
             if (remoteVideoRef.current) {
