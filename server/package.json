@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.13",
     "pusher": "^5.2.0",
+    "uuid": "^9.0.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.12.7",
     "@types/nodemailer": "^6.4.14",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "cross-env": "^7.0.3",

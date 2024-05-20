@@ -4,11 +4,11 @@ import {
   logoutController,
   signupController,
   refreshController,
-  pusherController,
   forgotPasswordController,
   resetPasswordController,
 } from '../../controlleres/authController';
 import { loginValidation, signupValidation, resetPassValidation } from '../../middlewares/validations';
+import { pusherController } from '../../controlleres/pusherController';
 
 const router = express.Router();
 

@@ -4,7 +4,6 @@ import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 
 import db from '../config/prismadb';
 import { userPayload } from '../shared/type';
-import { pusherServer } from '../config/pusher';
 import { jwtConfig } from '../config/jwtOption';
 import ErrorResponse from '../error/ErrorResponse';
 import { compileHTMLEmailTemplate, sendMail } from '../helpers/mail.helper';
@@ -119,7 +118,7 @@ const loginController = async (req: Request, res: Response) => {
 
     // Handle invalid password
     const match = await bcrypt.compare(password, user?.hashedPassword as string);
- 
+
     if (!match) {
       validationErrors['password'] = ['Oops! The password you entered does not match.'];
       return res.status(400).json({
@@ -420,34 +419,6 @@ const resetPasswordController = async (req: Request, res: Response, next: NextFu
   }
 };
 
-/**
- * fetch pusher server response
- * @param req The Express Request object.
- * @param res The Express Response object.
- * @param next The Express NextFunction for error handling.
- * @returns A JSON response indicating the success or failure of the pusher fetch process.
- */
-const pusherController = async (req: Request, res: Response, next: NextFunction) => {
-  const { user } = req.body;
-  try {
-    if (!user) {
-      return next(ErrorResponse.badRequest('unauthorized'));
-    }
-
-    const socketId = req.body.socket_id;
-    const channel = req.body.channel_name;
-    const data = {
-      user_id: user,
-    };
-
-    const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
-
-    return res.send(authResponse);
-  } catch (error) {
-    return next(ErrorResponse.badRequest('An error occurred during pusher'));
-  }
-};
-
 export {
   signupController,
   loginController,
@@ -455,5 +426,4 @@ export {
   refreshController,
   forgotPasswordController,
   resetPasswordController,
-  pusherController,
 };
