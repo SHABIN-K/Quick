@@ -20,17 +20,17 @@ const useActiveChannel = () => {
       const initialMembers: string[] = [];
 
       members.each((member: Record<string, any>) =>
-        initialMembers.push(member.id)
+        initialMembers.push(member.info.email)
       );
       set(initialMembers);
     });
 
     channel.bind("pusher:member_added", (member: Record<string, any>) => {
-      add(member.id);
+      add(member.info.email);
     });
 
     channel.bind("pusher:member_removed", (member: Record<string, any>) => {
-      remove(member.id);
+      remove(member.info.email);
     });
 
     return () => {
