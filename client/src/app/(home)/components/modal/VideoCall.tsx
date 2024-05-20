@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import toast from "react-hot-toast";
 import Peer, { MediaConnection } from "peerjs";
 import { IoClose, IoVideocam } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useRef, useEffect } from "react";
+import { Fragment, useState, useRef, useEffect, useCallback } from "react";
 
 import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@/shared/types";
-import toast from "react-hot-toast";
 
 interface AddMemberModalProps {
   isOpen?: boolean;
@@ -30,48 +30,114 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     null
   );
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
-
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const peerInstance = useRef<Peer | null>(null);
 
+  // Function to handle accepting an incoming call
+  const handleAcceptCall = useCallback(() => {
+    if (incomingCall) {
+      // Answer the incoming call with current media stream
+      const stream = mediaStreamRef.current;
+      if (stream) {
+        incomingCall.answer(stream);
+        // Event listener for when remote stream is received
+        incomingCall.on("stream", (remoteStream) => {
+          console.log("Received remote stream: ", remoteStream);
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStream;
+            remoteVideoRef.current.play();
+          }
+        });
+        // Event listener for call errors
+        incomingCall.on("error", (err) => {
+          console.error("Call error: ", err);
+        });
+        toast.success("Call accepted");
+      }
+    }
+    // Reset incoming call state
+    setIncomingCall(null);
+  }, [incomingCall]);
+
+  // Function to handle rejecting an incoming call
+  const handleRejectCall = useCallback(() => {
+    // Close incoming call connection
+    if (incomingCall) {
+      incomingCall.close();
+    }
+    toast.error("Call rejected");
+    // Reset incoming call state
+    setIncomingCall(null);
+  }, [incomingCall]);
+
   useEffect(() => {
     const peer = new Peer();
 
     peer.on("open", (id: string) => {
-      console.log("My peer ID is: " + id);
+      console.log("my peer id is :", id);
       setRemotePeerIdValue(id);
     });
 
+    // Event listener for incoming calls
     peer.on("call", (call: MediaConnection) => {
       console.log("Receiving call from: " + call.peer);
       setIncomingCall(call);
-      toast.success("Incoming call");
+      toast((t) => (
+        <span>
+          Incoming call
+          <button
+            onClick={() => {
+              handleRejectCall();
+              toast.dismiss(t.id);
+            }}
+          >
+            reject
+          </button>
+          <button
+            onClick={() => {
+              handleAcceptCall();
+              toast.dismiss(t.id);
+            }}
+          >
+            answer
+          </button>
+        </span>
+      ));
     });
 
+    // Save the Peer instance to the ref
     peerInstance.current = peer;
 
+    // Cleanup function
     return () => {
+      // Destroy Peer instance and release media devices
       peer.destroy();
       releaseMediaDevices();
     };
-  }, []);
+  }, [handleAcceptCall, handleRejectCall]);
 
+  // Function to initiate a call to a remote peer
   const initiateCall = (remotePeerId: string) => {
     console.log("Calling peer: " + remotePeerId);
+    // Check if getUserMedia is supported by the browser
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // Get user media with video and audio
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
+          // Set media stream to the currentUserVideoRef
           mediaStreamRef.current = mediaStream;
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = mediaStream;
             currentUserVideoRef.current.play();
           }
 
+          // Make a call to the remote peer
           if (peerInstance.current) {
             const call = peerInstance.current.call(remotePeerId, mediaStream);
+            // Event listener for when remote stream is received
             call.on("stream", (remoteStream) => {
               console.log("Received remote stream: ", remoteStream);
               if (remoteVideoRef.current) {
@@ -79,6 +145,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                 remoteVideoRef.current.play();
               }
             });
+            // Event listener for call errors
             call.on("error", (err) => {
               console.error("Call error: ", err);
             });
@@ -94,6 +161,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     }
   };
 
+  // Function to release media devices
   const releaseMediaDevices = () => {
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -107,37 +175,15 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
     }
   };
 
+  // Function to end the ongoing call
   const endCall = () => {
+    // Close incoming call connection
     if (incomingCall) {
       incomingCall.close();
     }
+    // Release media devices
     releaseMediaDevices();
-    setIncomingCall(null);
-  };
-
-  const handleAcceptCall = () => {
-    if (incomingCall && mediaStreamRef.current) {
-      incomingCall.answer(mediaStreamRef.current);
-      incomingCall.on("stream", (remoteStream) => {
-        console.log("Received remote stream: ", remoteStream);
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.play();
-        }
-      });
-      incomingCall.on("error", (err) => {
-        console.error("Call error: ", err);
-      });
-      toast.success("Call accepted");
-    }
-    setIncomingCall(null);
-  };
-
-  const handleRejectCall = () => {
-    if (incomingCall) {
-      incomingCall.close();
-    }
-    toast.error("Call rejected");
+    // Reset incoming call state
     setIncomingCall(null);
   };
 
@@ -225,13 +271,13 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         <Fragment>
                           <button
                             className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-100"
-                            onClick={handleAcceptCall}
+                            //onClick={handleAcceptCall}
                           >
                             Accept
                           </button>
                           <button
                             className="h-12 w-12 p-3 bg-red-500 hover:bg-red-600 rounded-full text-gray-100"
-                            onClick={handleRejectCall}
+                            //onClick={handleRejectCall}
                           >
                             Reject
                           </button>
