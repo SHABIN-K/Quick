@@ -3,9 +3,10 @@ import { Channel, Members } from "pusher-js";
 
 import { pusherClient } from "@/config/pusher";
 import useActiveListStore from "../store/useActiveList";
+import { CallInfo } from "@/shared/types";
 
 const useActiveChannel = () => {
-  const { set, add, remove } = useActiveListStore();
+  const { set, add, remove, addCall } = useActiveListStore();
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
 
   useEffect(() => {
@@ -18,10 +19,15 @@ const useActiveChannel = () => {
 
     channel.bind("pusher:subscription_succeeded", (members: Members) => {
       const initialMembers: string[] = [];
+      const initialCall: CallInfo[] = [];
 
-      members.each((member: Record<string, any>) =>
-        initialMembers.push(member.info.email)
-      );
+      members.each((member: Record<string, any>) => {
+        initialMembers.push(member.info.email);
+        initialCall.push(member.info);
+      });
+      initialCall.forEach((callInfo) => {
+        addCall(callInfo);
+      });
       set(initialMembers);
     });
 

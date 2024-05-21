@@ -1,3 +1,8 @@
+export type CallInfo = {
+  email: string;
+  socket_id: string;
+};
+
 export type UserType = {
   id: string;
   name: string;
@@ -8,7 +13,9 @@ export type UserType = {
 };
 
 export type User = {
-  map(arg0: (user: { id: any; name: any; }) => { value: any; label: any; }): Record<string, any>[];
+  map(
+    arg0: (user: { id: any; name: any }) => { value: any; label: any }
+  ): Record<string, any>[];
   id: string;
   name?: string;
   username?: string;

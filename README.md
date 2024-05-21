@@ -43,7 +43,7 @@ E.g. "chore(grunt): Updated Grunt tasks for better task automation and build pro
 ```````
 
 # articles :
-
+- https://dev.to/alexsam986/build-chat-apps-like-whatsapp-telegram-slack-2jn2
 ### jwt token
 
 - https://tkacz.pro/how-to-securely-store-jwt-tokens/
@@ -59,3 +59,4 @@ E.g. "chore(grunt): Updated Grunt tasks for better task automation and build pro
 ### hande webrtc
 - https://medium.com/@aysunitai/building-a-simple-video-chat-app-with-react-and-peerjs-5650cf89569d
 - https://pusher.com/tutorials/webrtc-video-call-app-nodejs/
+- https://stackoverflow.com/questions/77884063/react-peerjs-issue-when-building-video-chat-uncaught-in-promise-domexception
