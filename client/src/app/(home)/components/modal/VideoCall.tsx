@@ -101,26 +101,36 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
 
     // Handle incoming voice/video connection
     peerInstance.on("call", (call: MediaConnection) => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          if (currentUserVideoRef.current) {
-            currentUserVideoRef.current.srcObject = stream;
-            currentUserVideoRef.current.play();
-          }
-          call.answer(stream); // Answer the call with an A/V stream.
-          call.on("stream", renderVideo);
-        })
-        .catch((err) => {
-          console.error("Failed to get local stream", err);
-        });
+      toast((t) => (
+        <span>
+          Incoming call
+          <button
+            className="h-12 w-12 p-3 bg-red-500 hover:bg-red-600 rounded-full text-gray-100"
+            onClick={() => {
+              handleRejectCall(call);
+              toast.dismiss(t.id);
+            }}
+          >
+            reject
+          </button>
+          <button
+            className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-100"
+            onClick={() => {
+              handleAcceptCall(call);
+              toast.dismiss(t.id);
+            }}
+          >
+            answer
+          </button>
+        </span>
+      ));
     });
 
     return () => {
       peerInstance.destroy();
       releaseMediaDevices();
     };
-  }, [peerId, renderVideo]);
+  }, [handleAcceptCall, handleRejectCall, peerId, renderVideo]);
 
   const initiateCall = (remotePeerId: string) => {
     console.log(`Connecting to ${remotePeerId}...`);
