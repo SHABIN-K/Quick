@@ -38,13 +38,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
-    const myId = call.find((info) => {
-      return info.email === session?.email;
-    })?.socket_id;
-
-    const otherUserId = call.find((info) => {
-      return info.email === otherUser?.email;
-    })?.socket_id;
+    const myId = call.find((info) => info.email === session?.email)?.socket_id;
+    const otherUserId = call.find(
+      (info) => info.email === otherUser?.email
+    )?.socket_id;
     setPeerId(myId as string);
     setRemotePeerIdValue(otherUserId as string);
   }, [call, otherUser?.email, session?.email]);
@@ -58,24 +55,23 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
 
   const handleAcceptCall = useCallback(
     (call: MediaConnection) => {
-      console.log("set se i dcommmmmming");
-      if (currentCall) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((stream) => {
-            if (currentUserVideoRef.current) {
-              currentUserVideoRef.current.srcObject = stream;
-              currentUserVideoRef.current.play();
-            }
-            call.answer(stream);
-            call.on("stream", renderVideo);
-          })
-          .catch((err) => {
-            console.error("Failed to get local stream", err);
-          });
-      }
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          if (currentUserVideoRef.current) {
+            currentUserVideoRef.current.srcObject = stream;
+            currentUserVideoRef.current.play();
+          }
+          mediaStreamRef.current = stream;
+          call.answer(stream);
+          call.on("stream", renderVideo);
+          setCurrentCall(call);
+        })
+        .catch((err) => {
+          console.error("Failed to get local stream", err);
+        });
     },
-    [currentCall, renderVideo]
+    [renderVideo]
   );
 
   const handleRejectCall = useCallback((call: MediaConnection) => {
@@ -87,19 +83,17 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   }, []);
 
   useEffect(() => {
-    // Register with the peer server
     const peerInstance = new Peer(peerId);
     setPeer(peerInstance);
 
     peerInstance.on("open", (id) => {
-      console.log("hello world!", id);
+      console.log("Connected with ID:", id);
     });
 
     peerInstance.on("error", (error) => {
       console.error(error);
     });
 
-    // Handle incoming voice/video connection
     peerInstance.on("call", (call: MediaConnection) => {
       toast((t) => (
         <span>
@@ -133,7 +127,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   }, [handleAcceptCall, handleRejectCall, peerId, renderVideo]);
 
   const initiateCall = (remotePeerId: string) => {
-    console.log(`Connecting to ${remotePeerId}...`);
     if (peer) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -142,8 +135,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.play();
           }
+          mediaStreamRef.current = stream;
           const call = peer.call(remotePeerId, stream);
           call.on("stream", renderVideo);
+          setCurrentCall(call);
         })
         .catch((err) => {
           console.error("Failed to get local stream", err);
@@ -152,8 +147,12 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   };
 
   const releaseMediaDevices = () => {
+    console.log("Releasing media devices");
     if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current.getTracks().forEach((track) => {
+        console.log(`Stopping track: ${track.kind}`);
+        track.stop();
+      });
       mediaStreamRef.current = null;
     }
     if (currentUserVideoRef.current) {
@@ -165,12 +164,13 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   };
 
   const endCall = () => {
+    console.log("Ending call");
     if (currentCall) {
       currentCall.close();
       setCurrentCall(null);
-      releaseMediaDevices();
-      toast("Call ended");
     }
+    releaseMediaDevices();
+    toast("Call ended");
   };
 
   return (
