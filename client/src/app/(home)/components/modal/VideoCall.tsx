@@ -31,7 +31,9 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   const [peer, setPeer] = useState<Peer | null>(null);
   const [peerId, setPeerId] = useState<string>("");
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
+  const [isActive, setIsActive] = useState<boolean>(false);
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
+  const [callStatus, setCallStatus] = useState<string>("start video call");
 
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
@@ -57,6 +59,8 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
 
   const handleAcceptCall = useCallback(
     (call: MediaConnection) => {
+      setIsActive(true);
+      setCallStatus("In call...");
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
@@ -81,6 +85,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
   const handleRejectCall = useCallback((call: MediaConnection) => {
     call.close();
     setCurrentCall(null);
+    setCallStatus("Caller is busy");
     toast("Call rejected");
   }, []);
 
@@ -140,13 +145,29 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
             };
           }
           mediaStreamRef.current = stream;
+          setIsActive(false); // Reset active state until the call is connected
           const call = peer.call(remotePeerId, stream);
-          call.on("stream", renderVideo);
+          call.on("stream", (remoteStream) => {
+            renderVideo(remoteStream);
+            setIsActive(true); // Activate video elements when remote stream is received
+            setCallStatus("In call...");
+          });
+          call.on("close", () => {
+            setCallStatus("Call ended");
+            setIsActive(false);
+          });
+          call.on("error", () => {
+            setCallStatus("Call failed");
+            setIsActive(false);
+          });
           setCurrentCall(call);
         })
         .catch((err) => {
           console.error("Failed to get local stream", err);
+          setCallStatus("Failed to access media devices");
         });
+    } else {
+      setCallStatus("User is offline");
     }
   };
 
@@ -174,6 +195,8 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
       setCurrentCall(null);
     }
     releaseMediaDevices();
+    setIsActive(false); // Deactivate the video elements
+    setCallStatus("Call ended");
     toast("Call ended");
   };
 
@@ -217,33 +240,35 @@ const VideoCall: React.FC<AddMemberModalProps> = ({
                         {otherUser?.name}
                       </p>
                       <p className="text-gray-700 capitalize text-base font-semibold">
-                        start video call
+                        {callStatus}
                       </p>
                     </div>
-                    <div className="flex gap-7">
-                      <video
-                        ref={currentUserVideoRef}
-                        autoPlay
-                        playsInline
-                        style={{
-                          width: "300px",
-                          height: "200px",
-                          borderRadius: "14px",
-                          backgroundColor: "black",
-                        }}
-                      />
-                      <video
-                        ref={remoteVideoRef}
-                        autoPlay
-                        playsInline
-                        style={{
-                          width: "300px",
-                          height: "200px",
-                          borderRadius: "14px",
-                          backgroundColor: "black",
-                        }}
-                      />
-                    </div>
+                    {isActive && (
+                      <div className="flex gap-7">
+                        <video
+                          ref={currentUserVideoRef}
+                          autoPlay
+                          playsInline
+                          style={{
+                            width: "300px",
+                            height: "200px",
+                            borderRadius: "14px",
+                            backgroundColor: "black",
+                          }}
+                        />
+                        <video
+                          ref={remoteVideoRef}
+                          autoPlay
+                          playsInline
+                          style={{
+                            width: "300px",
+                            height: "200px",
+                            borderRadius: "14px",
+                            backgroundColor: "black",
+                          }}
+                        />
+                      </div>
+                    )}
                     <div className="flex mt-5 gap-4">
                       <IoClose
                         className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
