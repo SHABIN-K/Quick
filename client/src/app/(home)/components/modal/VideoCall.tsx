@@ -55,7 +55,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
         remoteVideoRef.current.srcObject = stream;
         remoteVideoRef.current.onloadedmetadata = () => {
           console.log("Remote video metadata loaded");
-          remoteVideoRef.current.play().catch((error) => {
+          remoteVideoRef.current?.play().catch((error) => {
             console.error("Error playing remote video", error);
           });
         };
@@ -76,7 +76,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current.play().catch((error) => {
+              currentUserVideoRef.current?.play().catch((error) => {
                 console.error("Error playing local video", error);
               });
             };
@@ -118,6 +118,8 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
 
   const initiateCall = (remotePeerId: string) => {
     console.log("Calling to", remotePeerId);
+    setIsActive(true);
+    setCallStatus("In call...");
     if (peer) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -126,13 +128,12 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current.play().catch((error) => {
+              currentUserVideoRef.current?.play().catch((error) => {
                 console.error("Error playing local video", error);
               });
             };
           }
           mediaStreamRef.current = stream;
-          setIsActive(false); // Reset active state until the call is connected
           const call = peer.call(remotePeerId, stream);
           call.on("stream", (remoteStream) => {
             console.log(
