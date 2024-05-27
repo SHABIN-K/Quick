@@ -18,6 +18,7 @@ interface AddMemberModalProps {
     users: User[];
   };
 }
+
 const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   const {
     peer,
@@ -27,6 +28,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     setCurrentCall,
     incommingCall,
     setIncommingCall,
+    releaseMediaDevices,
+    mediaStreamRef,
+    currentUserVideoRef,
+    remoteVideoRef,
   } = useCallContext();
   const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
@@ -36,10 +41,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
 
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const currentUserVideoRef = useRef<HTMLVideoElement>(null);
-
   useEffect(() => {
     const otherUserId = call.find(
       (info) => info.email === otherUser?.email
@@ -47,14 +48,17 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     setRemotePeerIdValue(otherUserId as string);
   }, [call, otherUser?.email, session?.email]);
 
-  const renderVideo = useCallback((stream: MediaStream) => {
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = stream;
-      remoteVideoRef.current.onloadedmetadata = () => {
-        remoteVideoRef.current?.play();
-      };
-    }
-  }, []);
+  const renderVideo = useCallback(
+    (stream: MediaStream) => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+        remoteVideoRef.current.onloadedmetadata = () => {
+          remoteVideoRef.current?.play();
+        };
+      }
+    },
+    [remoteVideoRef]
+  );
 
   const handleAcceptCall = useCallback(
     (call: MediaConnection) => {
@@ -79,7 +83,14 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           console.error("Failed to get local stream", err);
         });
     },
-    [renderVideo, setCallStatus, setCurrentCall, setIncommingCall]
+    [
+      currentUserVideoRef,
+      mediaStreamRef,
+      renderVideo,
+      setCallStatus,
+      setCurrentCall,
+      setIncommingCall,
+    ]
   );
 
   const handleRejectCall = useCallback(
@@ -128,23 +139,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
         });
     } else {
       setCallStatus("User is offline");
-    }
-  };
-
-  const releaseMediaDevices = () => {
-    console.log("Releasing media devices");
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => {
-        console.log(`Stopping track: ${track.kind}`);
-        track.stop();
-      });
-      mediaStreamRef.current = null;
-    }
-    if (currentUserVideoRef.current) {
-      currentUserVideoRef.current.srcObject = null;
-    }
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = null;
     }
   };
 

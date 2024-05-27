@@ -1,7 +1,14 @@
 "use client";
 
 import Peer, { MediaConnection } from "peerjs";
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";
@@ -15,6 +22,10 @@ interface CallContextType {
   setCurrentCall: React.Dispatch<React.SetStateAction<MediaConnection | null>>;
   incommingCall: boolean;
   setIncommingCall: React.Dispatch<React.SetStateAction<boolean>>;
+  releaseMediaDevices: () => void;
+  mediaStreamRef: React.MutableRefObject<MediaStream | null>;
+  currentUserVideoRef: React.MutableRefObject<HTMLVideoElement | null>;
+  remoteVideoRef: React.MutableRefObject<HTMLVideoElement | null>;
 }
 
 const CallContext = createContext<CallContextType | undefined>(undefined);
@@ -32,6 +43,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
   const [callStatus, setCallStatus] = useState<string>("start video call");
 
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const currentUserVideoRef = useRef<HTMLVideoElement | null>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+
   useEffect(() => {
     if (call && session) {
       const myId = call.find((info) => info.email === session.email)?.socket_id;
@@ -39,6 +54,23 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       setPeerId(myId || null);
     }
   }, [call, session]);
+
+  const releaseMediaDevices = useCallback(() => {
+    console.log("Releasing media devices");
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => {
+        console.log(`Stopping track: ${track.kind}`);
+        track.stop();
+      });
+    }
+    if (currentUserVideoRef.current) {
+      currentUserVideoRef.current.srcObject = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+    mediaStreamRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (peerId) {
@@ -54,7 +86,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       peerInstance.on("call", (call: MediaConnection) => {
-        console.log(call);
+        console.log(call.peer);
         setIsVideoCall(true);
         setIncommingCall(true);
         setCurrentCall(call);
@@ -63,9 +95,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
 
       return () => {
         peerInstance.destroy();
+        releaseMediaDevices();
       };
     }
-  }, [peerId, setIsVideoCall]);
+  }, [peerId, releaseMediaDevices, setIsVideoCall]);
 
   const contextValue: CallContextType = {
     peer,
@@ -75,6 +108,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     setCurrentCall,
     incommingCall,
     setIncommingCall,
+    releaseMediaDevices,
+    mediaStreamRef,
+    currentUserVideoRef,
+    remoteVideoRef,
   };
 
   return (
