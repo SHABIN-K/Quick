@@ -60,6 +60,7 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success("Welcome to Quick! Your account is ready to use");
+          Cookies.remove("-secure-node-authToken");
           Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
             expires: 7,
           });
@@ -85,6 +86,7 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success(`Great to see you again, ${res?.data?.data?.name}!`);
+          Cookies.remove("-secure-node-authToken");
           Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
             expires: 7,
           });

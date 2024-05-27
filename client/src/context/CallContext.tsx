@@ -45,6 +45,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (call && session) {
       const myId = call.find((info) => info.email === session.email)?.socket_id;
+      console.log("my session id:", myId);
       setPeerId(myId || null);
     }
   }, [call, session]);
@@ -113,7 +114,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       setPeer(peerInstance);
 
       peerInstance.on("open", (id) => {
-        console.log("Connected with ID:", id);
+        console.log("my peer ID:", id);
       });
 
       peerInstance.on("error", (error) => {
@@ -154,6 +155,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [acceptCall, peerId, rejectCall, releaseMediaDevices]);
 
   const initiateCall = (remotePeerId: string) => {
+    console.log("remote id::", remotePeerId);
     if (peer) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
