@@ -46,6 +46,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
+  const ringtoneRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (call && session) {
@@ -59,7 +60,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Releasing media devices");
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => {
-        console.log(`Stopping track: ${track.kind}`);
         track.stop();
       });
     }
@@ -90,15 +90,45 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsVideoCall(true);
         setIncommingCall(true);
         setCurrentCall(call);
+        if (ringtoneRef.current) {
+          ringtoneRef.current.play().catch((error) => {
+            console.error("Error playing ringtone", error);
+          });
+        }
         setCallStatus("Incoming call...");
       });
 
       return () => {
         peerInstance.destroy();
         releaseMediaDevices();
+
+        // Stop the ringtone and reset its state
+        if (ringtoneRef.current) {
+          ringtoneRef.current.pause();
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          ringtoneRef.current.currentTime = 0;
+        }
       };
     }
   }, [peerId, releaseMediaDevices, setIsVideoCall]);
+
+  useEffect(() => {
+    // Ensure the ringtone component mounts only once
+    if (ringtoneRef.current && incommingCall) {
+      ringtoneRef.current.play().catch((error) => {
+        console.error("Error playing ringtone", error);
+      });
+    }
+
+    return () => {
+      // Clean up the ringtone component when the provider unmounts
+      if (ringtoneRef.current) {
+        ringtoneRef.current.pause();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        ringtoneRef.current.currentTime = 0;
+      }
+    };
+  }, [incommingCall]);
 
   const contextValue: CallContextType = {
     peer,
@@ -115,7 +145,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <CallContext.Provider value={contextValue}>{children}</CallContext.Provider>
+    <CallContext.Provider value={contextValue}>
+      {children}
+      <audio ref={ringtoneRef} src="/audio/ringtone.mp3" loop />
+    </CallContext.Provider>
   );
 };
 

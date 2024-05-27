@@ -50,11 +50,9 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
 
   const renderVideo = useCallback(
     (stream: MediaStream) => {
-      console.log("Rendering video stream:", stream);
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
         remoteVideoRef.current.onloadedmetadata = () => {
-          console.log("Remote video metadata loaded");
           remoteVideoRef.current?.play().catch((error) => {
             console.error("Error playing remote video", error);
           });
@@ -72,7 +70,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
-          console.log("Local stream acquired for incoming call:", stream);
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
@@ -84,10 +81,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           mediaStreamRef.current = stream;
           call.answer(stream);
           call.on("stream", (remoteStream) => {
-            console.log(
-              "Remote stream received for incoming call:",
-              remoteStream
-            );
             renderVideo(remoteStream);
           });
           setCurrentCall(call);
@@ -124,7 +117,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
-          console.log("Local stream acquired for outgoing call:", stream);
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
@@ -136,10 +128,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           mediaStreamRef.current = stream;
           const call = peer.call(remotePeerId, stream);
           call.on("stream", (remoteStream) => {
-            console.log(
-              "Remote stream received for outgoing call:",
-              remoteStream
-            );
             renderVideo(remoteStream);
             setIsActive(true); // Activate video elements when remote stream is received
             setCallStatus("In call...");
@@ -157,7 +145,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
         })
         .catch((err) => {
           console.error("Failed to get local stream", err);
-          setCallStatus("Failed to access media devices");
         });
     } else {
       setCallStatus("User is offline");
@@ -264,7 +251,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
                         />
 
                         <IoClose
-                          className="h-12 w-12 p-2 bg-rose-600 rounded-full text-gray-800"
+                          className="h-12 w-12 p-2 bg-rose-600 rounded-full text-white"
                           onClick={() =>
                             currentCall && handleRejectCall(currentCall)
                           }
@@ -272,15 +259,17 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
                       </div>
                     ) : (
                       <div className="flex mt-5 gap-4">
-                        <IoVideocam
-                          className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
-                          onClick={() =>
-                            initiateCall(remotePeerIdValue as string)
-                          }
-                        />
+                        {!isActive && (
+                          <IoVideocam
+                            className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
+                            onClick={() =>
+                              initiateCall(remotePeerIdValue as string)
+                            }
+                          />
+                        )}
 
                         <IoClose
-                          className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                          className="h-12 w-12 p-2 bg-rose-600 rounded-full text-white"
                           onClick={endCall}
                         />
                       </div>
