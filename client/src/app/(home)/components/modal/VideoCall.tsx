@@ -1,16 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import { MediaConnection } from "peerjs";
 import { IoClose, IoVideocam } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useRef, useEffect } from "react";
+import { Fragment, useState, useRef, useEffect, useCallback } from "react";
 
 import useOpenStore from "@/store/useOpen";
 import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@/shared/types";
-import { useCallContext } from "@/context/CallContext";
 import useActiveListStore from "@/store/useActiveList";
+import { useCallContext } from "@/context/CallContext";
 
 interface AddMemberModalProps {
   data: Conversation & {
@@ -18,22 +19,25 @@ interface AddMemberModalProps {
   };
 }
 const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
+  const {
+    peer,
+    callStatus,
+    currentCall,
+    setCallStatus,
+    setCurrentCall,
+    incommingCall,
+    setIncommingCall,
+  } = useCallContext();
   const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
   const { call } = useActiveListStore();
   const { isVideoCall, setIsVideoCall } = useOpenStore();
 
-  const {
-    initiateCall,
-    endCall,
-    callStatus,
-    isActive,
-    currentCall,
-  } = useCallContext();
-
+  const [isActive, setIsActive] = useState<boolean>(false);
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
 
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -43,18 +47,118 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     setRemotePeerIdValue(otherUserId as string);
   }, [call, otherUser?.email, session?.email]);
 
-  useEffect(() => {
-    if (isActive && currentCall) {
-      currentCall.on("stream", (remoteStream) => {
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = remoteStream;
-          remoteVideoRef.current.onloadedmetadata = () => {
-            remoteVideoRef.current?.play();
-          };
-        }
-      });
+  const renderVideo = useCallback((stream: MediaStream) => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = stream;
+      remoteVideoRef.current.onloadedmetadata = () => {
+        remoteVideoRef.current?.play();
+      };
     }
-  }, [isActive, currentCall]);
+  }, []);
+
+  const handleAcceptCall = useCallback(
+    (call: MediaConnection) => {
+      setIncommingCall(false);
+      setIsActive(true);
+      setCallStatus("In call...");
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          if (currentUserVideoRef.current) {
+            currentUserVideoRef.current.srcObject = stream;
+            currentUserVideoRef.current.onloadedmetadata = () => {
+              currentUserVideoRef.current?.play();
+            };
+          }
+          mediaStreamRef.current = stream;
+          call.answer(stream);
+          call.on("stream", renderVideo);
+          setCurrentCall(call);
+        })
+        .catch((err) => {
+          console.error("Failed to get local stream", err);
+        });
+    },
+    [renderVideo, setCallStatus, setCurrentCall, setIncommingCall]
+  );
+
+  const handleRejectCall = useCallback(
+    (call: MediaConnection) => {
+      call.close();
+      setIncommingCall(false);
+      setCurrentCall(null);
+      setCallStatus("Caller is busy");
+    },
+    [setCallStatus, setCurrentCall, setIncommingCall]
+  );
+
+  const initiateCall = (remotePeerId: string) => {
+    console.log("calling to ", remotePeerId);
+    if (peer) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          if (currentUserVideoRef.current) {
+            currentUserVideoRef.current.srcObject = stream;
+            currentUserVideoRef.current.onloadedmetadata = () => {
+              currentUserVideoRef.current?.play();
+            };
+          }
+          mediaStreamRef.current = stream;
+          setIsActive(false); // Reset active state until the call is connected
+          const call = peer.call(remotePeerId, stream);
+          call.on("stream", (remoteStream) => {
+            renderVideo(remoteStream);
+            setIsActive(true); // Activate video elements when remote stream is received
+            setCallStatus("In call...");
+          });
+          call.on("close", () => {
+            setCallStatus("Call ended");
+            setIsActive(false);
+          });
+          call.on("error", () => {
+            setCallStatus("Call failed");
+            setIsActive(false);
+          });
+          setCurrentCall(call);
+        })
+        .catch((err) => {
+          console.error("Failed to get local stream", err);
+          setCallStatus("Failed to access media devices");
+        });
+    } else {
+      setCallStatus("User is offline");
+    }
+  };
+
+  const releaseMediaDevices = () => {
+    console.log("Releasing media devices");
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => {
+        console.log(`Stopping track: ${track.kind}`);
+        track.stop();
+      });
+      mediaStreamRef.current = null;
+    }
+    if (currentUserVideoRef.current) {
+      currentUserVideoRef.current.srcObject = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+  };
+
+  const endCall = () => {
+    console.log("Ending call");
+    if (currentCall) {
+      currentCall.close();
+      setCurrentCall(null);
+    }
+    releaseMediaDevices();
+    onClose();
+    setIsActive(false); // Deactivate the video elements
+    setCallStatus("Call ended");
+  };
 
   function onClose() {
     setIsVideoCall(false);
@@ -129,18 +233,37 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
                         />
                       </div>
                     )}
-                    <div className="flex mt-5 gap-4">
-                      <IoClose
-                        className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
-                        onClick={endCall}
-                      />
-                      <IoVideocam
-                        className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
-                        onClick={() =>
-                          initiateCall(remotePeerIdValue as string)
-                        }
-                      />
-                    </div>
+                    {incommingCall ? (
+                      <div className="flex mt-5 gap-4">
+                        <IoVideocam
+                          className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
+                          onClick={() =>
+                            currentCall && handleAcceptCall(currentCall)
+                          }
+                        />
+
+                        <IoClose
+                          className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                          onClick={() =>
+                            currentCall && handleRejectCall(currentCall)
+                          }
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex mt-5 gap-4">
+                        <IoVideocam
+                          className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
+                          onClick={() =>
+                            initiateCall(remotePeerIdValue as string)
+                          }
+                        />
+
+                        <IoClose
+                          className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                          onClick={endCall}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </Dialog.Panel>

@@ -1,30 +1,20 @@
 "use client";
 
-import React, {
-  createContext,
-  useState,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
 import Peer, { MediaConnection } from "peerjs";
-import toast from "react-hot-toast";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";
 import useActiveListStore from "@/store/useActiveList";
 
 interface CallContextType {
-  initiateCall: (remotePeerId: string) => void;
-  endCall: () => void;
-  acceptCall: (call: MediaConnection) => void;
-  rejectCall: (call: MediaConnection) => void;
-  setPeerId: (id: string) => void;
-  peerId: string | null;
+  peer: Peer | null;
   callStatus: string;
   currentCall: MediaConnection | null;
-  isActive: boolean;
+  setCallStatus: React.Dispatch<React.SetStateAction<string>>;
+  setCurrentCall: React.Dispatch<React.SetStateAction<MediaConnection | null>>;
+  incommingCall: boolean;
+  setIncommingCall: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CallContext = createContext<CallContextType | undefined>(undefined);
@@ -34,19 +24,13 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { session } = useAuthStore();
   const { call } = useActiveListStore();
-  const { isVideoCall, setIsVideoCall } = useOpenStore();
+  const { setIsVideoCall } = useOpenStore();
 
   const [peer, setPeer] = useState<Peer | null>(null);
   const [peerId, setPeerId] = useState<string | null>(null);
+  const [incommingCall, setIncommingCall] = useState<boolean>(false);
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
   const [callStatus, setCallStatus] = useState<string>("start video call");
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [isIncomingCall, setIsIncomingCall] = useState<boolean>(false);
-
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const currentUserVideoRef = useRef<HTMLVideoElement>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const ringtoneRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (call && session) {
@@ -56,85 +40,13 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [call, session]);
 
-  const renderVideo = useCallback((stream: MediaStream) => {
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = stream;
-      remoteVideoRef.current.onloadedmetadata = () => {
-        remoteVideoRef.current?.play();
-      };
-    }
-  }, []);
-
-  const acceptCall = useCallback(
-    (call: MediaConnection) => {
-      setIsActive(true);
-      setIsVideoCall(true);
-      setCallStatus("In call...");
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          if (currentUserVideoRef.current) {
-            currentUserVideoRef.current.srcObject = stream;
-            currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current?.play();
-            };
-          }
-          mediaStreamRef.current = stream;
-          call.answer(stream);
-          call.on("stream", renderVideo);
-          setCurrentCall(call);
-        })
-        .catch((err) => {
-          console.error("Failed to get local stream", err);
-        });
-    },
-    [renderVideo, setIsVideoCall]
-  );
-
-  const rejectCall = useCallback((call: MediaConnection) => {
-    call.close();
-    setCurrentCall(null);
-  }, []);
-
-  const releaseMediaDevices = useCallback(() => {
-    console.log("Releasing media devices");
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => {
-        console.log(`Stopping track: ${track.kind}`);
-        track.stop();
-      });
-      mediaStreamRef.current = null;
-    }
-    if (currentUserVideoRef.current) {
-      currentUserVideoRef.current.srcObject = null;
-    }
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isIncomingCall) {
-      const audio = ringtoneRef.current;
-      if (audio) {
-        audio.play();
-      }
-    } else {
-      const audio = ringtoneRef.current;
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-    }
-  }, [isIncomingCall]);
-
   useEffect(() => {
     if (peerId) {
       const peerInstance = new Peer(peerId);
       setPeer(peerInstance);
 
       peerInstance.on("open", (id) => {
-        console.log("my peer ID:", id);
+        console.log("Connected with ID:", id);
       });
 
       peerInstance.on("error", (error) => {
@@ -142,107 +54,31 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       peerInstance.on("call", (call: MediaConnection) => {
-        toast((t) => (
-          <span>
-            Incoming call
-            <button
-              className="h-12 w-12 p-3 bg-red-500 hover:bg-red-600 rounded-full text-gray-100"
-              onClick={() => {
-                rejectCall(call);
-                toast.dismiss(t.id);
-              }}
-            >
-              reject
-            </button>
-            <button
-              className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-100"
-              onClick={() => {
-                acceptCall(call);
-                toast.dismiss(t.id);
-              }}
-            >
-              answer
-            </button>
-          </span>
-        ));
+        console.log(call);
+        setIsVideoCall(true);
+        setIncommingCall(true);
+        setCurrentCall(call);
+        setCallStatus("Incoming call...");
       });
 
       return () => {
         peerInstance.destroy();
-        releaseMediaDevices();
       };
     }
-  }, [acceptCall, peerId, rejectCall, releaseMediaDevices]);
+  }, [peerId, setIsVideoCall]);
 
-  const initiateCall = (remotePeerId: string) => {
-    console.log("remote id::", remotePeerId);
-    if (peer) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          if (currentUserVideoRef.current) {
-            currentUserVideoRef.current.srcObject = stream;
-            currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current?.play();
-            };
-          }
-          mediaStreamRef.current = stream;
-          setIsActive(false); // Reset active state until the call is connected
-          const call = peer.call(remotePeerId, stream);
-          call.on("stream", (remoteStream) => {
-            renderVideo(remoteStream);
-            setIsActive(true); // Activate video elements when remote stream is received
-            setCallStatus("In call...");
-          });
-          call.on("close", () => {
-            console.log("disconnected")
-            setCallStatus("Call ended");
-            setIsActive(false);
-          });
-          call.on("error", () => {
-            setCallStatus("Call failed");
-            setIsActive(false);
-          });
-          setCurrentCall(call);
-        })
-        .catch((err) => {
-          console.error("Failed to get local stream", err);
-          setCallStatus("Failed to access media devices");
-        });
-    } else {
-      setCallStatus("User is offline");
-    }
-  };
-
-  const endCall = () => {
-    console.log("Ending call");
-    if (currentCall) {
-      currentCall.close();
-      setCurrentCall(null);
-    }
-    releaseMediaDevices();
-    setIsActive(false);
-    setIsVideoCall(false);
-    setCallStatus("start video call");
+  const contextValue: CallContextType = {
+    peer,
+    callStatus,
+    currentCall,
+    setCallStatus,
+    setCurrentCall,
+    incommingCall,
+    setIncommingCall,
   };
 
   return (
-    <CallContext.Provider
-      value={{
-        initiateCall,
-        endCall,
-        acceptCall,
-        rejectCall,
-        setPeerId,
-        peerId,
-        callStatus,
-        currentCall,
-        isActive,
-      }}
-    >
-      {children}
-      <audio ref={ringtoneRef} src="/client/public/audio/ringtone.mp3" />
-    </CallContext.Provider>
+    <CallContext.Provider value={contextValue}>{children}</CallContext.Provider>
   );
 };
 
