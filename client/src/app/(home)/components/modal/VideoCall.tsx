@@ -55,7 +55,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
         remoteVideoRef.current.srcObject = stream;
         remoteVideoRef.current.onloadedmetadata = () => {
           console.log("Remote video metadata loaded");
-          remoteVideoRef.current?.play().catch(error => {
+          remoteVideoRef.current.play().catch((error) => {
             console.error("Error playing remote video", error);
           });
         };
@@ -76,7 +76,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current?.play().catch(error => {
+              currentUserVideoRef.current.play().catch((error) => {
                 console.error("Error playing local video", error);
               });
             };
@@ -84,7 +84,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           mediaStreamRef.current = stream;
           call.answer(stream);
           call.on("stream", (remoteStream) => {
-            console.log("Remote stream received for incoming call:", remoteStream);
+            console.log(
+              "Remote stream received for incoming call:",
+              remoteStream
+            );
             renderVideo(remoteStream);
           });
           setCurrentCall(call);
@@ -123,7 +126,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
-              currentUserVideoRef.current?.play().catch(error => {
+              currentUserVideoRef.current.play().catch((error) => {
                 console.error("Error playing local video", error);
               });
             };
@@ -132,7 +135,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           setIsActive(false); // Reset active state until the call is connected
           const call = peer.call(remotePeerId, stream);
           call.on("stream", (remoteStream) => {
-            console.log("Remote stream received for outgoing call:", remoteStream);
+            console.log(
+              "Remote stream received for outgoing call:",
+              remoteStream
+            );
             renderVideo(remoteStream);
             setIsActive(true); // Activate video elements when remote stream is received
             setCallStatus("In call...");
@@ -156,6 +162,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
       setCallStatus("User is offline");
     }
   };
+
   const endCall = () => {
     console.log("Ending call");
     if (currentCall) {
