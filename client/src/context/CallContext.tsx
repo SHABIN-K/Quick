@@ -10,7 +10,9 @@ import React, {
 } from "react";
 import Peer, { MediaConnection } from "peerjs";
 import toast from "react-hot-toast";
+
 import useAuthStore from "@/store/useAuth";
+import useOpenStore from "@/store/useOpen";
 import useActiveListStore from "@/store/useActiveList";
 
 interface CallContextType {
@@ -32,6 +34,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { session } = useAuthStore();
   const { call } = useActiveListStore();
+  const { isVideoCall, setIsVideoCall } = useOpenStore();
+
   const [peer, setPeer] = useState<Peer | null>(null);
   const [peerId, setPeerId] = useState<string | null>(null);
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
@@ -64,6 +68,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const acceptCall = useCallback(
     (call: MediaConnection) => {
       setIsActive(true);
+      setIsVideoCall(true);
       setCallStatus("In call...");
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -83,14 +88,12 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
           console.error("Failed to get local stream", err);
         });
     },
-    [renderVideo]
+    [renderVideo, setIsVideoCall]
   );
 
   const rejectCall = useCallback((call: MediaConnection) => {
     call.close();
     setCurrentCall(null);
-    setCallStatus("Caller is busy");
-    toast("Call rejected");
   }, []);
 
   const releaseMediaDevices = useCallback(() => {
@@ -192,6 +195,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
             setCallStatus("In call...");
           });
           call.on("close", () => {
+            console.log("disconnected")
             setCallStatus("Call ended");
             setIsActive(false);
           });
@@ -218,7 +222,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     releaseMediaDevices();
     setIsActive(false);
-    setCallStatus("Call ended");
+    setIsVideoCall(false);
+    setCallStatus("start video call");
   };
 
   return (
