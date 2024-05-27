@@ -26,8 +26,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   const {
     initiateCall,
     endCall,
-    setPeerId,
-    peerId,
     callStatus,
     isActive,
     currentCall,
@@ -39,13 +37,11 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const myId = call.find((info) => info.email === session?.email)?.socket_id;
     const otherUserId = call.find(
       (info) => info.email === otherUser?.email
     )?.socket_id;
-    setPeerId(myId as string);
     setRemotePeerIdValue(otherUserId as string);
-  }, [call, otherUser?.email, session?.email, setPeerId]);
+  }, [call, otherUser?.email, session?.email]);
 
   useEffect(() => {
     if (isActive && currentCall) {

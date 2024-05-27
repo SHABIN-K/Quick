@@ -37,10 +37,12 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
   const [callStatus, setCallStatus] = useState<string>("start video call");
   const [isActive, setIsActive] = useState<boolean>(false);
+  const [isIncomingCall, setIsIncomingCall] = useState<boolean>(false);
 
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const ringtoneRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (call && session) {
@@ -107,6 +109,21 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       remoteVideoRef.current.srcObject = null;
     }
   }, []);
+
+  useEffect(() => {
+    if (isIncomingCall) {
+      const audio = ringtoneRef.current;
+      if (audio) {
+        audio.play();
+      }
+    } else {
+      const audio = ringtoneRef.current;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+  }, [isIncomingCall]);
 
   useEffect(() => {
     if (peerId) {
@@ -219,6 +236,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       }}
     >
       {children}
+      <audio ref={ringtoneRef} src="/client/public/audio/ringtone.mp3" />
     </CallContext.Provider>
   );
 };
