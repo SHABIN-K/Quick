@@ -68,6 +68,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
+          console.log("Local stream acquired for incoming call:", stream);
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
@@ -76,11 +77,17 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           }
           mediaStreamRef.current = stream;
           call.answer(stream);
-          call.on("stream", renderVideo);
+          call.on("stream", (remoteStream) => {
+            console.log(
+              "Remote stream received for incoming call:",
+              remoteStream
+            );
+            renderVideo(remoteStream);
+          });
           setCurrentCall(call);
         })
         .catch((err) => {
-          console.error("Failed to get local stream", err);
+          console.error("Failed to get local stream for incoming call", err);
         });
     },
     [
@@ -104,11 +111,12 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   );
 
   const initiateCall = (remotePeerId: string) => {
-    console.log("calling to ", remotePeerId);
+    console.log("Calling to", remotePeerId);
     if (peer) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
+          console.log("Local stream acquired for outgoing call:", stream);
           if (currentUserVideoRef.current) {
             currentUserVideoRef.current.srcObject = stream;
             currentUserVideoRef.current.onloadedmetadata = () => {
@@ -119,6 +127,10 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           setIsActive(false); // Reset active state until the call is connected
           const call = peer.call(remotePeerId, stream);
           call.on("stream", (remoteStream) => {
+            console.log(
+              "Remote stream received for outgoing call:",
+              remoteStream
+            );
             renderVideo(remoteStream);
             setIsActive(true); // Activate video elements when remote stream is received
             setCallStatus("In call...");
@@ -127,7 +139,8 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
             setCallStatus("Call ended");
             setIsActive(false);
           });
-          call.on("error", () => {
+          call.on("error", (error) => {
+            console.error("Call error:", error);
             setCallStatus("Call failed");
             setIsActive(false);
           });
@@ -151,7 +164,13 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     releaseMediaDevices();
     onClose();
     setIsActive(false); // Deactivate the video elements
-    setCallStatus("Call ended");
+    setCallStatus("start video call");
+
+    if (peer) {
+      peer.disconnect();
+      peer.destroy();
+      console.log("Disconnected from PeerJS server");
+    }
   };
 
   function onClose() {
@@ -230,14 +249,14 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
                     {incommingCall ? (
                       <div className="flex mt-5 gap-4">
                         <IoVideocam
-                          className="h-12 w-12 p-3 bg-sky-500 hover:bg-sky-600 rounded-full text-gray-100"
+                          className="h-12 w-12 p-3 bg-green-500 hover:bg-green-600 rounded-full text-gray-800"
                           onClick={() =>
                             currentCall && handleAcceptCall(currentCall)
                           }
                         />
 
                         <IoClose
-                          className="h-12 w-12 p-2 bg-white rounded-full text-gray-600"
+                          className="h-12 w-12 p-2 bg-rose-600 rounded-full text-gray-800"
                           onClick={() =>
                             currentCall && handleRejectCall(currentCall)
                           }

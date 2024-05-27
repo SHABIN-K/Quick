@@ -94,6 +94,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       return () => {
+        peerInstance.disconnect();
         peerInstance.destroy();
         releaseMediaDevices();
       };
