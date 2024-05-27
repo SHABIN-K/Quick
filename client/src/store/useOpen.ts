@@ -5,6 +5,8 @@ interface openState {
   setIsLogout: (isLoading: boolean) => void;
   isSettings: boolean;
   setIsSettings: (isLoading: boolean) => void;
+  isVideoCall: boolean;
+  setIsVideoCall: (isLoading: boolean) => void;
 }
 
 const useOpenStore = create<openState>((set) => ({
@@ -12,6 +14,8 @@ const useOpenStore = create<openState>((set) => ({
   setIsLogout: (value) => set({ isLogout: value }),
   isSettings: false,
   setIsSettings: (value) => set({ isSettings: value }),
+  isVideoCall: false,
+  setIsVideoCall: (value) => set({ isVideoCall: value }),
 }));
 
 export default useOpenStore;

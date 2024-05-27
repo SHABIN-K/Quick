@@ -12,6 +12,7 @@ import AvatarGroup from "@/components/AvatarGroup";
 import { User, Conversation } from "@/shared/types";
 import useActiveListStore from "@/store/useActiveList";
 import VideoCall from "../modal/VideoCall";
+import useOpenStore from "@/store/useOpen";
 
 interface HeaderProps {
   conversation: Conversation & { users: User[] };
@@ -20,8 +21,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ conversation, chatType }) => {
   const otherUser = useOtherUser(conversation);
+  const { setIsVideoCall } = useOpenStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isVideocall, setIsVideocall] = useState(false);
 
   const { members } = useActiveListStore();
   const isActive = members.indexOf(otherUser?.email!) !== -1;
@@ -41,11 +42,7 @@ const Header: React.FC<HeaderProps> = ({ conversation, chatType }) => {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       />
-      <VideoCall
-        isOpen={isVideocall}
-        onClose={() => setIsVideocall(false)}
-        data={conversation}
-      />
+      <VideoCall data={conversation} />
       <div className="bg-white w-full flex border-b-[1px] sm:px-4 py-4 px-4 lg:px-6 justify-between items-center shadow-sm">
         <div className="flex gap-3 items-center">
           <Link
@@ -74,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ conversation, chatType }) => {
           />
           {chatType === "chats" && (
             <IoVideocamOutline
-              onClick={() => setIsVideocall(true)}
+              onClick={() => setIsVideoCall(true)}
               className="w-7 h-6 text-gray-500 cursor-pointer hover:text-sky-600 transition"
             />
           )}
