@@ -9,7 +9,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-
+         
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";
 import useActiveListStore from "@/store/useActiveList";
@@ -47,6 +47,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const currentUserVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const ringtoneRef = useRef<HTMLAudioElement>(null);
+  const ringtoneButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (call && session) {
@@ -90,11 +91,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsVideoCall(true);
         setIncommingCall(true);
         setCurrentCall(call);
-        if (ringtoneRef.current) {
-          ringtoneRef.current.play().catch((error) => {
-            console.error("Error playing ringtone", error);
-          });
-        }
+        handleRingtoneButtonClick();
         setCallStatus("Incoming call...");
       });
 
@@ -129,6 +126,14 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
   }, [incommingCall]);
+
+  const handleRingtoneButtonClick = () => {
+    if (ringtoneRef.current) {
+      ringtoneRef.current.play().catch((error) => {
+        console.error("Error playing ringtone", error);
+      });
+    }
+  };
 
   const contextValue: CallContextType = {
     peer,
