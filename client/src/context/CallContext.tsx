@@ -53,7 +53,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [session]);
 
   const releaseMediaDevices = useCallback(() => {
-    console.log("Releasing media devices");
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => {
         track.stop();

@@ -96,6 +96,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     (call: MediaConnection) => {
       call.close();
       onClose();
+      setIsActive(false);
       setIncommingCall(false);
       setCurrentCall(null);
     },
@@ -145,19 +146,18 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   };
 
   const endCall = () => {
-    console.log("Ending call");
     if (currentCall) {
       currentCall.close();
       setCurrentCall(null);
     }
     releaseMediaDevices();
     onClose();
-    setIsActive(false);
     setCallStatus("start video call");
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   function onClose() {
+    setIsActive(false);
     setIsVideoCall(false);
   }
   return (
