@@ -9,10 +9,9 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-         
+
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";
-import useActiveListStore from "@/store/useActiveList";
 
 interface CallContextType {
   peer: Peer | null;
@@ -34,7 +33,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { session } = useAuthStore();
-  const { call } = useActiveListStore();
   const { setIsVideoCall } = useOpenStore();
 
   const [peer, setPeer] = useState<Peer | null>(null);
@@ -49,12 +47,10 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const ringtoneRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (call && session) {
-      const myId = call.find((info) => info.email === session.email)?.socket_id;
-      console.log("my session id:", myId);
-      setPeerId(myId || null);
+    if (session) {
+      setPeerId(session.id || null);
     }
-  }, [call, session]);
+  }, [session]);
 
   const releaseMediaDevices = useCallback(() => {
     console.log("Releasing media devices");

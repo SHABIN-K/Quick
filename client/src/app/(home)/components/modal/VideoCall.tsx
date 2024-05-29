@@ -7,10 +7,8 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect, useCallback } from "react";
 
 import useOpenStore from "@/store/useOpen";
-import useAuthStore from "@/store/useAuth";
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@/shared/types";
-import useActiveListStore from "@/store/useActiveList";
 import { useCallContext } from "@/context/CallContext";
 
 interface AddMemberModalProps {
@@ -33,20 +31,15 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     currentUserVideoRef,
     remoteVideoRef,
   } = useCallContext();
-  const { session } = useAuthStore();
   const otherUser = useOtherUser(data);
-  const { call } = useActiveListStore();
   const { isVideoCall, setIsVideoCall } = useOpenStore();
 
   const [isActive, setIsActive] = useState<boolean>(false);
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>("");
 
   useEffect(() => {
-    const otherUserId = call.find(
-      (info) => info.email === otherUser?.email
-    )?.socket_id;
-    setRemotePeerIdValue(otherUserId as string);
-  }, [call, otherUser?.email, session?.email]);
+    setRemotePeerIdValue(otherUser?.id as string);
+  }, [otherUser?.id]);
 
   const renderVideo = useCallback(
     (stream: MediaStream) => {
@@ -102,11 +95,11 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   const handleRejectCall = useCallback(
     (call: MediaConnection) => {
       call.close();
+      onClose();
       setIncommingCall(false);
       setCurrentCall(null);
-      setCallStatus("Caller is busy");
     },
-    [setCallStatus, setCurrentCall, setIncommingCall]
+    [onClose, setCurrentCall, setIncommingCall]
   );
 
   const initiateCall = (remotePeerId: string) => {
@@ -161,13 +154,9 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     onClose();
     setIsActive(false);
     setCallStatus("start video call");
-
-    if (peer) {
-      peer.destroy();
-      console.log("Disconnected from PeerJS server");
-    }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   function onClose() {
     setIsVideoCall(false);
   }
