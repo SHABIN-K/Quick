@@ -47,7 +47,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const currentUserVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
   const ringtoneRef = useRef<HTMLAudioElement>(null);
-  const ringtoneButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (call && session) {
@@ -76,18 +75,22 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (peerId) {
       const peerInstance = new Peer(peerId);
-      setPeer(peerInstance);
 
       peerInstance.on("open", (id) => {
         console.log("Connected with ID:", id);
       });
 
+      peerInstance.on("disconnected", () => {
+        console.warn("Peer disconnected, attempting to reconnect...");
+        peerInstance.reconnect();
+      });
+
       peerInstance.on("error", (error) => {
-        console.error(error);
+        console.error("PeerJS error:", error);
       });
 
       peerInstance.on("call", (call: MediaConnection) => {
-        console.log(call.peer);
+        console.log("Incoming call from:", call.peer);
         setIsVideoCall(true);
         setIncommingCall(true);
         setCurrentCall(call);
@@ -95,11 +98,12 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
         setCallStatus("Incoming call...");
       });
 
+      setPeer(peerInstance);
+
       return () => {
         peerInstance.destroy();
         releaseMediaDevices();
 
-        // Stop the ringtone and reset its state
         if (ringtoneRef.current) {
           ringtoneRef.current.pause();
           // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +114,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [peerId, releaseMediaDevices, setIsVideoCall]);
 
   useEffect(() => {
-    // Ensure the ringtone component mounts only once
     if (ringtoneRef.current && incommingCall) {
       ringtoneRef.current.play().catch((error) => {
         console.error("Error playing ringtone", error);
@@ -118,7 +121,6 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     return () => {
-      // Clean up the ringtone component when the provider unmounts
       if (ringtoneRef.current) {
         ringtoneRef.current.pause();
         // eslint-disable-next-line react-hooks/exhaustive-deps

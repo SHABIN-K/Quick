@@ -4,7 +4,7 @@ import Image from "next/image";
 import { MediaConnection } from "peerjs";
 import { IoClose, IoVideocam } from "react-icons/io5";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState, useRef, useEffect, useCallback } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
 
 import useOpenStore from "@/store/useOpen";
 import useAuthStore from "@/store/useAuth";
@@ -129,7 +129,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
           const call = peer.call(remotePeerId, stream);
           call.on("stream", (remoteStream) => {
             renderVideo(remoteStream);
-            setIsActive(true); // Activate video elements when remote stream is received
+            setIsActive(true);
             setCallStatus("In call...");
           });
           call.on("close", () => {
@@ -159,7 +159,7 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
     }
     releaseMediaDevices();
     onClose();
-    setIsActive(false); // Deactivate the video elements
+    setIsActive(false);
     setCallStatus("start video call");
 
     if (peer) {
@@ -171,7 +171,6 @@ const VideoCall: React.FC<AddMemberModalProps> = ({ data }) => {
   function onClose() {
     setIsVideoCall(false);
   }
-
   return (
     <Transition.Root show={isVideoCall} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
