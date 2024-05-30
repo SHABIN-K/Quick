@@ -55,7 +55,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="space-y-12">
+        <div className="space-y-12 mt-5 sm:mt-0">
           <div className="border-b border-gray-900/10 pb-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900">
               Profile
@@ -106,7 +106,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-x-6">
+          <div className="mt-6 flex items-center justify-end">
             <Button disabled={isLoading} secondary onClick={onClose}>
               Cancel
             </Button>

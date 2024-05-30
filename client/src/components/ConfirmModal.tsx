@@ -28,7 +28,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <div className="sm:flex sm:items-start">
+        <div className="sm:flex sm:items-start mt-5">
           <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-sky-100 sm:mx-0 sm:h-10 sm:w-10">
             <FiAlertTriangle className="h-6 w-6 text-sky-600" />
           </div>
@@ -44,7 +44,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </div>
           </div>
         </div>
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+        <div className="mt-5 sm:mt-4 flex flex-row-reverse">
           <Button disabled={isLoading} onClick={onClick}>
             {buttonLabel}
           </Button>
