@@ -40,12 +40,7 @@ const DesktopSidebar = () => {
             href="/chats"
             className="flex flex-col items-center justify-between"
           >
-            <Image
-              alt="Logo"
-              height="48"
-              width="48"
-              src="/quick-logo.png"
-            />
+            <Image alt="Logo" height="48" width="48" src="/quick-logo.png" />
           </Link>
           <ul role="list" className="flex flex-col items-center mt-2 space-y-1">
             {routes.slice(0, 3).map((item) => (
@@ -75,11 +70,12 @@ const DesktopSidebar = () => {
               />
             ))}
           </ul>
-          <div
+          <Link
+            href="/profile"
             className="cursor-pointer hover:opacity-75 transition ring-2 ring-sky-500 rounded-full p-1 mt-2"
           >
             {session && <Avatar user={session} />}
-          </div>
+          </Link>
         </nav>
       </div>
     </>
