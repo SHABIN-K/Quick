@@ -32,6 +32,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   } = useForm<FieldValues>({
     defaultValues: {
       name: currentUser?.name,
+      username: currentUser?.username,
+      email: currentUser?.email,
     },
   });
 
@@ -73,36 +75,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 required
                 register={register}
               />
-
-              {/* 
-              <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900">
-                  Photo
-                </label>
-                <div className="mt-2 flex items-center gap-x-3">
-                  <Image
-                    width="48"
-                    height="48"
-                    className="rounded-full"
-                    src={
-                      currentUser?.profile || "/images/placeholder.jpg"
-                    }
-                    alt="Avatar"
-                  />
-              
-                  <CldUploadButton
-                    options={{ maxFiles: 1 }}
-                    onUpload={handleUpload}
-                    uploadPreset="g1usl1sb"
-                  >
-                    <Button disabled={isLoading} secondary type="button">
-                      Change
-                    </Button>
-                  </CldUploadButton>
-                </div>
-              </div>
-
-                */}
+              <Input
+                disabled={isLoading}
+                label="Username"
+                id="username"
+                errors={errors}
+                required
+                register={register}
+              />
+              <Input
+                disabled={isLoading}
+                label="Email address"
+                id="email"
+                type="email"
+                errors={errors}
+                required
+                register={register}
+              />
             </div>
           </div>
 
