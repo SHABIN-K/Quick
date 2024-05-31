@@ -67,13 +67,12 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
     api
       .delete(`/chats/delete-chat/${conversationId}`)
       .then(() => {
-        onClose();
         router.push("/chats");
         router.refresh();
       })
       .catch(() => toast.error("Something went wrong!"))
       .finally(() => setIsLoading(false));
-  }, [api, conversationId, onClose, router]);
+  }, [api, conversationId, router]);
 
   return (
     <>

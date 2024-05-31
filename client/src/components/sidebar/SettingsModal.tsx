@@ -9,8 +9,8 @@ import Modal from "../Modal";
 import Button from "../Button";
 import Input from "../inputs/Input";
 import { UserType } from "@/shared/types";
-import { useSession } from "@/context/AuthContext";
 import usePrivateApi from "@/hooks/usePrivateApi";
+import { useSession } from "@/context/AuthContext";
 
 interface SettingsModalProps {
   isOpen?: boolean;

@@ -6,11 +6,12 @@ import { HiPaperAirplane } from "react-icons/hi2";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
-import axios from "@/config/api";
 import MessageInput from "./MessageInput";
+import usePrivateApi from "@/hooks/usePrivateApi";
 import useConversation from "@/hooks/useConversation";
 
 const Form = () => {
+  const api = usePrivateApi();
   const { conversationId } = useConversation();
   const [open, setOpen] = React.useState<boolean>(false);
   const emojiPickerRef = React.useRef<HTMLDivElement>(null);
@@ -30,7 +31,7 @@ const Form = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setValue("message", "", { shouldValidate: true });
 
-    axios.post("/chats/msg/create-msg", {
+    api.post("/chats/msg/create-msg", {
       ...data,
       conversationId,
     });

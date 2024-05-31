@@ -6,6 +6,7 @@ import { MdOutlineGroupAdd } from "react-icons/md";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { db } from "@/database";
 import UserBox from "./UserBox";
 import SearchBar from "./SearchBar";
 import useAuthStore from "@/store/useAuth";
@@ -61,7 +62,10 @@ const ConversationList: React.FC<ConversationProps> = ({
 
     pusherClient.subscribe(pusherKey);
 
-    const newHandler = (conversation: FullConversationType) => {
+    const newHandler = async (conversation: FullConversationType) => {
+      // Store new conversation in IndexedDB
+      await db.chats.add(conversation);
+
       setItems((current) => {
         if (find(current, { id: conversation.id })) {
           return current;
@@ -71,7 +75,12 @@ const ConversationList: React.FC<ConversationProps> = ({
       });
     };
 
-    const updateHandler = (conversation: FullConversationType) => {
+    const updateHandler = async (conversation: FullConversationType) => {
+      // Update conversation in IndexedDB
+      //await db.chats.update(conversation.id, {
+      //  messages: conversation.messages,
+      //});
+
       setItems((current) =>
         current?.map((currentConversation) => {
           if (currentConversation.id === conversation.id) {
@@ -86,7 +95,10 @@ const ConversationList: React.FC<ConversationProps> = ({
       );
     };
 
-    const removeHandler = (conversation: FullConversationType) => {
+    const removeHandler = async (conversation: FullConversationType) => {
+      // Remove conversation from IndexedDB
+      await db.chats.delete(conversation.id);
+
       setItems((current) => {
         return [
           ...(current ?? []).filter((convo) => convo.id !== conversation.id),
