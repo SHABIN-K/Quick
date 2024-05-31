@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
@@ -18,22 +19,26 @@ const UserBox: React.FC<UserBoxProps> = ({ data, currentUser }) => {
 
   const handleClick = useCallback(async () => {
     setIsLoading(true);
+
     try {
+      if (currentUser === data.email) {
+        toast("You cannot start a chat with yourself.");
+      } else {
+        const response = await api.post("/chats/create-chat", {
+          chatId: data.id as string,
+        });
 
-      const response = await api.post("/chats/create-chat", {
-        chatId: data.id as string,
-      });
-
-      const chatId = response.data.data.id;
-      if (chatId) {
-        router.push(`/chats/${chatId}`);
+        const chatId = response.data.data.id;
+        if (chatId) {
+          router.push(`/chats/${chatId}`);
+        }
       }
     } catch (error) {
       console.error("Error fetching chats:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [api, data, router]);
+  }, [api, currentUser, data.email, data.id, router]);
 
   return (
     <>

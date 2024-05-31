@@ -47,12 +47,12 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
   const isActive = members.indexOf(otherUser?.email!) !== -1;
 
   const joinedDate = useMemo(() => {
-    return format(new Date(otherUser.createdAt), "PP");
-  }, [otherUser.createdAt]);
+    return format(new Date(otherUser?.createdAt), "PP");
+  }, [otherUser?.createdAt]);
 
   const title = useMemo(() => {
-    return data.name || otherUser.name;
-  }, [data.name, otherUser.name]);
+    return data.name || otherUser?.name;
+  }, [data.name, otherUser?.name]);
 
   const statusText = useMemo(() => {
     if (data.isGroup) {
@@ -147,17 +147,19 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                           </div>
                           <div className="flex gap-10 my-8">
                             {data.isGroup && (
-                              <div
-                                onClick={() => setAddMember(true)}
-                                className="flex flex-col gap-3 items-center cursor-pointer hover:opacity-75"
-                              >
-                                <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
-                                  <IoPersonAddOutline size={20} />
+                              <>
+                                <div
+                                  onClick={() => setAddMember(true)}
+                                  className="flex flex-col gap-3 items-center cursor-pointer hover:opacity-75"
+                                >
+                                  <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center">
+                                    <IoPersonAddOutline size={20} />
+                                  </div>
+                                  <div className="text-sm font-light text-neutral-600">
+                                    Add member
+                                  </div>
                                 </div>
-                                <div className="text-sm font-light text-neutral-600">
-                                  Add member
-                                </div>
-                              </div>
+                              </>
                             )}
                             <div
                               onClick={() => setConfirmOpen(true)}
@@ -195,7 +197,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
                                     Email
                                   </dt>
                                   <dd className="mt-1 text-sm text-gray-900 sm:col-span-2">
-                                    {otherUser.email}
+                                    {otherUser?.email}
                                   </dd>
                                 </div>
                               )}
