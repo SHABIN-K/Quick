@@ -1,0 +1,42 @@
+# specify the version of docker-compose
+version: "0.0.6"
+
+services:
+  web:
+    depends_on:
+      - api
+    build: ./client
+    ports:
+      - 3000:3000
+    env_file:
+      - ./client/.env
+
+    develop:
+      watch:
+        - path: ./client/package.json
+          action: rebuild
+        - path: ./client/package-lock.json
+          action: rebuild
+        - path: ./client
+          target: /usr/src/app
+          action: sync
+
+  api:
+    build: ./server
+    ports:
+      - 5000:5000
+    env_file:
+      - ./server/.env
+
+    develop:
+      watch:
+        - path: ./server/package.json
+          action: rebuild
+        - path: ./server/package-lock.json
+          action: rebuild
+        - path: ./server
+          target: /usr/src/app
+          action: sync
+
+volumes:
+  db_data:
