@@ -97,13 +97,13 @@ export const getAllUsersController = async (req: Request, res: Response, next: N
 
 /**
  * Updates a user's information.
- * 
+ *
  * @param req - The request object.
  * @param res - The response object.
  * @param next - The next function.
  * @returns A JSON response indicating the success of the update operation.
  */
-export const updateUserController = async (req: Request, res: Response, next: NextFunction) => {
+export const updateprofileController = async (req: Request, res: Response, next: NextFunction) => {
   // Access session data
   const user = req.userSession;
   const { name, email, username } = req.body;
@@ -129,7 +129,39 @@ export const updateUserController = async (req: Request, res: Response, next: Ne
       data: updatedUser,
     });
   } catch (error) {
-    console.error('Error in updateUserController:', error);
-    return next(ErrorResponse.badRequest('An error occurred during get update user'));
+    console.error('Error in updateprofileController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during update user'));
+  }
+};
+
+/**
+ * Controller function to get the user profile.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response with the user profile data.
+ */
+export const getProfileController = async (req: Request, res: Response, next: NextFunction) => {
+  // Access session data
+  const user = req.userSession;
+  try {
+    if (!user) {
+      return next(ErrorResponse.forbidden('Unauthorized: no access '));
+    }
+
+    const currentUser = await db.user.findUnique({
+      where: {
+        id: user?.id,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'User fetched successfully',
+      data: currentUser,
+    });
+  } catch (error) {
+    console.error('Error in getProfileController:', error);
+    return next(ErrorResponse.badRequest('An error occurred during get user'));
   }
 };

@@ -1,5 +1,10 @@
 import express from 'express';
-import { getUsersController, getAllUsersController, updateUserController } from '../../controlleres/userController';
+import {
+  getUsersController,
+  getAllUsersController,
+  updateprofileController,
+  getProfileController,
+} from '../../controlleres/userController';
 
 const router = express.Router();
 
@@ -9,7 +14,10 @@ router.get('/get-users', getUsersController);
 //api/users/all
 router.get('/all', getAllUsersController);
 
-//api/users/update-user
-router.put('/update-user', updateUserController);
+//api/users/profile
+router.get('/profile', getProfileController);
+
+//api/users/update-profile
+router.put('/update-profile', updateprofileController);
 
 export default router;

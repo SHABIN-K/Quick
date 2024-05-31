@@ -13,32 +13,31 @@ import { createMessagesControllerr, getMessagesController } from '../../controll
 
 const router = express.Router();
 
-//api/chats/msg/get-messages/:Id
+// Get messages by chat ID
 router.get('/msg/get-messages/:Id', getMessagesController);
 
-//api/chats/create-msg
+// Create a new message
 router.post('/msg/create-msg', createMessagesControllerr);
 
-//chats
-//api/chats/get-chats
+// Get all chats
 router.get('/get-chats', getChatController);
 
-//api/chats/get-groupchats
+// Get all group chats
 router.get('/get-groupchats', getGroupChatController);
 
-//api/chats/get-chats/:Id
+// Get a single chat by ID
 router.get('/get-chats/:Id', getSingleChatController);
 
-//api/chats/:Id/seen
+// Mark a chat as seen
 router.get('/:Id/seen', getChatByParamsController);
 
-//api/chats/create-chat
+// Create a new chat
 router.post('/create-chat', getcreateChatController);
 
-//api/chats/create-chat
+// Add members to a chat
 router.patch('/add-members', updateChatController);
 
-//api/chats/create-chat/:Id
+// Delete a chat by ID
 router.delete('/delete-chat/:Id', deleteChatController);
 
 export default router;

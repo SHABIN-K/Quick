@@ -41,7 +41,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setIsLoading(true);
 
     axios
-      .put("/users/update-user", {
+      .put("/users/update-profile", {
         name: data?.name,
         email: data?.email,
         username: data?.username,
