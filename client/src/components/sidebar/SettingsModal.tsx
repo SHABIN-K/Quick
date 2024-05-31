@@ -7,9 +7,10 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import Modal from "../Modal";
 import Button from "../Button";
-import axios from "@/config/api";
 import Input from "../inputs/Input";
 import { UserType } from "@/shared/types";
+import { useSession } from "@/context/AuthContext";
+import usePrivateApi from "@/hooks/usePrivateApi";
 
 interface SettingsModalProps {
   isOpen?: boolean;
@@ -23,6 +24,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   currentUser,
 }) => {
   const router = useRouter();
+  const api = usePrivateApi();
+  const { setSession } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -40,13 +43,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    axios
+    api
       .put("/users/update-profile", {
         name: data?.name,
         email: data?.email,
         username: data?.username,
       })
-      .then(() => {
+      .then((res) => {
+        setSession?.(res.data.data);
         toast.success("user updated succesfully");
         router.refresh();
         onClose();

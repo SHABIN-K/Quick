@@ -122,11 +122,24 @@ export const updateprofileController = async (req: Request, res: Response, next:
         username: username,
       },
     });
+    
+    const token = await db.account.findFirst({
+      where: {
+        userId: user?.id,
+      },
+    });
 
     return res.status(200).json({
       success: true,
       message: 'User updated successfully',
-      data: updatedUser,
+      data: {
+        id: updatedUser?.id,
+        name: updatedUser?.name,
+        username: updatedUser?.username,
+        email: updatedUser?.email,
+        profile: updatedUser?.profile,
+        confirmToken: token?.access_token,
+      },
     });
   } catch (error) {
     console.error('Error in updateprofileController:', error);
