@@ -41,6 +41,4 @@ router.patch('/add-members', updateChatController);
 //api/chats/create-chat/:Id
 router.delete('/delete-chat/:Id', deleteChatController);
 
-///
-
 export default router;

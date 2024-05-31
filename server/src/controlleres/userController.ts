@@ -54,7 +54,6 @@ export const getUsersController = async (req: Request, res: Response, next: Next
   }
 };
 
-
 /**
  * Retrieves all users from the database, excluding the current user.
  * Requires the user to be authenticated and have an email in the session.
@@ -96,23 +95,31 @@ export const getAllUsersController = async (req: Request, res: Response, next: N
   }
 };
 
+/**
+ * Updates a user's information.
+ * 
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - The next function.
+ * @returns A JSON response indicating the success of the update operation.
+ */
 export const updateUserController = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, email } = req.body;
+  // Access session data
+  const user = req.userSession;
+  const { name, email, username } = req.body;
   try {
-    const currentUser = await db.user.findUnique({
-      where: { email: email },
-    });
-
-    if (!currentUser) {
-      return next(ErrorResponse.badRequest('something wernt wrong'));
+    if (!user) {
+      return next(ErrorResponse.forbidden('Unauthorized: no access '));
     }
 
     const updatedUser = await db.user.update({
       where: {
-        id: currentUser?.id,
+        id: user?.id,
       },
       data: {
         name: name,
+        email: email,
+        username: username,
       },
     });
 
@@ -123,6 +130,6 @@ export const updateUserController = async (req: Request, res: Response, next: Ne
     });
   } catch (error) {
     console.error('Error in updateUserController:', error);
-    return next(error);
+    return next(ErrorResponse.badRequest('An error occurred during get update user'));
   }
 };

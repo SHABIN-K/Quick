@@ -41,9 +41,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setIsLoading(true);
 
     axios
-      .post("/users/update-user", {
+      .put("/users/update-user", {
         name: data?.name,
-        email: currentUser?.email,
+        email: data?.email,
+        username: data?.username,
       })
       .then(() => {
         toast.success("user updated succesfully");

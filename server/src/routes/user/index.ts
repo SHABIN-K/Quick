@@ -8,8 +8,8 @@ router.get('/get-users', getUsersController);
 
 //api/users/all
 router.get('/all', getAllUsersController);
-///
 
-router.post('/update-user', updateUserController);
+//api/users/update-user
+router.put('/update-user', updateUserController);
 
 export default router;

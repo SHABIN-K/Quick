@@ -6,13 +6,13 @@ import { IoVideocamOutline } from "react-icons/io5";
 import { HiChevronLeft, HiEllipsisHorizontal } from "react-icons/hi2";
 
 import Avatar from "@/components/Avatar";
+import useOpenStore from "@/store/useOpen";
+import VideoCall from "../modal/VideoCall";
 import ProfileDrawer from "./ProfileDrawer";
 import useOtherUser from "@/hooks/useOtherUser";
 import AvatarGroup from "@/components/AvatarGroup";
 import { User, Conversation } from "@/shared/types";
 import useActiveListStore from "@/store/useActiveList";
-import VideoCall from "../modal/VideoCall";
-import useOpenStore from "@/store/useOpen";
 
 interface HeaderProps {
   conversation: Conversation & { users: User[] };
@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ conversation, chatType }) => {
             <Avatar user={otherUser} />
           )}
           <div className="flex flex-col">
-            <span>{conversation.name || otherUser.name}</span>
+            <span>{conversation.name || otherUser?.name}</span>
             <span className="text-sm font-light text-neutral-500">
               {statusText}
             </span>
