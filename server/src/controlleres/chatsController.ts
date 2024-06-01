@@ -224,11 +224,7 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
       });
     }
 
-    await pusherServer.trigger(Id!, 'message:update', {
-      id: Id,
-      isGroup: conversation.isGroup,
-      message: [updatedMessage],
-    });
+    await pusherServer.trigger(Id!, 'message:update', updatedMessage);
 
     return res.status(200).json({
       success: true,

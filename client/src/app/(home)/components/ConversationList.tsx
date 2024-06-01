@@ -106,12 +106,15 @@ const ConversationList: React.FC<ConversationProps> = ({
             conversation.messages.map((msg) => msg.id)
           );
 
-          const mergedMessages = [
-            ...conversation.messages,
-            ...updateData.messages.filter(
-              (msg) => !uniqueMessageIds.has(msg.id)
-            ),
-          ];
+          // Add a null check or use optional chaining to safely access filter
+          const filteredMessages = updateData.messages?.filter(
+            (msg) => !uniqueMessageIds.has(msg.id)
+          );
+
+          // Check if filteredMessages is defined before merging
+          const mergedMessages = filteredMessages
+            ? [...conversation.messages, ...filteredMessages]
+            : conversation.messages;
 
           conversation.messages = mergedMessages;
           await table.put(conversation);

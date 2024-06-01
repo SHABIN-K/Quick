@@ -99,12 +99,8 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
       },
     });
    
-    await pusherServer.trigger(conversationId, 'messages:new', {
-      id: conversationId,
-      isGroup: updatedConversation.isGroup,
-      message: [newMessage],
-    });
-
+    await pusherServer.trigger(conversationId, 'messages:new', newMessage);
+    
     const lastMsg = updatedConversation.messages[updatedConversation.messages.length - 1];
 
     updatedConversation.users.map((user) => {
