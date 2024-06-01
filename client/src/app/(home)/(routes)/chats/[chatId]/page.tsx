@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { db } from "@/database";
 import EmptyState from "@/components/EmptyState";
 import usePrivateApi from "@/hooks/usePrivateApi";
+import LoadingModal from "@/components/LoadingModal";
 import { Header, Body, Form } from "@/app/(home)/components/body";
+import { FullConversationType, FullMessageType } from "@/shared/types";
 
 interface IParams {
   chatId: string;
@@ -13,29 +16,37 @@ interface IParams {
 const ConversationId = ({ params }: { params: IParams }) => {
   const api = usePrivateApi();
 
-  const [conversation, setConversation] = useState(null);
-  const [messages, setMessages] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [messages, setMessages] = useState<FullMessageType[]>();
+  const [conversation, setConversation] = useState<FullConversationType>();
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       try {
-        var chatId = params.chatId;
+        const chatId = params.chatId;
+        let chat = await db.chats.get(chatId);
 
-        //get chats from chat id
-        const chat = await api.get(`/chats/get-chats/${chatId}`);
-        setConversation(chat.data.data[0]);
+        if (!chat) {
+          const [resChat, resMsg] = await Promise.all([
+            api.get(`/chats/get-chats/${chatId}`),
+            api.get(`/chats/msg/get-messages/${chatId}`),
+          ]);
+          chat = resChat.data.data[0];
+          setMessages(resMsg.data.data);
+        } else {
+          setMessages(chat.messages);
+        }
 
-        //get messages from chat id
-        const msg = await api.get(`/chats/msg/get-messages/${chatId}`);
-        setMessages(msg.data.data);
+        setConversation(chat);
+        setIsLoading(false);
       } catch (err: any) {
         console.error("Error fetching:", err);
         setError(err.message);
       }
     };
 
-    fetch();
+    fetchData();
   }, [api, params.chatId]);
 
   if (error || !conversation) {
@@ -50,6 +61,7 @@ const ConversationId = ({ params }: { params: IParams }) => {
 
   return (
     <div className="lg:pl-80 h-full">
+      {isLoading && <LoadingModal />}
       <div className="h-full flex flex-col">
         <Header conversation={conversation} chatType="chats" />
         <Body initialMessages={messages || []} chatType="chat" />

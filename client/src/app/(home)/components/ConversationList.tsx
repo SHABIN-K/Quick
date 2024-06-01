@@ -102,7 +102,18 @@ const ConversationList: React.FC<ConversationProps> = ({
         let table = updateData.isGroup ? db.groupchat : db.chats;
         const conversation = await table.get(updateData.id);
         if (conversation) {
-          conversation.messages = updateData.messages;
+          const uniqueMessageIds = new Set(
+            conversation.messages.map((msg) => msg.id)
+          );
+
+          const mergedMessages = [
+            ...conversation.messages,
+            ...updateData.messages.filter(
+              (msg) => !uniqueMessageIds.has(msg.id)
+            ),
+          ];
+
+          conversation.messages = mergedMessages;
           await table.put(conversation);
         }
 

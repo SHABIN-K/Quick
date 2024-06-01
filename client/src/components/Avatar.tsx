@@ -15,7 +15,7 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
 
   return (
     <div className="relative">
-      <div className="relative  rounded-full overflow-hidden h-9 w-9 md:h-11 md:w-11">
+      <div className="relative rounded-full overflow-hidden h-9 w-9 md:h-11 md:w-11">
         <Image
           alt="Avatar"
           src={user?.profile || "/images/placeholder.jpg"}
@@ -23,7 +23,10 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
         />
       </div>
       {isActive && (
-        <span className="absolute block rounded-full bg-green-500 ring-2 ring-white top-0 right-0 h-2 w-2 md:h-3 md:w-3" />
+        <span className="absolute flex h-2 w-2 md:h-3 md:w-3 top-0 right-0 ring-2 ring-white">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 md:h-3 md:w-3 bg-green-500"></span>
+        </span>
       )}
     </div>
   );
