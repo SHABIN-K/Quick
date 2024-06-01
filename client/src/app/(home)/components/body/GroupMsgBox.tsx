@@ -29,7 +29,7 @@ const GroupMsgBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
       </div>
       <div
         className={clsx(
-          "flex flex-col w-full max-w-[320px] leading-1.5 p-2.5 border-gray-200",
+          "flex flex-col max-w-[320px] leading-1.5 p-2.5 border-gray-200",
           isOwn
             ? "rounded-s-2xl rounded-b-2xl bg-sky-200"
             : "rounded-e-2xl rounded-es-2xl bg-sky-300"

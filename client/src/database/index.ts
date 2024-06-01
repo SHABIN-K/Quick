@@ -1,4 +1,5 @@
 import Dexie, { Table } from "dexie";
+
 import { FullConversationType, User } from "@/shared/types";
 
 const db = new Dexie("quick-database") as Dexie & {

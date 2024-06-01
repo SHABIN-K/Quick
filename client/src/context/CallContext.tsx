@@ -1,6 +1,5 @@
 "use client";
 
-import Peer, { MediaConnection } from "peerjs";
 import React, {
   createContext,
   useState,
@@ -9,6 +8,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import Peer, { MediaConnection } from "peerjs";
 
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";

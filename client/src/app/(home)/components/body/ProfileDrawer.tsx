@@ -14,10 +14,10 @@ import useOtherUser from "@/hooks/useOtherUser";
 import usePrivateApi from "@/hooks/usePrivateApi";
 import AvatarGroup from "@/components/AvatarGroup";
 import { Conversation, User } from "@/shared/types";
+import AddMemberModal from "../modal/AddMembetModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import useConversation from "@/hooks/useConversation";
 import useActiveListStore from "@/store/useActiveList";
-import AddMemberModal from "../modal/AddMembetModal";
 
 interface ProfileDrawerProps {
   isOpen: boolean;
