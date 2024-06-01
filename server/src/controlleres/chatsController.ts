@@ -210,6 +210,8 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
       },
     });
 
+    await pusherServer.trigger(Id!, 'message:update', updatedMessage);
+
     await pusherServer.trigger(user?.email, 'conversation:update', {
       id: Id,
       isGroup: conversation.isGroup,
@@ -224,15 +226,13 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
       });
     }
 
-    await pusherServer.trigger(Id!, 'message:update', updatedMessage);
-
     return res.status(200).json({
       success: true,
       message: 'updatedMessage',
       data: updatedMessage,
     });
   } catch (error) {
-    console.error('Error is getMessageController:', error);
+    console.error('Error is getChatByParamsController:', error);
     return next(ErrorResponse.badRequest('An error occurred during get messages'));
   }
 };

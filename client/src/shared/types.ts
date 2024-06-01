@@ -24,13 +24,13 @@ export type User = {
   profile?: string;
   hashedPassword?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 
-  conversationIds: string[];
-  conversations: Conversation[];
-  seenMessageIds: string[];
-  seenMessages: Message[];
-  messages: Message[];
+  conversationIds?: string[];
+  conversations?: Conversation[];
+  seenMessageIds?: string[];
+  seenMessages?: Message[];
+  messages?: Message[];
 };
 
 export type Conversation = {
@@ -50,15 +50,16 @@ export type Message = {
   body?: string;
   image?: string;
   createdAt: string;
-  seenIds: string[];
-  seen: User[];
-  conversationId: string;
-  conversation: Conversation;
-  senderId: string;
-  sender: User;
+  seenIds?: string[];
+  seen?: User[];
+  conversationId?: string;
+  conversation?: Conversation;
+  senderId?: string;
+  sender?: User;
 };
 
 export type FullMessageType = Message & {
+  isInstant?: boolean;
   sender: User;
   seen: User[];
 };

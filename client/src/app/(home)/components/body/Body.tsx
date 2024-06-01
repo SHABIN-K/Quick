@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import MessageBox from "./MessageBox";
 import GroupMsgBox from "./GroupMsgBox";
+import useAuthStore from "@/store/useAuth";
 import { pusherClient } from "@/config/pusher";
 import { FullMessageType } from "@/shared/types";
 import usePrivateApi from "@/hooks/usePrivateApi";
@@ -18,6 +19,7 @@ interface BodyProps {
 
 const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
   const api = usePrivateApi();
+  const { session } = useAuthStore();
   const { conversationId } = useConversation();
 
   const [messages, setMessages] = useState(initialMessages);
@@ -32,20 +34,24 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
     pusherClient.subscribe(conversationId);
     bottomRef?.current?.scrollIntoView();
 
-    const messageHandler = (message: FullMessageType) => {
+    const messageHandler = (data: { id: string; message: FullMessageType }) => {
+      console.log(data.id);
       api.get(`/chats/${conversationId}/seen`);
-
       setMessages((current) => {
-        if (find(current, { id: message.id })) {
-          return current;
+        // Find the instant message by its body and remove it
+        const filteredMessages = current.filter(
+          (msg) => !(msg.isInstant && msg.body === data.message.body)
+        );
+
+        if (find(filteredMessages, { id: data.message.id })) {
+          return filteredMessages;
         }
 
-        return [...current, message];
+        return [...filteredMessages, data.message];
       });
 
       bottomRef?.current?.scrollIntoView();
     };
-
     const updateMessageHandler = (newMessage: FullMessageType) => {
       setMessages((current) =>
         current.map((currentMessage) => {
@@ -58,15 +64,44 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
       );
     };
 
+    const instantUpdate = (data: { id: string; body: string }) => {
+      console.log(data);
+      const message: FullMessageType = {
+        id: data.id,
+        body: data.body as string,
+        createdAt: new Date().toString(),
+        isInstant: true,
+        seenIds: [],
+        seen: [],
+        sender: {
+          id: session?.id,
+          name: session?.name,
+          email: session?.email,
+          map: function (
+            arg0: (user: { id: any; name: any }) => { value: any; label: any }
+          ): Record<string, any>[] {
+            throw new Error("Function not implemented.");
+          },
+          profile: session?.profile,
+          createdAt: new Date().toString(),
+        },
+      };
+
+      setMessages((prevMessages) => [...prevMessages, message]);
+      bottomRef?.current?.scrollIntoView();
+    };
+
     pusherClient.bind("messages:new", messageHandler);
     pusherClient.bind("message:update", updateMessageHandler);
+    pusherClient.bind("instant:message", instantUpdate);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
       pusherClient.unbind("messages:new", messageHandler);
       pusherClient.unbind("message:update", updateMessageHandler);
+      pusherClient.unbind("instant:message", instantUpdate);
     };
-  }, [api, conversationId]);
+  }, [api, conversationId, session]);
 
   return (
     <div className="flex-1 overflow-y-scroll body-scroll bg-[url(/background.jpg)]">

@@ -1,3 +1,4 @@
+import { v4 as uuid_v4 } from 'uuid';
 import { Request, Response, NextFunction } from 'express';
 
 import db from '../config/prismadb';
@@ -48,8 +49,15 @@ export const getMessagesController = async (req: Request, res: Response, next: N
  */
 export const createMessagesControllerr = async (req: Request, res: Response, next: NextFunction) => {
   const user = req.userSession;
+  const instant_id = uuid_v4();
   const { message, image, conversationId } = req.body;
+
   try {
+    await pusherServer.trigger(conversationId, 'instant:message', {
+      id: instant_id,
+      body: message,
+    });
+
     // create message for the current user
     const newMessage = await db.message.create({
       data: {
@@ -77,6 +85,8 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
       },
     });
 
+    await pusherServer.trigger(conversationId, 'messages:new', { id: instant_id, message: newMessage });
+
     const updatedConversation = await db.conversation.update({
       where: {
         id: conversationId,
@@ -98,9 +108,7 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
         },
       },
     });
-   
-    await pusherServer.trigger(conversationId, 'messages:new', newMessage);
-    
+
     const lastMsg = updatedConversation.messages[updatedConversation.messages.length - 1];
 
     updatedConversation.users.map((user) => {

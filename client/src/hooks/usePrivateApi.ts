@@ -25,8 +25,6 @@ const usePrivateApi = () => {
     const responseIntercept = privateApi.interceptors.response.use(
       (response) => response,
       async (err) => {
-        console.log("response::", err);
-        console.log(err.response);
         const prvsRequest = err?.config;
         if (
           err?.response &&
