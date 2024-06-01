@@ -107,6 +107,7 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
       if (user?.email) {
         pusherServer.trigger(user.email, 'conversation:update', {
           id: conversationId,
+          isGroup: updatedConversation.isGroup,
           message: [lastMsg],
         });
       }

@@ -158,11 +158,7 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
 
   const { Id } = req.params;
   try {
-    const currentUser = await db.user.findUnique({
-      where: { email: user?.email },
-    });
-
-    if (!currentUser?.id || !currentUser?.email) {
+    if (!user) {
       return next(ErrorResponse.unauthorized('unauthorized'));
     }
 
@@ -208,18 +204,19 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
       data: {
         seen: {
           connect: {
-            id: currentUser?.id,
+            id: user?.id,
           },
         },
       },
     });
 
-    await pusherServer.trigger(currentUser?.email, 'conversation:update', {
+    await pusherServer.trigger(user?.email, 'conversation:update', {
       id: Id,
+      isGroup: conversation.isGroup,
       messages: [updatedMessage],
     });
 
-    if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
+    if (lastMessage.seenIds.indexOf(user.id) !== -1) {
       return res.status(200).json({
         success: true,
         message: 'conversation founded',

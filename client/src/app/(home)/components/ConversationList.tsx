@@ -3,8 +3,8 @@
 import clsx from "clsx";
 import { find } from "lodash";
 import { MdOutlineGroupAdd } from "react-icons/md";
-import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { db } from "@/database";
 import UserBox from "./UserBox";
@@ -42,6 +42,14 @@ const ConversationList: React.FC<ConversationProps> = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const otherUser = useCallback(
+    (conversation: FullConversationType) => {
+      const user = conversation.users.find((user) => user.id !== session.id);
+      return user;
+    },
+    [session.id]
+  );
+
   useEffect(() => {
     setUsers(userData || []);
     setItems(feed);
@@ -64,8 +72,18 @@ const ConversationList: React.FC<ConversationProps> = ({
 
     const newHandler = async (conversation: FullConversationType) => {
       // Store new conversation in IndexedDB
-      await db.chats.add(conversation);
+      if (conversation.isGroup) {
+        await db.groupchat.add(conversation);
+      } else {
+        await db.chats.add(conversation);
 
+        const user = otherUser(conversation);
+        if (user) {
+          await db.users.add(user);
+        }
+      }
+
+      // Update state with the new conversation
       setItems((current) => {
         if (find(current, { id: conversation.id })) {
           return current;
@@ -77,30 +95,23 @@ const ConversationList: React.FC<ConversationProps> = ({
 
     const updateHandler = async (updateData: {
       id: string;
+      isGroup: boolean;
       messages: FullMessageType[];
     }) => {
       try {
-        // Retrieve the conversation from IndexedDB
-        const conversation = await db.chats.get(updateData.id);
-
-        // Update the messages field
+        let table = updateData.isGroup ? db.groupchat : db.chats;
+        const conversation = await table.get(updateData.id);
         if (conversation) {
           conversation.messages = updateData.messages;
-          // Update conversation in IndexedDB
-          await db.chats.put(conversation);
+          await table.put(conversation);
         }
 
-        // Update the state with the new messages
         setItems((current) =>
-          current?.map((currentConversation) => {
-            if (currentConversation.id === updateData.id) {
-              return {
-                ...currentConversation,
-                messages: updateData.messages,
-              };
-            }
-            return currentConversation;
-          })
+          current?.map((currentConversation) =>
+            currentConversation.id === updateData.id
+              ? { ...currentConversation, messages: updateData.messages }
+              : currentConversation
+          )
         );
       } catch (error) {
         console.error("Failed to update conversation in IndexedDB:", error);
@@ -109,7 +120,15 @@ const ConversationList: React.FC<ConversationProps> = ({
 
     const removeHandler = async (conversation: FullConversationType) => {
       // Remove conversation from IndexedDB
-      await db.chats.delete(conversation.id);
+      if (conversation.isGroup) {
+        await db.groupchat.delete(conversation.id);
+      } else {
+        const user = otherUser(conversation);
+        if (user) {
+          await db.users.delete(user.id);
+        }
+        await db.chats.delete(conversation.id);
+      }
 
       setItems((current) => {
         return [
@@ -132,7 +151,7 @@ const ConversationList: React.FC<ConversationProps> = ({
       pusherClient.unbind("conversation:update", updateHandler);
       pusherClient.unbind("conversation:remove", removeHandler);
     };
-  }, [conversationId, pusherKey, router, title]);
+  }, [conversationId, otherUser, pusherKey, router, session.id, title]);
 
   return (
     <>
