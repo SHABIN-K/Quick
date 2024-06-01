@@ -10,11 +10,11 @@ import { db } from "@/database";
 import UserBox from "./UserBox";
 import SearchBar from "./SearchBar";
 import useAuthStore from "@/store/useAuth";
-import GroupChatModal from "./modal/GroupChatModal";
 import { pusherClient } from "@/config/pusher";
 import ConversationBox from "./ConversationBox";
+import GroupChatModal from "./modal/GroupChatModal";
 import useConversation from "@/hooks/useConversation";
-import { FullConversationType, User } from "@/shared/types";
+import { FullConversationType, FullMessageType, User } from "@/shared/types";
 
 interface ConversationProps {
   title: string;
@@ -75,24 +75,36 @@ const ConversationList: React.FC<ConversationProps> = ({
       });
     };
 
-    const updateHandler = async (conversation: FullConversationType) => {
-      // Update conversation in IndexedDB
-      //await db.chats.update(conversation.id, {
-      //  messages: conversation.messages,
-      //});
+    const updateHandler = async (updateData: {
+      id: string;
+      messages: FullMessageType[];
+    }) => {
+      try {
+        // Retrieve the conversation from IndexedDB
+        const conversation = await db.chats.get(updateData.id);
 
-      setItems((current) =>
-        current?.map((currentConversation) => {
-          if (currentConversation.id === conversation.id) {
-            return {
-              ...currentConversation,
-              messages: conversation.messages,
-            };
-          }
+        // Update the messages field
+        if (conversation) {
+          conversation.messages = updateData.messages;
+          // Update conversation in IndexedDB
+          await db.chats.put(conversation);
+        }
 
-          return currentConversation;
-        })
-      );
+        // Update the state with the new messages
+        setItems((current) =>
+          current?.map((currentConversation) => {
+            if (currentConversation.id === updateData.id) {
+              return {
+                ...currentConversation,
+                messages: updateData.messages,
+              };
+            }
+            return currentConversation;
+          })
+        );
+      } catch (error) {
+        console.error("Failed to update conversation in IndexedDB:", error);
+      }
     };
 
     const removeHandler = async (conversation: FullConversationType) => {
@@ -186,7 +198,7 @@ const ConversationList: React.FC<ConversationProps> = ({
                       currentUser={session?.email as string}
                     />
                   ))
-                : users.map((user) => (
+                : users?.map((user) => (
                     <UserBox
                       key={user.id}
                       data={user}
