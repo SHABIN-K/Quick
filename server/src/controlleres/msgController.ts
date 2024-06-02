@@ -55,7 +55,7 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
   try {
     await pusherServer.trigger(conversationId, 'instant:message', {
       id: instant_id,
-      body: message,
+      message: message,
     });
 
     // create message for the current user

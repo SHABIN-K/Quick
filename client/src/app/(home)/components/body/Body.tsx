@@ -35,23 +35,29 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
     bottomRef?.current?.scrollIntoView();
 
     const messageHandler = (data: { id: string; message: FullMessageType }) => {
-      console.log(data.id);
       api.get(`/chats/${conversationId}/seen`);
+    
       setMessages((current) => {
-        // Find the instant message by its body and remove it
+        // Find and remove the instant message by its id
         const filteredMessages = current.filter(
-          (msg) => !(msg.isInstant && msg.body === data.message.body)
+          (msg) => !(msg.isInstant && msg.id === data.id)
         );
-
+    
         if (find(filteredMessages, { id: data.message.id })) {
           return filteredMessages;
         }
-
-        return [...filteredMessages, data.message];
+    
+        // Add the new message and sort by createdAt date
+        const updatedMessages = [...filteredMessages, data.message].sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+    
+        return updatedMessages;
       });
+    
 
-      bottomRef?.current?.scrollIntoView();
     };
+    
     const updateMessageHandler = (newMessage: FullMessageType) => {
       setMessages((current) =>
         current.map((currentMessage) => {
@@ -64,11 +70,10 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
       );
     };
 
-    const instantUpdate = (data: { id: string; body: string }) => {
-      console.log(data);
+    const instantUpdate = (data: { id: string; message: string }) => {
       const message: FullMessageType = {
         id: data.id,
-        body: data.body as string,
+        body: data.message,
         createdAt: new Date().toString(),
         isInstant: true,
         seenIds: [],
@@ -77,19 +82,21 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
           id: session?.id,
           name: session?.name,
           email: session?.email,
-          map: function (
-            arg0: (user: { id: any; name: any }) => { value: any; label: any }
-          ): Record<string, any>[] {
-            throw new Error("Function not implemented.");
-          },
           profile: session?.profile,
           createdAt: new Date().toString(),
         },
       };
-
-      setMessages((prevMessages) => [...prevMessages, message]);
+    
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages, message].sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        return updatedMessages;
+      });
+    
       bottomRef?.current?.scrollIntoView();
     };
+    
 
     pusherClient.bind("messages:new", messageHandler);
     pusherClient.bind("message:update", updateMessageHandler);
@@ -137,7 +144,7 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
         </>
       )}
 
-      <div ref={bottomRef} className="pt-24" />
+      <div ref={bottomRef} className="pt-20" />
     </div>
   );
 };
