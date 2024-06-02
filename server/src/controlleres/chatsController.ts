@@ -187,8 +187,7 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
     if (!lastMessage) {
       return res.status(200).json({
         success: true,
-        message: 'conversation founded',
-        data: conversation,
+        message: 'conversation not started yet',
       });
     }
 
@@ -209,7 +208,7 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
         },
       },
     });
-
+   
     await pusherServer.trigger(Id!, 'message:update', updatedMessage);
 
     await pusherServer.trigger(user?.email, 'conversation:update', {
@@ -222,14 +221,12 @@ export const getChatByParamsController = async (req: Request, res: Response, nex
       return res.status(200).json({
         success: true,
         message: 'conversation founded',
-        data: conversation,
       });
     }
 
     return res.status(200).json({
       success: true,
       message: 'updatedMessage',
-      data: updatedMessage,
     });
   } catch (error) {
     console.error('Error is getChatByParamsController:', error);

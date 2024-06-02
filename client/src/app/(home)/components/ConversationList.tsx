@@ -99,6 +99,14 @@ const ConversationList: React.FC<ConversationProps> = ({
       messages: FullMessageType[];
     }) => {
       try {
+        setItems((current) =>
+          current?.map((currentConversation) =>
+            currentConversation.id === updateData.id
+              ? { ...currentConversation, messages: updateData.messages }
+              : currentConversation
+          )
+        );
+
         let table = updateData.isGroup ? db.groupchat : db.chats;
         const conversation = await table.get(updateData.id);
         if (conversation) {
@@ -119,14 +127,6 @@ const ConversationList: React.FC<ConversationProps> = ({
           conversation.messages = mergedMessages;
           await table.put(conversation);
         }
-
-        setItems((current) =>
-          current?.map((currentConversation) =>
-            currentConversation.id === updateData.id
-              ? { ...currentConversation, messages: updateData.messages }
-              : currentConversation
-          )
-        );
       } catch (error) {
         console.error("Failed to update conversation in IndexedDB:", error);
       }

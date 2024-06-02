@@ -55,6 +55,13 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
   try {
     await pusherServer.trigger(conversationId, 'instant:message', {
       id: instant_id,
+      sender: {
+        id: user?.id,
+        name: user?.name,
+        email: user?.email,
+        profile: `https://avatar.iran.liara.run/public/?username=${user?.username}`,
+        createdAt: new Date().toISOString(),
+      },
       message: message,
     });
 
@@ -85,8 +92,7 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
       },
     });
 
-    await pusherServer.trigger(conversationId, 'messages:new', { id: instant_id, message: newMessage });
-
+    // update chat for the current user
     const updatedConversation = await db.conversation.update({
       where: {
         id: conversationId,
@@ -109,22 +115,26 @@ export const createMessagesControllerr = async (req: Request, res: Response, nex
       },
     });
 
-    const lastMsg = updatedConversation.messages[updatedConversation.messages.length - 1];
+    await pusherServer.trigger(conversationId, 'messages:new', {
+      id: instant_id,
+      chatId: conversationId,
+      isGroup: updatedConversation.isGroup,
+      message: newMessage,
+    });
 
-    updatedConversation.users.map((user) => {
+    updatedConversation.users.forEach((user) => {
       if (user?.email) {
         pusherServer.trigger(user.email, 'conversation:update', {
           id: conversationId,
           isGroup: updatedConversation.isGroup,
-          message: [lastMsg],
+          message: [newMessage],
         });
       }
     });
 
     return res.status(200).json({
       success: true,
-      message: 'message founded',
-      data: newMessage,
+      message: 'Message created successfully',
     });
   } catch (error) {
     console.error('Error is createMessageController:', error);

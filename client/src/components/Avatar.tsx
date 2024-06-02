@@ -23,7 +23,7 @@ const Avatar: React.FC<AvatarProps> = ({ user }) => {
         />
       </div>
       {isActive && (
-        <span className="absolute flex h-2 w-2 md:h-3 md:w-3 top-0 right-0 ring-2 ring-white">
+        <span className="absolute flex h-2 w-2 md:h-3 md:w-3 top-0 right-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 md:h-3 md:w-3 bg-green-500"></span>
         </span>

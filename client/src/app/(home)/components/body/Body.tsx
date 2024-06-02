@@ -8,9 +8,10 @@ import MessageBox from "./MessageBox";
 import GroupMsgBox from "./GroupMsgBox";
 import useAuthStore from "@/store/useAuth";
 import { pusherClient } from "@/config/pusher";
-import { FullMessageType } from "@/shared/types";
 import usePrivateApi from "@/hooks/usePrivateApi";
 import useConversation from "@/hooks/useConversation";
+import { FullMessageType, User } from "@/shared/types";
+import { db } from "@/database";
 
 interface BodyProps {
   initialMessages: FullMessageType[];
@@ -34,30 +35,51 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
     pusherClient.subscribe(conversationId);
     bottomRef?.current?.scrollIntoView();
 
-    const messageHandler = (data: { id: string; message: FullMessageType }) => {
+    const messageHandler = async (data: {
+      id: string;
+      chatId: string;
+      isGroup: boolean;
+      message: FullMessageType;
+    }) => {
       api.get(`/chats/${conversationId}/seen`);
-    
+
       setMessages((current) => {
         // Find and remove the instant message by its id
         const filteredMessages = current.filter(
           (msg) => !(msg.isInstant && msg.id === data.id)
         );
-    
+
         if (find(filteredMessages, { id: data.message.id })) {
           return filteredMessages;
         }
-    
-        // Add the new message and sort by createdAt date
+
         const updatedMessages = [...filteredMessages, data.message].sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
-    
+
         return updatedMessages;
       });
-    
 
+      try {
+        const table = data.isGroup ? db.groupchat : db.chats;
+        const conversation = await table.get(data.chatId);
+
+        if (conversation) {
+          const uniqueMessageIds = new Set(
+            conversation.messages.map((msg) => msg.id)
+          );
+
+          if (!uniqueMessageIds.has(data.message.id)) {
+            conversation.messages.push(data.message);
+            await table.put(conversation);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to update conversation in IndexedDB:", error);
+      }
     };
-    
+
     const updateMessageHandler = (newMessage: FullMessageType) => {
       setMessages((current) =>
         current.map((currentMessage) => {
@@ -70,33 +92,31 @@ const Body: React.FC<BodyProps> = ({ initialMessages, chatType }) => {
       );
     };
 
-    const instantUpdate = (data: { id: string; message: string }) => {
+    const instantUpdate = (data: {
+      id: string;
+      sender: User;
+      message: string;
+    }) => {
       const message: FullMessageType = {
         id: data.id,
         body: data.message,
-        createdAt: new Date().toString(),
+        createdAt: new Date().toISOString(),
         isInstant: true,
         seenIds: [],
         seen: [],
-        sender: {
-          id: session?.id,
-          name: session?.name,
-          email: session?.email,
-          profile: session?.profile,
-          createdAt: new Date().toString(),
-        },
+        sender: data.sender,
       };
-    
+
       setMessages((prevMessages) => {
         const updatedMessages = [...prevMessages, message].sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
         return updatedMessages;
       });
-    
+
       bottomRef?.current?.scrollIntoView();
     };
-    
 
     pusherClient.bind("messages:new", messageHandler);
     pusherClient.bind("message:update", updateMessageHandler);
