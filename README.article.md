@@ -29,3 +29,8 @@
 
 ## notifications
 - https://medium.com/@greennolgaa/push-notifications-in-javascript-the-comprehensive-guide-6757f2f8ea98
+
+## pwa 
+- https://medium.com/readytowork-org/implementing-pwa-in-the-next-13-application-3e46f6b3f6d8
+- https://dev.to/chrisachinga/into-pwa-creating-an-installable-nextjs-application-5b9c
+- https://ducanh-next-pwa.vercel.app/

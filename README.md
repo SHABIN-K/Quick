@@ -4,6 +4,7 @@
 
 ## Key Features ✨
 
+- **PWA**: Install as a Progressive Web App on your device.
 - **Instant Messaging**: Send and receive messages in real-time.
 - **One-on-One Chat**: Engage in private conversations with individual users.
 - **Group Chats**: Create or join group conversations with multiple users.
