@@ -26,3 +26,6 @@
 
 - https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 - https://pusher.com/docs/channels/getting_started/javascript
+
+## notifications
+- https://medium.com/@greennolgaa/push-notifications-in-javascript-the-comprehensive-guide-6757f2f8ea98

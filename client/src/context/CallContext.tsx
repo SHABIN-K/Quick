@@ -50,6 +50,11 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     if (session) {
       setPeerId(session.id || null);
     }
+
+    // Request notification permission
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
   }, [session]);
 
   const releaseMediaDevices = useCallback(() => {

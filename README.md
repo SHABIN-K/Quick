@@ -75,15 +75,16 @@ From your command line:
    APP_ACCESS_TOKEN_EXPIRY=7d
    APP_RESET_PASSWORD_TOKEN_SECRET=15m
    APP_RESET_PASSWORD_TOKEN_EXPIRY_MINS=15m
+   
+# for email config
+  APP_GMAIL_USERNAME='your_email_id'
+  APP_GMAIL_PASS="your_email_pass"
 
-# https://pusher.com/
+# https://pusher.com
   APP_PUSHER_ID=""
   APP_PUSHER_KEY=""
   APP_PUSHER_SECRET=""
   APP_PUSHER_CLUSTER="
-  #for email config
-  APP_GMAIL_USERNAME='your_email_id'
-  APP_GMAIL_PASS="your_email_pass"
 ```
 
  Navigate to the `client` folder and create a file: `.env`:
