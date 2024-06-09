@@ -28,6 +28,7 @@ const GroupId = ({ params }: { params: IParams }) => {
       try {
         const chatId = params.chatId;
         let chat = await db.groupchat.get(chatId);
+        api.get(`/chats/${chatId}/seen`);
         if (!chat) {
           const [resChat, resMsg] = await Promise.all([
             api.get(`/chats/get-chats/${chatId}`),
