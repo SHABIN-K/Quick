@@ -125,12 +125,9 @@ _For development purposes, you can start the client and server separately to ben
 _All key features have been thoroughly tested using Playwright to ensure reliability and performance. To run the tests, use:_
 
 ```bash
-# Navigate to the tests directory
-cd tests
-
-# Run Playwright tests
-npx playwright test
-
+   # Run Playwright tests
+   npx playwright test
+```
 
 ## Support 💬
 
