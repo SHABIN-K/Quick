@@ -26,6 +26,7 @@ const ConversationId = ({ params }: { params: IParams }) => {
       try {
         const chatId = params.chatId;
         let chat = await db.chats.get(chatId);
+        api.get(`/chats/${chatId}/seen`);
 
         if (!chat) {
           const [resChat, resMsg] = await Promise.all([
