@@ -1,44 +1,41 @@
-### NEW FUN STARTED !
+# Quick Chat Application 🚀
 
-Commit message types
+Quick is a simple and efficient chat application designed to facilitate fast and easy communication between users. Whether you want to chat one-on-one with friends or participate in group conversations, Quick has got you covered.
 
-- The MAJOR version should increment when you make incompatible API changes.
-- The MINOR version should increment when you add functionality in a backwards-compatible manner.
-- The PATCH version should increment when you make backwards-compatible bug fixes.
+## Key Features ✨
 
-This means that PATCHes are bug fixes and MINORs add new features but neither of them break what worked before. <br/> Finally, MAJORs add changes that won’t work with earlier versions.
+- **Instant Messaging**: Send and receive messages in real-time.
+- **One-on-One Chat**: Engage in private conversations with individual users.
+- **Group Chats**: Create or join group conversations with multiple users.
+- **User Authentication**: Secure login system using JWT authentication.
+- **Customizable Profiles**: Personalize your profile with avatars, statuses, and more.
+- **Notification System**: Receive alerts for new messages and updates.
+- **Lightweight and Fast**: Built for speed and efficiency, ensuring a smooth user experience.
+- **Video Call**: Initiate video calls with other users 📹.
+- **Audio Call**: Make voice calls to other users 📞.
+- **Responsive**: Provides a user-friendly experience on various devices.
 
-<hr/>
-<hr/>
+## Technologies Used 🛠️
 
-```````
-feat: (adds valuable new features or improvements that directly benefit and engage users.)
+- **MERN Stack**: MongoDB, Express.js, React.js, Node.js
+- **Prisma**: Modern database toolkit
+- **Dexie**: IndexedDB wrapper library for client-side storage
+- **Tailwind CSS**: Utility-first CSS framework
+- **Pusher**: Real-time communication API
+- **Nodemailer**: Email sending library
+- **PeerJS**: Peer-to-peer communication library
+- **WebRTC**: Real-time communication protocol
+- **Zustand**: Lightweight state management library
+- **Playwright**: Browser automation library
+- **Docker**: Containerization platform
 
-E.g. "feat(column): Added new feature.""
+## Support 💬
 
-fix: ( resolve user-related issues, improving the software's reliability and providing a smoother user experience.)
+Join Our [Telegram Group](https://www.telegram.dog/codexbotzsupport) for support and assistance, and our [Channel](https://www.telegram.dog/codexbotz) for updates. Report bugs and give feature requests there.
 
-E.g. "fix(case): Fixed case sensitivity issue in search functionality for accurate results."
+## Contribution 🤝
 
-docs: (making changes or updates to the documentation for better clarity and understanding.)
+We welcome contributions from the community! If you'd like to contribute to Quick Chat Application, please feel free to fork the repository, make your changes, and submit a pull request.
 
-E.g. "docs(readme): Updated README file with installation instructions and usage examples."
 
-style: ( focus on improving code appearance, such as formatting and fixing missing semicolons, without affecting functionality.)
-
-E.g. "style(format): Corrected indentation and added missing semicolons for consistent code style."
-
-refactor: (modifying the production code, such as renaming variables, to improve its structure and maintainability.)
-
-E.g. "refactor(variables): Renamed variables for improved code clarity and maintainability."
-
-test: (adding tests that were missing and improving existing tests, without changing the production code.)
-
-E.g. "test(login): Added tests for user login functionality and refactored existing login tests."
-
-chore: (updating build tasks and other non-production code aspects, without changing the actual software.)
-
-E.g. "chore(grunt): Updated Grunt tasks for better task automation and build process efficiency."``````
-
-```````
 
