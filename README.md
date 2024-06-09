@@ -1,6 +1,6 @@
 # Quick Chat Application 🚀
 
-Quick is a simple and efficient chat application designed to facilitate fast and easy communication between users. Whether you want to chat one-on-one with friends or participate in group conversations, Quick has got you covered.
+**Quick is a simple and efficient chat application designed to facilitate fast and easy communication between users. Whether you want to chat one-on-one with friends or participate in group conversations, Quick has got you covered.**
 
 ## Key Features ✨
 
@@ -15,6 +15,8 @@ Quick is a simple and efficient chat application designed to facilitate fast and
 - **Audio Call**: Make voice calls to other users 📞.
 - **Responsive**: Provides a user-friendly experience on various devices.
 - **Search Functionality**: Quickly find users and conversations 🔍.
+
+_All key features have been thoroughly tested using Playwright to ensure reliability and performance._
 
 ## Technologies Used 🛠️
 
@@ -55,42 +57,41 @@ From your command line:
  Navigate to the `server` folder and create a file: `.env`. Add the following contents:
 
 ```bash
-      APP_PORT='Your server port number'
-      APP_LOG_LEVEL='log level'
-      APP_NODE_ENV='prodcution | development mode'
-      APP_WEB_URL='your frontend url'
-      APP_SESSION_SECRET='secret_key'
-      APP_SALT_ROUNDS = 10
-      APP_LEVEL="development"
+   APP_PORT='Your server port number'
+   APP_LOG_LEVEL='log level'
+   APP_NODE_ENV='prodcution | development mode'
+   APP_WEB_URL='your frontend url'
+   APP_SESSION_SECRET='secret_key'
+   APP_SALT_ROUNDS = 10
+   APP_LEVEL="development"
   
-      #for database purposes
-      APP_DATABASE_URL='your_Mongodb_database_url'
+# for database purposes
+   APP_DATABASE_URL='your_Mongodb_database_url'
 
-      #for jwt token generation
-      APP_ACCESS_TOKEN_SECRET='your_access_token_secret'
-      APP_REFRESH_TOKEN_SECRET='your_access_token_secret'
-      APP_REFRESH_TOKEN_EXPIRY=30d
-      APP_ACCESS_TOKEN_EXPIRY=7d
-      APP_RESET_PASSWORD_TOKEN_SECRET=15m
-      APP_RESET_PASSWORD_TOKEN_EXPIRY_MINS=15m
+# for jwt token generation
+   APP_ACCESS_TOKEN_SECRET='your_access_token_secret'
+   APP_REFRESH_TOKEN_SECRET='your_access_token_secret'
+   APP_REFRESH_TOKEN_EXPIRY=30d
+   APP_ACCESS_TOKEN_EXPIRY=7d
+   APP_RESET_PASSWORD_TOKEN_SECRET=15m
+   APP_RESET_PASSWORD_TOKEN_EXPIRY_MINS=15m
 
-      #https://pusher.com/
-      APP_PUSHER_ID=""
-      APP_PUSHER_KEY=""
-      APP_PUSHER_SECRET=""
-      APP_PUSHER_CLUSTER=""
-
-      #for email config
-      APP_GMAIL_USERNAME='your_email_id'
-      APP_GMAIL_PASS="your_email_pass"
+# https://pusher.com/
+  APP_PUSHER_ID=""
+  APP_PUSHER_KEY=""
+  APP_PUSHER_SECRET=""
+  APP_PUSHER_CLUSTER="
+  #for email config
+  APP_GMAIL_USERNAME='your_email_id'
+  APP_GMAIL_PASS="your_email_pass"
 ```
 
  Navigate to the `client` folder and create a file: `.env`:
 
-```
-      #https://pusher.com/
-      NEXT_PUBLIC_PUSHER_APP_KEY=''
-      NEXT_PUBLIC_BACKEND_URL='your backend url'
+```bash
+# https://pusher.com/
+  NEXT_PUBLIC_PUSHER_APP_KEY=''
+  NEXT_PUBLIC_BACKEND_URL='your backend url'
 ```
 ### Running the Application 🛫
 
@@ -100,6 +101,34 @@ From your command line:
 ```bash
    docker-compose up --build
 ```
+
+### Development Workflow 🛠️
+
+_For development purposes, you can start the client and server separately to benefit from hot reloading:_
+
+1. Navigate to the `client` directory and run:
+
+```bash
+   npm install
+   npm run dev
+```
+2. Open a new terminal, navigate to the server directory, and run:
+
+```bash
+   npm install
+   npm run dev
+```
+
+### Testing 🧪
+
+_All key features have been thoroughly tested using Playwright to ensure reliability and performance. To run the tests, use:_
+
+```bash
+# Navigate to the tests directory
+cd tests
+
+# Run Playwright tests
+npx playwright test
 
 
 ## Support 💬
