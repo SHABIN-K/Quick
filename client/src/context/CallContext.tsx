@@ -10,8 +10,11 @@ import React, {
 } from "react";
 import Peer, { MediaConnection } from "peerjs";
 
+import { db } from "@/database";
 import useAuthStore from "@/store/useAuth";
 import useOpenStore from "@/store/useOpen";
+import { FullConversationType } from "@/shared/types";
+import VideoCall from "@/app/(home)/components/modal/VideoCall";
 
 interface CallContextType {
   peer: Peer | null;
@@ -36,6 +39,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   const { setIsVideoCall } = useOpenStore();
 
   const [peer, setPeer] = useState<Peer | null>(null);
+  const [caller, setCaller] = useState<FullConversationType>();
   const [peerId, setPeerId] = useState<string | null>(null);
   const [incommingCall, setIncommingCall] = useState<boolean>(false);
   const [currentCall, setCurrentCall] = useState<MediaConnection | null>(null);
@@ -55,7 +59,30 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
     if (Notification.permission !== "granted") {
       Notification.requestPermission();
     }
-  }, [session]);
+
+    const findcaller = async () => {
+      if (currentCall?.peer && peerId) {
+        const sessionId = session.id;
+
+        try {
+          const chat = await db.chats
+            .filter(
+              (chat) =>
+                chat.userIds.includes(currentCall.peer) &&
+                chat.userIds.includes(sessionId)
+            )
+            .first();
+
+          setCaller(chat);
+        } catch (error) {
+          console.error("Error finding chat:", error);
+        }
+      }
+    };
+
+    findcaller();
+  }, [currentCall?.peer, peerId, session]);
+
 
   const releaseMediaDevices = useCallback(() => {
     if (mediaStreamRef.current) {
@@ -154,6 +181,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <CallContext.Provider value={contextValue}>
       {children}
+
+      {caller && <VideoCall data={caller} />}
       <audio ref={ringtoneRef} src="/audio/ringtone.mp3" loop />
     </CallContext.Provider>
   );

@@ -41,8 +41,6 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
       ? global_users[0].filter((user) => !groupUserIds.includes(user.id))
       : [];
 
-    console.log("Unique Users:", uniqueUsers);
-
     setUsers(uniqueUsers);
   }, [global_users, group_users]);
 
