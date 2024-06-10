@@ -87,6 +87,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
         isLoading={isLoading}
       />
       <AddMemberModal
+        users={data.users}
         isOpen={addMember}
         onClose={() => setAddMember(false)}
         groupId={data.id}

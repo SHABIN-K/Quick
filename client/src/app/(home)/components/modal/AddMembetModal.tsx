@@ -1,8 +1,9 @@
-import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
+import { User } from "@/shared/types";
 import Modal from "@/components/Modal";
 import useUsersStore from "@/store/useUsers";
 import { Button, Select } from "@/components";
@@ -12,17 +13,38 @@ interface AddMemberModalProps {
   isOpen?: boolean;
   onClose: () => void;
   groupId: string;
+  users: User[];
 }
 
 const AddMemberModal: React.FC<AddMemberModalProps> = ({
   isOpen,
   onClose,
   groupId: chatId,
+  users: group_users,
 }) => {
   const router = useRouter();
   const api = usePrivateApi();
-  const { users } = useUsersStore();
+  const { users: global_users } = useUsersStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    // Extract IDs from global_users and group_users
+    const globalUserIds = Array.isArray(global_users[0])
+      ? global_users[0].map((user) => user?.id)
+      : [];
+
+    const groupUserIds = group_users.map((user) => user.id);
+
+    // Filter global_users to include only users whose IDs are not in groupUserIds
+    const uniqueUsers = Array.isArray(global_users[0])
+      ? global_users[0].filter((user) => !groupUserIds.includes(user.id))
+      : [];
+
+    console.log("Unique Users:", uniqueUsers);
+
+    setUsers(uniqueUsers);
+  }, [global_users, group_users]);
 
   const { handleSubmit, setValue, watch } = useForm<FieldValues>({
     defaultValues: {
@@ -60,7 +82,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
               <Select
                 disabled={isLoading}
                 label="Members"
-                options={users[0]?.map((user: { id: any; name: any }) => ({
+                options={users?.map((user) => ({
                   value: user.id,
                   label: user.name,
                 }))}
