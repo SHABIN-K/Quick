@@ -52,7 +52,15 @@ const ConversationList: React.FC<ConversationProps> = ({
 
   useEffect(() => {
     setUsers(userData || []);
-    setItems(feed);
+
+    if (feed) {
+      const sortedFeed = [...feed].sort((a, b) => {
+        const dateA = new Date(a.lastMessageAt).getTime();
+        const dateB = new Date(b.lastMessageAt).getTime();
+        return dateB - dateA; 
+      });
+      setItems(sortedFeed);
+    }
   }, [feed, userData]);
 
   /**
