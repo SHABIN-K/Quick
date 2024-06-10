@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
+import { db } from "@/database";
 import { Button, Input } from "@/components";
 import { signInApi, signUpApi } from "@/api/Auth";
 import { useSession } from "@/context/AuthContext";
@@ -23,6 +24,13 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState<ErrorObject>({});
   const [variant, setVariant] = useState<Variant>("LOGIN");
+
+  const clearSiteData = async () => {
+    Cookies.remove("-secure-node-authToken");
+    localStorage.clear();
+    await db.delete();
+    await db.open();
+  };
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -60,7 +68,7 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success("Welcome to Quick! Your account is ready to use");
-          Cookies.remove("-secure-node-authToken");
+          await clearSiteData();
           Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
             expires: 7,
           });
@@ -86,7 +94,7 @@ const AuthForm = () => {
 
         if (res?.data?.success) {
           toast.success(`Great to see you again, ${res?.data?.data?.name}!`);
-          Cookies.remove("-secure-node-authToken");
+          await clearSiteData();
           Cookies.set("-secure-node-authToken", res?.data?.data?.confirmToken, {
             expires: 7,
           });

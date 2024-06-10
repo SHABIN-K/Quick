@@ -44,11 +44,17 @@ const signupValidation = async (req: Request, res: Response, next: NextFunction)
     ]);
 
     if (existingUser) {
-      validationErrors['email'] = ['Email already registered'];
+      return res.status(400).json({
+        success: false,
+        message: { email: ['Email already registered'] },
+      });
     }
 
     if (existingUsername) {
-      validationErrors['username'] = ['Username already registered'];
+      return res.status(400).json({
+        success: false,
+        message: { username: ['Username already registered'] },
+      });
     }
 
     // Validate input fields
